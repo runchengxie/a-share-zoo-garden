@@ -1,5 +1,5 @@
 {
-  "date": "20260904",
+  "date": "20260907",
   "strict": [
     {
       "ts_code": "600123.SH",
@@ -70,6 +70,12 @@
       "forced": false
     },
     {
+      "ts_code": "002474.SZ",
+      "name": "榕基软件",
+      "keyword": "榕",
+      "forced": false
+    },
+    {
       "ts_code": "002577.SZ",
       "name": "雷柏科技",
       "keyword": "雷柏",
@@ -85,6 +91,12 @@
       "ts_code": "300111.SZ",
       "name": "向日葵",
       "keyword": "向日葵",
+      "forced": false
+    },
+    {
+      "ts_code": "300511.SZ",
+      "name": "雪榕生物",
+      "keyword": "榕",
       "forced": false
     },
     {
@@ -139,6 +151,12 @@
       "ts_code": "601003.SH",
       "name": "柳钢股份",
       "keyword": "柳钢",
+      "forced": false
+    },
+    {
+      "ts_code": "601233.SH",
+      "name": "桐昆股份",
+      "keyword": "桐",
       "forced": false
     },
     {

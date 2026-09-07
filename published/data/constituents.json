@@ -1,10 +1,16 @@
 {
-  "date": "20260904",
+  "date": "20260907",
   "strict": [
     {
       "ts_code": "000572.SZ",
       "name": "海马汽车",
       "keyword": "海马",
+      "forced": false
+    },
+    {
+      "ts_code": "002081.SZ",
+      "name": "金螳螂",
+      "keyword": "螳螂",
       "forced": false
     },
     {
@@ -44,6 +50,12 @@
       "forced": false
     },
     {
+      "ts_code": "601311.SH",
+      "name": "骆驼股份",
+      "keyword": "骆驼",
+      "forced": false
+    },
+    {
       "ts_code": "603029.SH",
       "name": "天鹅股份",
       "keyword": "天鹅",
@@ -73,6 +85,12 @@
       "ts_code": "000050.SZ",
       "name": "深天马A",
       "keyword": "马",
+      "forced": false
+    },
+    {
+      "ts_code": "000520.SZ",
+      "name": "凤凰航运",
+      "keyword": "凤凰",
       "forced": false
     },
     {
@@ -181,6 +199,18 @@
       "ts_code": "002068.SZ",
       "name": "黑猫股份",
       "keyword": "猫",
+      "forced": false
+    },
+    {
+      "ts_code": "002069.SZ",
+      "name": "獐子岛",
+      "keyword": "獐",
+      "forced": false
+    },
+    {
+      "ts_code": "002081.SZ",
+      "name": "金螳螂",
+      "keyword": "螳螂",
       "forced": false
     },
     {
@@ -343,6 +373,12 @@
       "ts_code": "002960.SZ",
       "name": "青鸟智控",
       "keyword": "鸟",
+      "forced": false
+    },
+    {
+      "ts_code": "002984.SZ",
+      "name": "森麒麟",
+      "keyword": "麒麟",
       "forced": false
     },
     {
@@ -610,6 +646,12 @@
       "forced": false
     },
     {
+      "ts_code": "600071.SH",
+      "name": "凤凰光学",
+      "keyword": "凤凰",
+      "forced": false
+    },
+    {
       "ts_code": "600125.SH",
       "name": "铁龙物流",
       "keyword": "龙",
@@ -688,9 +730,21 @@
       "forced": false
     },
     {
+      "ts_code": "600679.SH",
+      "name": "上海凤凰",
+      "keyword": "凤凰",
+      "forced": false
+    },
+    {
       "ts_code": "600686.SH",
       "name": "金龙汽车",
       "keyword": "龙",
+      "forced": false
+    },
+    {
+      "ts_code": "600716.SH",
+      "name": "凤凰股份",
+      "keyword": "凤凰",
       "forced": false
     },
     {
@@ -726,7 +780,7 @@
     {
       "ts_code": "600993.SH",
       "name": "马应龙",
-      "keyword": "马",
+      "keyword": "龙",
       "forced": false
     },
     {
@@ -742,9 +796,21 @@
       "forced": false
     },
     {
+      "ts_code": "601311.SH",
+      "name": "骆驼股份",
+      "keyword": "骆驼",
+      "forced": false
+    },
+    {
       "ts_code": "601828.SH",
       "name": "美凯龙",
       "keyword": "龙",
+      "forced": false
+    },
+    {
+      "ts_code": "601928.SH",
+      "name": "凤凰传媒",
+      "keyword": "凤凰",
       "forced": false
     },
     {
@@ -856,6 +922,12 @@
       "forced": false
     },
     {
+      "ts_code": "603586.SH",
+      "name": "金麒麟",
+      "keyword": "麒麟",
+      "forced": false
+    },
+    {
       "ts_code": "603668.SH",
       "name": "天马科技",
       "keyword": "马",
@@ -864,7 +936,7 @@
     {
       "ts_code": "603686.SH",
       "name": "福龙马",
-      "keyword": "马",
+      "keyword": "龙",
       "forced": false
     },
     {
@@ -967,6 +1039,12 @@
       "ts_code": "688078.SH",
       "name": "龙软科技",
       "keyword": "龙",
+      "forced": false
+    },
+    {
+      "ts_code": "688152.SH",
+      "name": "麒麟信安",
+      "keyword": "麒麟",
       "forced": false
     },
     {
