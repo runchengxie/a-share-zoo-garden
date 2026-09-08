@@ -461,6 +461,13 @@ h2 {
   background: color-mix(in srgb, var(--surface) 78%, transparent);
 }
 
+.zoo-chart-loading {
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  font-size: 12px;
+}
+
 .home-research-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.45fr) minmax(280px, 0.7fr);

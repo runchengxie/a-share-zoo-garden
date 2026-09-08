@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Changes,
@@ -13,7 +13,8 @@ import {
 } from "../api";
 import ChangesList from "../components/ChangesList";
 import NavCards from "../components/NavCards";
-import ZooChart from "../components/ZooChart";
+
+const ZooChart = lazy(() => import("../components/ZooChart"));
 
 type ThemeData = { latest: Latest; history: NavPoint[]; changes: Changes; constituents: Constituents };
 type State =
@@ -50,7 +51,9 @@ function ThemeDashboard({ theme, data }: { theme: IndexTheme; data: ThemeData })
 
       <section className="research-section" aria-labelledby={`${theme}-performance-heading`}>
         <div className="section-heading"><div><div className="section-kicker">表现 / 标准化净值</div><h3 id={`${theme}-performance-heading`}>净值与基准</h3><p className="section-deck">比较严格{themeLabel}、扩展{themeLabel}和基准。缩放区间只改变视图，不改变指数口径。</p></div></div>
-        <ZooChart history={data.history} benchmarkLabel={data.latest.benchmark_label} themeLabel={themeLabel} />
+        <Suspense fallback={<div className="zoo-chart zoo-chart-loading" role="status">加载图表…</div>}>
+          <ZooChart history={data.history} benchmarkLabel={data.latest.benchmark_label} themeLabel={themeLabel} />
+        </Suspense>
       </section>
 
       <div className="home-research-grid">
