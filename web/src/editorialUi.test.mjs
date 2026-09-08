@@ -6,6 +6,7 @@ const app = readFileSync(new URL("./App.tsx", import.meta.url), "utf8");
 const theme = readFileSync(new URL("./theme.ts", import.meta.url), "utf8");
 const themeToggle = readFileSync(new URL("./components/ThemeToggle.tsx", import.meta.url), "utf8");
 const home = readFileSync(new URL("./pages/Home.tsx", import.meta.url), "utf8");
+const historyPage = readFileSync(new URL("./pages/History.tsx", import.meta.url), "utf8");
 const styles = readFileSync(new URL("./styles.css", import.meta.url), "utf8");
 const chart = readFileSync(new URL("./components/ZooChart.tsx", import.meta.url), "utf8");
 const constituentsTable = readFileSync(new URL("./components/ConstituentsTable.tsx", import.meta.url), "utf8");
@@ -39,6 +40,18 @@ test("home page leads with a research question and index snapshot", () => {
   assert.match(home, /id=\{`\$\{theme\}-panel`\}/);
   assert.match(home, /research-section/);
   assert.match(home, /植物园/);
+});
+
+test("home page lazy-loads the chart without changing its data contract", () => {
+  assert.match(home, /lazy/);
+  assert.match(home, /Suspense/);
+  assert.match(home, /加载图表/);
+});
+
+test("history page shares the lazy chart boundary", () => {
+  assert.match(historyPage, /lazy/);
+  assert.match(historyPage, /Suspense/);
+  assert.doesNotMatch(historyPage, /import ZooChart from/);
 });
 
 test("theme data is loaded from an independent plant snapshot", () => {
