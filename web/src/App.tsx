@@ -7,6 +7,7 @@ import Constituents from "./pages/Constituents";
 import History from "./pages/History";
 import Home from "./pages/Home";
 import Methodology from "./pages/Methodology";
+import ThemeToggle from "./components/ThemeToggle";
 
 export default function App() {
   const [updated, setUpdated] = useState<string>("");
@@ -39,6 +40,7 @@ export default function App() {
           <NavLink to="/history">历史</NavLink>
           <NavLink to="/changes">调仓</NavLink>
           <NavLink to="/about">关于</NavLink>
+          <ThemeToggle />
         </nav>
       </header>
       <main className="site-main">

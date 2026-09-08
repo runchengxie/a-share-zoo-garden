@@ -3,6 +3,8 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const app = readFileSync(new URL("./App.tsx", import.meta.url), "utf8");
+const theme = readFileSync(new URL("./theme.ts", import.meta.url), "utf8");
+const themeToggle = readFileSync(new URL("./components/ThemeToggle.tsx", import.meta.url), "utf8");
 const home = readFileSync(new URL("./pages/Home.tsx", import.meta.url), "utf8");
 const styles = readFileSync(new URL("./styles.css", import.meta.url), "utf8");
 const chart = readFileSync(new URL("./components/ZooChart.tsx", import.meta.url), "utf8");
@@ -17,7 +19,14 @@ test("site shell exposes an editorial masthead and research navigation", () => {
   assert.match(app, /A 股动物园与植物园/);
   assert.match(app, /site-deck/);
   assert.match(app, /site-nav/);
-  assert.doesNotMatch(app, /theme-link/);
+  assert.match(app, /ThemeToggle/);
+  assert.match(themeToggle, /theme-toggle/);
+});
+
+test("theme state is presentation-only and persists the user preference", () => {
+  assert.match(theme, /localStorage/);
+  assert.match(theme, /dataset\.theme/);
+  assert.match(theme, /themechange/);
 });
 
 test("home page leads with a research question and index snapshot", () => {
@@ -41,7 +50,9 @@ test("editorial stylesheet uses paper, rules, tabular numerals and mobile safegu
   assert.match(styles, /--paper:/);
   assert.match(styles, /--rule:/);
   assert.match(styles, /font-variant-numeric:\s*tabular-nums/);
-  assert.match(styles, /background-image:/);
+  assert.match(styles, /--accent:/);
+  assert.match(styles, /\[data-theme="dark"\]/);
+  assert.doesNotMatch(styles, /background-image:\s*\n\s*linear-gradient/);
   assert.match(styles, /\.metric-strip/);
   assert.match(styles, /@media\s*\(max-width:\s*640px\)/);
   assert.match(styles, /overflow-x:\s*auto/);
@@ -50,9 +61,10 @@ test("editorial stylesheet uses paper, rules, tabular numerals and mobile safegu
 test("NAV chart follows the low-noise research palette", () => {
   assert.match(chart, /axisPointer/);
   assert.match(chart, /splitLine/);
-  assert.match(chart, /#1267d6/);
-  assert.match(chart, /#b96800/);
-  assert.match(chart, /#68717d/);
+  assert.match(chart, /getComputedStyle/);
+  assert.match(chart, /--chart-strict/);
+  assert.match(chart, /--chart-extended/);
+  assert.match(chart, /--chart-benchmark/);
 });
 
 test("constituent groups can be collapsed", () => {

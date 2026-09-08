@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as echarts from "echarts";
 import { NavPoint } from "../api";
 
@@ -8,14 +8,20 @@ interface Props {
   themeLabel?: string;
 }
 
-const STRICT_COLOR = "#1267d6";
-const EXTENDED_COLOR = "#b96800";
-const BENCHMARK_COLOR = "#68717d";
-const RULE_COLOR = "#d9ddd9";
-const MUTED_COLOR = "#7a828c";
+function getThemeColor(name: string, fallback: string): string {
+  if (typeof window === "undefined") return fallback;
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
+}
 
 export default function ZooChart({ history, benchmarkLabel, themeLabel = "动物园" }: Props) {
   const ref = useRef<HTMLDivElement>(null);
+  const [themeVersion, setThemeVersion] = useState(0);
+
+  useEffect(() => {
+    const handleThemeChange = () => setThemeVersion((version) => version + 1);
+    window.addEventListener("themechange", handleThemeChange);
+    return () => window.removeEventListener("themechange", handleThemeChange);
+  }, []);
 
   useEffect(() => {
     if (!ref.current) return;
@@ -24,20 +30,26 @@ export default function ZooChart({ history, benchmarkLabel, themeLabel = "动物
     const strict = history.map((point) => point.zoo_strict_nav);
     const extended = history.map((point) => point.zoo_extended_nav);
     const benchmark = history.map((point) => point.benchmark_nav);
+    const strictColor = getThemeColor("--chart-strict", "#76513b");
+    const extendedColor = getThemeColor("--chart-extended", "#a77a58");
+    const benchmarkColor = getThemeColor("--chart-benchmark", "#77766f");
+    const ruleColor = getThemeColor("--rule", "#d9d7d0");
+    const mutedColor = getThemeColor("--muted", "#6e7069");
+    const chartSurface = getThemeColor("--chart-surface", "#efede7");
 
     chart.setOption({
       animationDuration: 280,
       backgroundColor: "transparent",
-      color: [STRICT_COLOR, EXTENDED_COLOR, BENCHMARK_COLOR],
+      color: [strictColor, extendedColor, benchmarkColor],
       tooltip: {
         trigger: "axis",
         backgroundColor: "#232a33",
         borderWidth: 0,
         padding: [10, 12],
-        textStyle: { color: "#f8f7f2", fontSize: 12 },
+        textStyle: { color: getThemeColor("--tooltip-text", "#f8f7f2"), fontSize: 12 },
         axisPointer: {
           type: "line",
-          lineStyle: { color: "#9aa1a8", type: "dashed", width: 1 },
+          lineStyle: { color: mutedColor, type: "dashed", width: 1 },
         },
       },
       legend: {
@@ -46,17 +58,17 @@ export default function ZooChart({ history, benchmarkLabel, themeLabel = "动物
         left: 0,
         itemWidth: 18,
         itemHeight: 2,
-        textStyle: { color: MUTED_COLOR, fontSize: 11 },
+        textStyle: { color: mutedColor, fontSize: 11 },
       },
       grid: { left: 52, right: 24, top: 44, bottom: 58 },
       xAxis: {
         type: "category",
         boundaryGap: false,
         data: dates,
-        axisLine: { lineStyle: { color: RULE_COLOR } },
+        axisLine: { lineStyle: { color: ruleColor } },
         axisTick: { show: false },
         axisLabel: {
-          color: MUTED_COLOR,
+          color: mutedColor,
           fontSize: 10,
           hideOverlap: true,
           formatter: (value: string) => value.slice(0, 7),
@@ -67,8 +79,8 @@ export default function ZooChart({ history, benchmarkLabel, themeLabel = "动物
         scale: true,
         axisLine: { show: false },
         axisTick: { show: false },
-        axisLabel: { color: MUTED_COLOR, fontSize: 10 },
-        splitLine: { lineStyle: { color: "#e5e6e2", width: 1 } },
+        axisLabel: { color: mutedColor, fontSize: 10 },
+        splitLine: { lineStyle: { color: ruleColor, width: 1 } },
       },
       dataZoom: [
         { type: "inside", filterMode: "none" },
@@ -77,12 +89,12 @@ export default function ZooChart({ history, benchmarkLabel, themeLabel = "动物
           height: 14,
           bottom: 12,
           borderColor: "transparent",
-          backgroundColor: "#eeede8",
-          fillerColor: "rgba(18, 103, 214, 0.12)",
+          backgroundColor: chartSurface,
+          fillerColor: getThemeColor("--chart-filler", "rgba(118, 81, 59, 0.14)"),
           handleSize: "90%",
           showDetail: false,
           moveHandleSize: 4,
-          textStyle: { color: MUTED_COLOR },
+          textStyle: { color: mutedColor },
         },
       ],
       series: [
@@ -92,7 +104,7 @@ export default function ZooChart({ history, benchmarkLabel, themeLabel = "动物
           data: strict,
           showSymbol: false,
           connectNulls: false,
-          lineStyle: { width: 2.2, color: STRICT_COLOR },
+          lineStyle: { width: 2.2, color: strictColor },
           emphasis: { focus: "series" },
         },
         {
@@ -101,7 +113,7 @@ export default function ZooChart({ history, benchmarkLabel, themeLabel = "动物
           data: extended,
           showSymbol: false,
           connectNulls: false,
-          lineStyle: { width: 2, color: EXTENDED_COLOR },
+          lineStyle: { width: 2, color: extendedColor },
           emphasis: { focus: "series" },
         },
         {
@@ -110,7 +122,7 @@ export default function ZooChart({ history, benchmarkLabel, themeLabel = "动物
           data: benchmark,
           showSymbol: false,
           connectNulls: false,
-          lineStyle: { width: 1.5, color: BENCHMARK_COLOR, type: "dashed" },
+          lineStyle: { width: 1.5, color: benchmarkColor, type: "dashed" },
           emphasis: { focus: "series" },
         },
       ],
@@ -122,7 +134,7 @@ export default function ZooChart({ history, benchmarkLabel, themeLabel = "动物
       window.removeEventListener("resize", onResize);
       chart.dispose();
     };
-  }, [history, benchmarkLabel]);
+  }, [history, benchmarkLabel, themeVersion]);
 
   return <div ref={ref} className="zoo-chart" role="img" aria-label={`${themeLabel}指数净值走势图`} />;
 }
