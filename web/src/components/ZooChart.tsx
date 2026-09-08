@@ -48,8 +48,8 @@ export default function ZooChart({ history, benchmarkLabel, themeLabel = "动物
     const extended = history.map((point) => point.zoo_extended_nav);
     const benchmark = history.map((point) => point.benchmark_nav);
     const strictColor = getThemeColor("--chart-strict", "#76513b");
-    const extendedColor = getThemeColor("--chart-extended", "#a77a58");
-    const benchmarkColor = getThemeColor("--chart-benchmark", "#77766f");
+    const extendedColor = getThemeColor("--chart-extended", "#4f7772");
+    const benchmarkColor = getThemeColor("--chart-benchmark", "#85857c");
     const ruleColor = getThemeColor("--rule", "#d9d7d0");
     const mutedColor = getThemeColor("--muted", "#6e7069");
     const chartSurface = getThemeColor("--chart-surface", "#efede7");
@@ -121,7 +121,7 @@ export default function ZooChart({ history, benchmarkLabel, themeLabel = "动物
           data: strict,
           showSymbol: false,
           connectNulls: false,
-          lineStyle: { width: 2.2, color: strictColor },
+          lineStyle: { width: 2.4, color: strictColor },
           emphasis: { focus: "series" },
         },
         {
@@ -139,7 +139,7 @@ export default function ZooChart({ history, benchmarkLabel, themeLabel = "动物
           data: benchmark,
           showSymbol: false,
           connectNulls: false,
-          lineStyle: { width: 1.5, color: benchmarkColor, type: "dashed" },
+          lineStyle: { width: 1.25, color: benchmarkColor, type: "dashed" },
           emphasis: { focus: "series" },
         },
       ],

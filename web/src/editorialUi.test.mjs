@@ -78,6 +78,11 @@ test("NAV chart follows the low-noise research palette", () => {
   assert.match(chart, /--chart-strict/);
   assert.match(chart, /--chart-extended/);
   assert.match(chart, /--chart-benchmark/);
+  assert.match(styles, /--chart-strict:\s*#76513b/);
+  assert.match(styles, /--chart-extended:\s*#4f7772/);
+  assert.match(styles, /--chart-benchmark:\s*#85857c/);
+  assert.match(styles, /--chart-extended:\s*#8fb8ae/);
+  assert.match(chart, /width: 2\.4/);
 });
 
 test("NAV chart imports only the ECharts modules it uses", () => {
