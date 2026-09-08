@@ -67,6 +67,14 @@ test("NAV chart follows the low-noise research palette", () => {
   assert.match(chart, /--chart-benchmark/);
 });
 
+test("NAV chart imports only the ECharts modules it uses", () => {
+  assert.match(chart, /from "echarts\/core"/);
+  assert.match(chart, /LineChart/);
+  assert.match(chart, /DataZoomComponent/);
+  assert.match(chart, /CanvasRenderer/);
+  assert.doesNotMatch(chart, /import \* as echarts from "echarts"/);
+});
+
 test("constituent groups can be collapsed", () => {
   assert.match(constituentsTable, /<details/);
   assert.match(constituentsTable, /<summary/);
