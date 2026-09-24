@@ -24,6 +24,7 @@ class VariantState:
     constituents: pd.DataFrame
     reason: str
     susp_days: dict[str, int] = field(default_factory=dict)
+    last_marks: dict[str, tuple[float, float]] = field(default_factory=dict)
 
 
 @dataclass
@@ -169,6 +170,7 @@ def compute_equal_weight_return(
     prev_adj_factors: pd.DataFrame | None = None,
     suspended: set[str] | None = None,
     weights: dict[str, float] | None = None,
+    last_marks: dict[str, tuple[float, float]] | None = None,
 ) -> tuple[float, pd.DataFrame, IndexStats]:
     if constituents.empty:
         return 0.0, constituents, IndexStats(0, 0, 0)
@@ -182,6 +184,11 @@ def compute_equal_weight_return(
         on="ts_code",
         how="left",
     )
+    if last_marks:
+        marked_close = merged["ts_code"].map(
+            lambda code: last_marks.get(code, (float("nan"), float("nan")))[0]
+        )
+        merged["prev_close_actual"] = marked_close.fillna(merged["prev_close_actual"])
 
     if adj_factors is not None and prev_adj_factors is not None:
         merged = merged.merge(
@@ -193,6 +200,11 @@ def compute_equal_weight_return(
             columns={"adj_factor": "prev_adj_factor"}
         )
         merged = merged.merge(prev_factors, on="ts_code", how="left")
+        if last_marks:
+            marked_factor = merged["ts_code"].map(
+                lambda code: last_marks.get(code, (float("nan"), float("nan")))[1]
+            )
+            merged["prev_adj_factor"] = marked_factor.fillna(merged["prev_adj_factor"])
         merged["adj_factor"] = pd.to_numeric(merged["adj_factor"], errors="coerce")
         merged["prev_adj_factor"] = pd.to_numeric(merged["prev_adj_factor"], errors="coerce")
         merged.loc[merged["adj_factor"] <= 0, "adj_factor"] = pd.NA
@@ -214,6 +226,12 @@ def compute_equal_weight_return(
         merged.loc[suspended_mask, "close"] = merged.loc[suspended_mask, "prev_close_actual"]
         merged.loc[suspended_mask, "pre_close"] = merged.loc[suspended_mask, "prev_close_actual"]
 
+    merged["mark_close"] = merged["close"].where(~no_price, merged["prev_close_actual"])
+    if adj_factors is not None and prev_adj_factors is not None:
+        merged["mark_adj_factor"] = merged["adj_factor"].where(~no_price, merged["prev_adj_factor"])
+    else:
+        merged["mark_adj_factor"] = 1.0
+
     # 真实缺失：无行情且非停牌，warning 后排除出收益计算，但权重保留（不静默再分配）。
     genuine_missing = no_price & ~merged["ts_code"].isin(suspended)
     if genuine_missing.any():
@@ -231,7 +249,18 @@ def compute_equal_weight_return(
         merged["contrib"] = merged["weight"] * merged["ret"].fillna(0.0)
         index_return = float(merged["contrib"].sum())
         holdings = merged[
-            ["ts_code", "name", "keyword", "forced", "weight", "ret", "close", "pre_close"]
+            [
+                "ts_code",
+                "name",
+                "keyword",
+                "forced",
+                "weight",
+                "ret",
+                "close",
+                "pre_close",
+                "mark_close",
+                "mark_adj_factor",
+            ]
         ].copy()
         # 缺失成分保留权重，收益记为 0。
         holdings["ret"] = holdings["ret"].fillna(0.0)
@@ -248,6 +277,17 @@ def compute_equal_weight_return(
     index_return = float(valid["ret"].mean())
 
     holdings = valid[
-        ["ts_code", "name", "keyword", "forced", "weight", "ret", "close", "pre_close"]
+        [
+            "ts_code",
+            "name",
+            "keyword",
+            "forced",
+            "weight",
+            "ret",
+            "close",
+            "pre_close",
+            "mark_close",
+            "mark_adj_factor",
+        ]
     ].copy()
     return index_return, holdings, IndexStats(total, priced, missing)

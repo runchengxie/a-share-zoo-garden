@@ -51,6 +51,7 @@ class Rules:
     theme: str = "animal"
     keyword_rules: tuple[KeywordRule, ...] = ()
     overrides: tuple[OverrideRule, ...] = ()
+    effective_from: str | None = None
 
 
 @dataclass(frozen=True)
@@ -229,6 +230,7 @@ def _rules_from_dict(data: object, *, default_theme: str = "animal") -> Rules:
         theme=theme,
         keyword_rules=keyword_rules,
         overrides=_parse_overrides(data, theme),
+        effective_from=str(data["effective_from"]) if data.get("effective_from") else None,
     )
 
 
@@ -287,9 +289,7 @@ def load_rules_asof(
                     )
                 )
 
-    # rules.yml 作为最新版本：当 as_of 达到或超过最后一版历史规则的生效日时，
-    # 当前规则自然胜出；as_of 落在历史版本区间内时取对应版本；早于所有历史版本
-    # 时取最早已知版本，避免把当前规则错配到没有对应记录的远古区间。
+    # rules.yml 需要自身的生效日，避免在最后一版历史规则生效时提前覆盖它。
     latest = load_rules(rules_path)
     return _select_rules_version(as_of, history_versions, latest)
 
@@ -303,11 +303,14 @@ def _select_rules_version(
     if not history_versions:
         return latest
 
-    max_hist_eff = max(eff for eff, _ in history_versions)
-    if as_of_value >= max_hist_eff:
-        return latest
-
-    candidates = [(eff, rules) for eff, rules in history_versions if eff <= as_of_value]
+    if latest.effective_from is None:
+        raise ValueError(
+            "rules.yml must declare effective_from when rules_history.yml has versions"
+        )
+    if not re.fullmatch(r"\d{8}", latest.effective_from):
+        raise ValueError("rules.yml effective_from must be YYYYMMDD")
+    versions = [*history_versions, (latest.effective_from, latest)]
+    candidates = [(eff, rules) for eff, rules in versions if eff <= as_of_value]
     if candidates:
         return max(candidates, key=lambda item: item[0])[1]
-    return min(history_versions, key=lambda item: item[0])[1]
+    return min(versions, key=lambda item: item[0])[1]

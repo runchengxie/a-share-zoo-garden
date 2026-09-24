@@ -7,6 +7,7 @@ import pytest
 
 from zoo_index.config import BacktestConfig, Rules, load_rules
 from zoo_index.data_sources.tushare import TradeCalendarEntry
+from zoo_index.outputs import save_holdings
 from zoo_index.runner import (
     BenchmarkConfig,
     RunConfig,
@@ -14,6 +15,7 @@ from zoo_index.runner import (
     _get_benchmark_return,
     _snapshot_rules,
     compute_day,
+    load_portfolio_state,
     run_backfill,
     run_daily,
 )
@@ -476,6 +478,137 @@ def test_compute_day_monthly_rebalance_removes_lookahead() -> None:
     # 新篮子权重等权（3 只），合计 1.0。
     feb_weights = feb.strict_holdings[feb.strict_holdings["ts_code"] == "000009.SZ"]["weight"]
     assert feb_weights.iloc[0] == pytest.approx(1 / 3)
+
+
+def test_resumption_books_price_move_after_suspended_days(tmp_path: Path) -> None:
+    class SuspendedClient(FakeClient):
+        def __init__(self) -> None:
+            super().__init__(["20240101", "20240102", "20240103", "20240104", "20240105"], {})
+            self.quotes = {
+                "20240101": {"000001.SZ": 10.0, "600000.SH": 10.0},
+                "20240102": {"000001.SZ": 10.0, "600000.SH": 10.0},
+                "20240103": {"600000.SH": 10.0},
+                "20240104": {"600000.SH": 10.0},
+                "20240105": {"000001.SZ": 8.0, "600000.SH": 10.0},
+            }
+
+        def get_daily(self, trade_date: str) -> pd.DataFrame:
+            return pd.DataFrame(
+                [
+                    {"ts_code": code, "close": close, "pre_close": 10.0}
+                    for code, close in self.quotes[trade_date].items()
+                ]
+            )
+
+        def get_adj_factor(self, trade_date: str) -> pd.DataFrame:
+            return pd.DataFrame(
+                [{"ts_code": code, "adj_factor": 1.0} for code in self.quotes[trade_date]]
+            )
+
+        def get_suspension(self, trade_date: str) -> pd.DataFrame:
+            if trade_date in {"20240103", "20240104"}:
+                return pd.DataFrame([{"ts_code": "000001.SZ"}])
+            return pd.DataFrame({"ts_code": pd.Series(dtype="str")})
+
+    client = SuspendedClient()
+    state = None
+    results = []
+    for date in client.open_dates[1:]:
+        result = compute_day(
+            client,
+            _rules(),
+            _benchmark(),
+            date,
+            client.get_stock_basic(),
+            client.get_namechange(),
+            prev_state=state,
+        )
+        results.append(result)
+        state = result.state
+        if date == "20240104":
+            snapshot = tmp_path / "holdings_20240104.csv"
+            save_holdings(snapshot, result.strict_holdings, result.extended_holdings)
+            state = load_portfolio_state(snapshot, date)
+            assert state is not None
+            assert state.strict.last_marks["000001.SZ"] == (10.0, 1.0)
+    assert results[1].strict_ret == pytest.approx(0.0)
+    assert results[2].strict_ret == pytest.approx(0.0)
+    assert results[3].strict_ret == pytest.approx(-0.1)
+
+    legacy = pd.concat(
+        [
+            results[2].strict_holdings.assign(variant="strict"),
+            results[2].extended_holdings.assign(variant="extended"),
+        ]
+    ).drop(columns=["mark_close", "mark_adj_factor"])
+    legacy_path = tmp_path / "legacy_holdings.csv"
+    legacy.to_csv(legacy_path, index=False)
+    legacy_state = load_portfolio_state(legacy_path, "20240104")
+    recovered = compute_day(
+        client,
+        _rules(),
+        _benchmark(),
+        "20240105",
+        client.get_stock_basic(),
+        client.get_namechange(),
+        prev_state=legacy_state,
+    )
+    assert recovered.strict_ret == pytest.approx(-0.1)
+
+
+def test_new_st_status_changes_next_day_holdings_not_same_day_return() -> None:
+    class StClient(FakeClient):
+        def __init__(self) -> None:
+            super().__init__(["20240101", "20240102", "20240103"], {})
+
+        def get_daily(self, trade_date: str) -> pd.DataFrame:
+            close = 10.0 if trade_date == "20240102" else 8.0
+            return pd.DataFrame(
+                [
+                    {"ts_code": "000001.SZ", "close": close, "pre_close": 10.0},
+                    {"ts_code": "600000.SH", "close": 10.0, "pre_close": 10.0},
+                ]
+            )
+
+        def get_adj_factor(self, trade_date: str) -> pd.DataFrame:
+            return pd.DataFrame(
+                [{"ts_code": code, "adj_factor": 1.0} for code in ("000001.SZ", "600000.SH")]
+            )
+
+        def get_namechange(self) -> pd.DataFrame:
+            return pd.DataFrame(
+                [
+                    {
+                        "ts_code": "000001.SZ",
+                        "name": "ST金龙鱼",
+                        "start_date": "20240103",
+                        "end_date": "99999999",
+                    },
+                ]
+            )
+
+    client = StClient()
+    jan2 = compute_day(
+        client,
+        _rules(),
+        _benchmark(),
+        "20240102",
+        client.get_stock_basic(),
+        client.get_namechange(),
+    )
+    jan3 = compute_day(
+        client,
+        _rules(),
+        _benchmark(),
+        "20240103",
+        client.get_stock_basic(),
+        client.get_namechange(),
+        prev_state=jan2.state,
+    )
+    assert jan3.strict_ret == pytest.approx(-0.1)
+    assert jan3.state is not None
+    assert jan3.state.strict is not None
+    assert "000001.SZ" not in jan3.state.strict.weights
 
 
 def test_backfill_carries_state_across_months(tmp_path: Path) -> None:
