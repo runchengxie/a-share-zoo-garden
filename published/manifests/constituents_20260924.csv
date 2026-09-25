@@ -3,14 +3,12 @@ ts_code,name,keyword,forced,variant
 603269.SH,海鸥股份,海鸥,False,strict
 603116.SH,红蜻蜓,蜻蜓,False,strict
 603029.SH,天鹅股份,天鹅,False,strict
-601311.SH,骆驼股份,骆驼,False,strict
 600775.SH,南京熊猫,熊猫,False,strict
 300999.SZ,金龙鱼,金龙鱼,False,strict
 300898.SZ,熊猫乳品,熊猫,False,strict
 300783.SZ,三只松鼠,松鼠,False,strict
 003011.SZ,海象新材,海象,False,strict
 002084.SZ,海鸥住工,海鸥,False,strict
-002081.SZ,金螳螂,螳螂,False,strict
 000572.SZ,海马汽车,海马,False,strict
 601123.SH,马矿股份,马,False,extended
 001257.SZ,盛龙股份,龙,False,extended
@@ -22,7 +20,6 @@ ts_code,name,keyword,forced,variant
 688357.SH,建龙微纳,龙,False,extended
 688295.SH,中复神鹰,鹰,False,extended
 688170.SH,德龙激光,龙,False,extended
-688152.SH,麒麟信安,麒麟,False,extended
 688078.SH,龙软科技,龙,False,extended
 688077.SH,大地熊,熊,False,extended
 688055.SH,龙腾光电,龙,False,extended
@@ -42,7 +39,6 @@ ts_code,name,keyword,forced,variant
 603733.SH,仙鹤股份,仙鹤,False,extended
 603686.SH,福龙马,龙,False,extended
 603668.SH,天马科技,马,False,extended
-603586.SH,金麒麟,麒麟,False,extended
 603530.SH,神马电力,马,False,extended
 603488.SH,展鹏科技,鹏,False,extended
 603406.SH,天富龙,龙,False,extended
@@ -61,9 +57,7 @@ ts_code,name,keyword,forced,variant
 603051.SH,鹿山新材,鹿,False,extended
 603029.SH,天鹅股份,天鹅,False,extended
 603004.SH,鼎龙科技,龙,False,extended
-601928.SH,凤凰传媒,凤凰,False,extended
 601828.SH,美凯龙,龙,False,extended
-601311.SH,骆驼股份,骆驼,False,extended
 601188.SH,龙江交通,龙,False,extended
 601015.SH,陕西黑猫,猫,False,extended
 600993.SH,马应龙,龙,False,extended
@@ -72,9 +66,7 @@ ts_code,name,keyword,forced,variant
 600775.SH,南京熊猫,熊猫,False,extended
 600769.SH,祥龙电业,龙,False,extended
 600722.SH,金牛化工,牛,False,extended
-600716.SH,凤凰股份,凤凰,False,extended
 600686.SH,金龙汽车,龙,False,extended
-600679.SH,上海凤凰,凤凰,False,extended
 600630.SH,龙头股份,龙,False,extended
 600592.SH,龙溪股份,龙,False,extended
 600580.SH,卧龙电驱,龙,False,extended
@@ -88,7 +80,6 @@ ts_code,name,keyword,forced,variant
 600173.SH,卧龙新能,龙,False,extended
 600159.SH,大龙地产,龙,False,extended
 600125.SH,铁龙物流,龙,False,extended
-600071.SH,凤凰光学,凤凰,False,extended
 600062.SH,华润双鹤,鹤,False,extended
 600059.SH,古越龙山,龙,False,extended
 600057.SH,厦门象屿,象,False,extended
@@ -133,7 +124,6 @@ ts_code,name,keyword,forced,variant
 003040.SZ,楚天龙,龙,False,extended
 003012.SZ,东鹏控股,鹏,False,extended
 003011.SZ,海象新材,海象,False,extended
-002984.SZ,森麒麟,麒麟,False,extended
 002960.SZ,青鸟智控,鸟,False,extended
 002959.SZ,小熊电器,熊,False,extended
 002938.SZ,鹏鼎控股,鹏,False,extended
@@ -161,8 +151,6 @@ ts_code,name,keyword,forced,variant
 002210.SZ,飞马国际,马,False,extended
 002154.SZ,报喜鸟,鸟,False,extended
 002084.SZ,海鸥住工,海鸥,False,extended
-002081.SZ,金螳螂,螳螂,False,extended
-002069.SZ,獐子岛,獐,False,extended
 002068.SZ,黑猫股份,猫,False,extended
 002047.SZ,宝鹰股份,鹰,False,extended
 002043.SZ,兔宝宝,兔,False,extended
@@ -181,5 +169,4 @@ ts_code,name,keyword,forced,variant
 000712.SZ,锦龙股份,龙,False,extended
 000593.SZ,德龙汇能,龙,False,extended
 000572.SZ,海马汽车,海马,False,extended
-000520.SZ,凤凰航运,凤凰,False,extended
 000050.SZ,深天马A,马,False,extended
