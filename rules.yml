@@ -1,4 +1,4 @@
-effective_from: "20260907"
+effective_from: "20260925"
 # 严格关键词使用明确的动物词，减少误匹配。
 strict_keywords:
   - 熊猫
@@ -23,6 +23,10 @@ strict_keywords:
   - 蜜蜂
   - 螳螂
   - 骆驼
+  - 狮头
+  - 锦鸡
+  - 紫燕
+  - 鹭燕
 
 # 扩展关键词加入单字或泛化动物词，噪声相对更高。
 extended_keywords:
@@ -57,6 +61,12 @@ extended_keywords:
   - 獐
   - 麒麟
   - 凤凰
+  - 凤
+  - 雁
+  - 羚
+  - 鸥
+  - 羊
+  - 狮
 
 exclude_patterns:
   - 马钢
