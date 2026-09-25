@@ -64,6 +64,7 @@ npm run build
 ## 缓存策略
 
 * 股票列表与更名（`stock_basic` / `namechange`）按 TTL（默认 1 天）刷新，避免长期运行看不到新股 / 退市 / 更名。
+* `namechange` 全市场查询需分页，并补取 2006 年名称断档；历史简称未知的股票不得使用当前 `stock_basic.name` 参与回测选股。
 * 按日期不可变的日行情、复权、指数、基金数据保持永久缓存。
 * `--force-refresh` 强制全部刷新，`--no-cache` 关闭缓存。
 * 可选备用 Token：环境变量 `TUSHARE_TOKEN_2` 配合 `TUSHARE_API_URL`（转发代理地址）。主 Token 请求失败时由 `TushareClient` 自动回退到备用 Token，官方口径不受影响。

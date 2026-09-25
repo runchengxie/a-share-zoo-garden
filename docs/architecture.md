@@ -46,13 +46,13 @@
 
 单日计算由 `runner.compute_day` 完成，核心是带状态的 `PortfolioState`。
 
-- `PortfolioState` 记录上一交易日的双变体组合（strict / extended），含各成分固定权重、成分表与停牌连续天数。
+- `PortfolioState` 记录上一交易日的双变体组合（strict / extended），含各成分固定权重、成分表、停牌连续天数与最后一次有效价格和复权因子。
 - 月度首个交易日触发再平衡：用上一篮子计算当日收益（去前视），新篮子等权后于次日生效。
 - 月内沿用上一篮子与固定权重，不再每日重算。
-- 异常再平衡：持有成分出现退市、新 ST 或连续停牌超阈值时，剔除触发成分并重新等权，新权重当日生效。
+- 异常再平衡：持有成分出现退市、新 ST 或连续停牌超阈值时，当日仍用旧篮子计算收益，剔除触发成分并重新等权，新权重次日生效。
 - 可交易回测：`backtest.yml` 默认关闭。开启后保留毛收益，同时追加价格漂移后的换手、佣金、印花税、滑点和成本后净值字段。
 - 规则时点化：`_get_constituents_for_rebalance` 在每次再平衡时按 `rules_path` 调用 `load_rules_asof`，使用当时生效的规则版本。
-- 状态重建：`run_daily` 从上一交易日的 `holdings_YYYYMMDD.csv` 读取权重与停牌天数重建 `PortfolioState`；`run_backfill` 在回填循环中按日向后传递状态，保证历史可复现且无前视。
+- 状态重建：`run_daily` 从上一交易日的 `holdings_YYYYMMDD.csv` 读取权重、停牌天数和最后一次有效价格标记；旧快照没有价格标记时，从历史行情恢复。`run_backfill` 在回填循环中按日向后传递状态。
 
 ## 徽章
 

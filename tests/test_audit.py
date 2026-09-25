@@ -39,11 +39,18 @@ def _stock_basic() -> pd.DataFrame:
     )
 
 
+def _name_history(stock: pd.DataFrame) -> pd.DataFrame:
+    history = stock[["ts_code", "name"]].copy()
+    history["start_date"] = "20100101"
+    history["end_date"] = None
+    return history
+
+
 def test_audit_keeps_theme_membership_separate_from_eligibility() -> None:
     stock = _stock_basic()
     rules = load_rules(__import__("pathlib").Path("plant_rules.yml"))
 
-    candidates = build_audit_candidates(stock, pd.DataFrame(), "20260904", rules)
+    candidates = build_audit_candidates(stock, _name_history(stock), "20260904", rules)
     by_code = {item.ts_code: item for item in candidates}
 
     assert by_code["605199.SH"].strict
@@ -57,8 +64,8 @@ def test_audit_modes_and_order_are_deterministic() -> None:
     stock = _stock_basic()
     rules = load_rules(__import__("pathlib").Path("rules.yml"))
 
-    precision = build_audit_candidates(stock, pd.DataFrame(), "20260904", rules, "precision")
-    recall = build_audit_candidates(stock, pd.DataFrame(), "20260904", rules, "recall")
+    precision = build_audit_candidates(stock, _name_history(stock), "20260904", rules, "precision")
+    recall = build_audit_candidates(stock, _name_history(stock), "20260904", rules, "recall")
 
     assert [item.ts_code for item in precision] == ["002081.SZ", "430001.BJ"]
     assert [item.ts_code for item in recall] == ["000001.SZ", "605199.SH"]
@@ -67,7 +74,7 @@ def test_audit_modes_and_order_are_deterministic() -> None:
 def test_audit_report_has_stable_json_and_markdown_sections(tmp_path) -> None:
     stock = _stock_basic()
     rules = load_rules(__import__("pathlib").Path("rules.yml"))
-    candidates = build_audit_candidates(stock, pd.DataFrame(), "20260904", rules)
+    candidates = build_audit_candidates(stock, _name_history(stock), "20260904", rules)
     result = build_audit_result(stock, candidates, "20260904", rules, "all")
 
     json_path, markdown_path = write_audit_report(result, tmp_path)

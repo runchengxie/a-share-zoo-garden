@@ -24,6 +24,12 @@ def _empty_namechange() -> pd.DataFrame:
     return pd.DataFrame(columns=pd.Index(["ts_code", "name", "start_date", "end_date"]))
 
 
+def _known_namechange() -> pd.DataFrame:
+    return pd.DataFrame(
+        [{"ts_code": "000001.SZ", "name": "金龙鱼", "start_date": "20200101", "end_date": None}]
+    )
+
+
 def test_anomalous_codes_detects_delist() -> None:
     held = pd.DataFrame([{"ts_code": "000001.SZ", "name": "金龙鱼"}])
     stock_basic = pd.DataFrame([{"ts_code": "000001.SZ", "delist_date": 20240101}])
@@ -51,18 +57,35 @@ def test_anomalous_codes_detects_st() -> None:
     assert anom == {"000001.SZ"}
 
 
+def test_anomalous_codes_removes_held_name_when_history_expires() -> None:
+    held = pd.DataFrame([{"ts_code": "000001.SZ", "name": "金龙鱼"}])
+    stock_basic = pd.DataFrame([{"ts_code": "000001.SZ", "delist_date": 99999999}])
+    history = pd.DataFrame(
+        [
+            {
+                "ts_code": "000001.SZ",
+                "name": "金龙鱼",
+                "start_date": "20200101",
+                "end_date": "20240101",
+            }
+        ]
+    )
+    anomalies, _ = _anomalous_codes(held, stock_basic, history, "20240102", set(), {}, 0)
+    assert anomalies == {"000001.SZ"}
+
+
 def test_anomalous_codes_detects_long_suspension() -> None:
     held = pd.DataFrame([{"ts_code": "000001.SZ", "name": "金龙鱼"}])
     stock_basic = pd.DataFrame([{"ts_code": "000001.SZ", "delist_date": 99999999}])
     # 连续停牌达阈值（3）触发；streak 累加为 3。
     anom, streak = _anomalous_codes(
-        held, stock_basic, _empty_namechange(), "20240105", {"000001.SZ"}, {"000001.SZ": 2}, 3
+        held, stock_basic, _known_namechange(), "20240105", {"000001.SZ"}, {"000001.SZ": 2}, 3
     )
     assert anom == {"000001.SZ"}
     assert streak["000001.SZ"] == 3
     # 未达阈值不触发。
     anom2, _ = _anomalous_codes(
-        held, stock_basic, _empty_namechange(), "20240105", {"000001.SZ"}, {"000001.SZ": 1}, 3
+        held, stock_basic, _known_namechange(), "20240105", {"000001.SZ"}, {"000001.SZ": 1}, 3
     )
     assert anom2 == set()
 
@@ -71,7 +94,7 @@ def test_anomalous_codes_long_suspension_disabled_when_zero() -> None:
     held = pd.DataFrame([{"ts_code": "000001.SZ", "name": "金龙鱼"}])
     stock_basic = pd.DataFrame([{"ts_code": "000001.SZ", "delist_date": 99999999}])
     anom, _ = _anomalous_codes(
-        held, stock_basic, _empty_namechange(), "20240105", {"000001.SZ"}, {"000001.SZ": 99}, 0
+        held, stock_basic, _known_namechange(), "20240105", {"000001.SZ"}, {"000001.SZ": 99}, 0
     )
     assert anom == set()
 
@@ -132,7 +155,10 @@ class DelistClient:
         )
 
     def get_namechange(self) -> pd.DataFrame:
-        return _empty_namechange()
+        basic = self.get_stock_basic()[["ts_code", "name"]].copy()
+        basic["start_date"] = "20200101"
+        basic["end_date"] = None
+        return basic
 
     def get_daily(self, trade_date: str) -> pd.DataFrame:
         day = self.prices.get(trade_date, {})

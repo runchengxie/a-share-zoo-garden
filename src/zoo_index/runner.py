@@ -321,8 +321,26 @@ def _variant_state_from_holdings(df: pd.DataFrame, variant: str) -> VariantState
     else:
         susp_days = {}
     return VariantState(
-        weights=weights, constituents=constituents, reason="restored", susp_days=susp_days
+        weights=weights,
+        constituents=constituents,
+        reason="restored",
+        susp_days=susp_days,
+        last_marks=_marks_from_holdings(sub),
     )
+
+
+def _marks_from_holdings(holdings: pd.DataFrame) -> dict[str, tuple[float, float]]:
+    if not {"mark_close", "mark_adj_factor"}.issubset(holdings.columns):
+        return {}
+    marks: dict[str, tuple[float, float]] = {}
+    for code, close_value, factor_value in holdings[
+        ["ts_code", "mark_close", "mark_adj_factor"]
+    ].itertuples(index=False, name=None):
+        close = pd.to_numeric(close_value, errors="coerce")
+        factor = pd.to_numeric(factor_value, errors="coerce")
+        if pd.notna(close) and pd.notna(factor) and close > 0 and factor > 0:
+            marks[str(code)] = (float(close), float(factor))
+    return marks
 
 
 def _attach_susp_days(holdings: pd.DataFrame, streak: dict[str, int]) -> pd.DataFrame:
@@ -348,6 +366,51 @@ def load_portfolio_state(holdings_path: Path, date: str) -> PortfolioState | Non
     return PortfolioState(date=date, strict=strict, extended=extended)
 
 
+def _recover_legacy_marks(client: TushareLike, state: PortfolioState) -> None:
+    """Recover the last traded mark when an older holdings CSV has no mark columns."""
+    variants = (state.strict, state.extended)
+    missing = {
+        code: max(variant.susp_days.get(code, 0) for variant in variants)
+        for variant in variants
+        for code in variant.weights
+        if variant.susp_days.get(code, 0) > 0 and code not in variant.last_marks
+    }
+    if not missing:
+        return
+    dates = client.get_recent_open_dates(state.date, max(missing.values()) + 1)
+    recovered: dict[str, tuple[float, float]] = {}
+    for day in reversed(dates):
+        if len(recovered) == len(missing):
+            break
+        prices = client.get_daily(day)
+        factors = client.get_adj_factor(day)
+        if prices.empty or factors.empty:
+            continue
+        joined = prices[["ts_code", "close"]].merge(
+            factors[["ts_code", "adj_factor"]], on="ts_code", how="inner"
+        )
+        for row in joined.itertuples(index=False):
+            code = str(row.ts_code)
+            close = pd.to_numeric(row.close, errors="coerce")
+            factor = pd.to_numeric(row.adj_factor, errors="coerce")
+            if (
+                code in missing
+                and code not in recovered
+                and pd.notna(close)
+                and pd.notna(factor)
+                and close > 0
+                and factor > 0
+            ):
+                recovered[code] = (float(close), float(factor))
+    unresolved = set(missing) - set(recovered)
+    if unresolved:
+        raise ValueError(f"无法恢复停牌前价格与复权因子：{sorted(unresolved)}")
+    for variant in variants:
+        variant.last_marks.update(
+            {code: mark for code, mark in recovered.items() if code in variant.weights}
+        )
+
+
 def _anomalous_codes(
     held: pd.DataFrame,
     stock_basic: pd.DataFrame,
@@ -359,8 +422,7 @@ def _anomalous_codes(
 ) -> tuple[set[str], dict[str, int]]:
     """检测持有成分中的异常，返回需剔除的代码与更新后的停牌连续天数。
 
-    异常三类：(1) 截至当日已退市（delist_date <= date）；(2) 当日名称含 ST；
-    (3) 连续停牌达到 max_susp_days（跨日累计，max_susp_days<=0 时关闭）。
+    异常包括退市、历史名称未知、当日名称含 ST，以及连续停牌达到阈值。
     """
     if held.empty:
         return set(), {}
@@ -388,6 +450,9 @@ def _anomalous_codes(
 
         delist_date = delist.get(code, 99999999)
         if delist_date <= as_of:
+            anomalies.add(code)
+            continue
+        if code not in name_map:
             anomalies.add(code)
             continue
         name = name_map.get(code, "")
@@ -529,10 +594,21 @@ def _resolve_day_variants(
         month_basket: pd.DataFrame,
         anom: set[str],
     ) -> tuple[float, pd.DataFrame, IndexStats, pd.DataFrame, dict[str, float], str]:
+        last_marks = prev_variant.last_marks if prev_variant is not None else None
         if anom:
             reduced = held[~held["ts_code"].isin(anom)].copy()
             new_weights = _equal_weights(reduced)
-            ret, holdings, stats = compute_equal_weight_return(
+            ret, _, stats = compute_equal_weight_return(
+                held,
+                daily_prices,
+                prev_daily,
+                adj_factors,
+                prev_adj_factors,
+                suspended=suspended,
+                weights=held_weights,
+                last_marks=last_marks,
+            )
+            _, holdings, _ = compute_equal_weight_return(
                 reduced,
                 daily_prices,
                 prev_daily,
@@ -540,6 +616,7 @@ def _resolve_day_variants(
                 prev_adj_factors,
                 suspended=suspended,
                 weights=new_weights,
+                last_marks=last_marks,
             )
             return ret, holdings, stats, reduced, new_weights, "exception"
         if prev_variant is None:
@@ -551,6 +628,7 @@ def _resolve_day_variants(
                 prev_adj_factors,
                 suspended=suspended,
                 weights=held_weights,
+                last_marks=last_marks,
             )
             return ret, holdings, stats, held, held_weights, "seed"
         if is_rebalance:
@@ -562,6 +640,7 @@ def _resolve_day_variants(
                 prev_adj_factors,
                 suspended=suspended,
                 weights=held_weights,
+                last_marks=last_marks,
             )
             _, holdings, _ = compute_equal_weight_return(
                 month_basket,
@@ -571,6 +650,7 @@ def _resolve_day_variants(
                 prev_adj_factors,
                 suspended=suspended,
                 weights=_equal_weights(month_basket),
+                last_marks=last_marks,
             )
             return ret, holdings, stats, month_basket, _equal_weights(month_basket), "monthly"
         ret, holdings, stats = compute_equal_weight_return(
@@ -581,6 +661,7 @@ def _resolve_day_variants(
             prev_adj_factors,
             suspended=suspended,
             weights=held_weights,
+            last_marks=last_marks,
         )
         return ret, holdings, stats, held, held_weights, prev_variant.reason
 
@@ -641,6 +722,10 @@ def _trade_metrics(
     target_weights = _equal_weights(target)
     current = daily_prices.set_index("ts_code")["close"]
     previous_prices = prev_daily.set_index("ts_code")["close"]
+    if previous is not None and previous.last_marks:
+        marked = pd.Series({code: mark[0] for code, mark in previous.last_marks.items()})
+        previous_prices = previous_prices.reindex(previous_prices.index.union(marked.index))
+        previous_prices = previous_prices.fillna(marked)
     tradable = pd.Series(True, index=target_weights.keys(), dtype=bool)
     tradable.loc[tradable.index.isin(suspended)] = False
     accounting = compute_trade_accounting(
@@ -675,6 +760,8 @@ def compute_day(
     prev_state 为上一交易日组合快照（含固定权重）。无 prev_state 视为建仓首日，
     当日即用新篮子等权；否则当日收益沿用上一篮子（去前视），新篮子于次日生效。
     """
+    if prev_state is not None:
+        _recover_legacy_marks(client, prev_state)
     month_cache: dict[str, str] = {}
     rebalance_date = _month_first_open_date(client, date, month_cache)
     strict_df, extended_df = _get_constituents_for_rebalance(
@@ -778,9 +865,19 @@ def compute_day(
     strict_holdings = _attach_susp_days(strict_holdings, strict_streak)
     extended_holdings = _attach_susp_days(extended_holdings, extended_streak)
 
-    new_strict = VariantState(strict_new_weights, strict_new_const, strict_reason, strict_streak)
+    new_strict = VariantState(
+        strict_new_weights,
+        strict_new_const,
+        strict_reason,
+        strict_streak,
+        _marks_from_holdings(strict_holdings),
+    )
     new_extended = VariantState(
-        extended_new_weights, extended_new_const, extended_reason, extended_streak
+        extended_new_weights,
+        extended_new_const,
+        extended_reason,
+        extended_streak,
+        _marks_from_holdings(extended_holdings),
     )
 
     if strict_stats.priced_constituents == 0 or extended_stats.priced_constituents == 0:

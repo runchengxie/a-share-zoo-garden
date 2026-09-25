@@ -1,3 +1,4 @@
+effective_from: "20260907"
 # 严格关键词使用明确的动物词，减少误匹配。
 strict_keywords:
   - 熊猫

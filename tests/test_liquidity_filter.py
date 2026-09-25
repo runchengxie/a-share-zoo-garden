@@ -86,7 +86,9 @@ def test_rebalance_excludes_low_amount() -> None:
             },
         ]
     )
-    namechange = pd.DataFrame(columns=pd.Index(["ts_code", "name", "start_date", "end_date"]))
+    namechange = stock_basic[["ts_code", "name"]].copy()
+    namechange["start_date"] = "20200101"
+    namechange["end_date"] = None
     rules = _rules_with(min_daily_amount=5e8)
 
     strict_df, extended_df = _get_constituents_for_rebalance(
@@ -128,7 +130,9 @@ def test_rebalance_keeps_all_when_amount_missing() -> None:
             },
         ]
     )
-    namechange = pd.DataFrame(columns=pd.Index(["ts_code", "name", "start_date", "end_date"]))
+    namechange = stock_basic[["ts_code", "name"]].copy()
+    namechange["start_date"] = "20200101"
+    namechange["end_date"] = None
     rules = _rules_with(min_daily_amount=5e8)
 
     strict_df, _ = _get_constituents_for_rebalance(
