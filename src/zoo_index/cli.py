@@ -51,6 +51,9 @@ def _parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--backfill-years", type=int, default=0, help="回填最近 N 年（按交易日历）")
     parser.add_argument(
+        "--start-date", type=str, default="", help="回填起点 YYYYMMDD，首个交易日收盘净值设为 1"
+    )
+    parser.add_argument(
         "--backfill-mode",
         type=str,
         choices=("missing", "all"),
@@ -108,33 +111,18 @@ def _resolve_benchmark(args: argparse.Namespace) -> BenchmarkConfig:
     return BenchmarkConfig(code, source, label)
 
 
-def build_run_config(args: argparse.Namespace, repo_root: Path) -> RunConfig | None:
-    rules_path = Path(args.rules).resolve() if args.rules else repo_root / "rules.yml"
-    token = args.token.strip() or os.getenv("TUSHARE_TOKEN", "").strip()
-
-    if not rules_path.exists():
-        print("规则文件不存在，请检查 rules.yml 路径。")
-        return None
-
-    if not token:
-        print("缺少 Tushare Token，请设置环境变量 TUSHARE_TOKEN 或传入 --token。")
-        return None
-
-    benchmark = _resolve_benchmark(args)
-
+def _resolve_backfill_args(args: argparse.Namespace) -> tuple[bool, int, int] | None:
     backfill_days = 0
     backfill_years = 0
-    backfill_requested = False
-
     if args.backfill_years < 0:
         print("回填年份必须大于 0。")
         return None
     if args.backfill_years > 0:
-        backfill_requested = True
         backfill_years = args.backfill_years
-
+    if args.start_date.strip() and (backfill_years > 0 or args.backfill is not None):
+        print("请勿同时指定 --start-date 与 --backfill / --backfill-years。")
+        return None
     if args.backfill is not None:
-        backfill_requested = True
         if args.backfill == -1:
             if backfill_years > 0:
                 print("请勿同时指定 --backfill 和 --backfill-years。")
@@ -148,6 +136,30 @@ def build_run_config(args: argparse.Namespace, repo_root: Path) -> RunConfig | N
         else:
             print("回填天数必须大于 0。")
             return None
+    return (
+        bool(args.start_date.strip() or backfill_years or backfill_days),
+        backfill_years,
+        backfill_days,
+    )
+
+
+def build_run_config(args: argparse.Namespace, repo_root: Path) -> RunConfig | None:
+    rules_path = Path(args.rules).resolve() if args.rules else repo_root / "rules.yml"
+    token = args.token.strip() or os.getenv("TUSHARE_TOKEN", "").strip()
+
+    if not rules_path.exists():
+        print("规则文件不存在，请检查 rules.yml 路径。")
+        return None
+
+    if not token:
+        print("缺少 Tushare Token，请设置环境变量 TUSHARE_TOKEN 或传入 --token。")
+        return None
+
+    backfill_args = _resolve_backfill_args(args)
+    if backfill_args is None:
+        return None
+    backfill_requested, backfill_years, backfill_days = backfill_args
+    benchmark = _resolve_benchmark(args)
 
     output_dir = Path(args.output_dir).resolve() if args.output_dir else repo_root / "artifacts"
 
@@ -162,6 +174,7 @@ def build_run_config(args: argparse.Namespace, repo_root: Path) -> RunConfig | N
         backfill_years=backfill_years,
         backfill_days=backfill_days,
         backfill_mode=args.backfill_mode,
+        start_date=args.start_date.strip(),
         backfill_write_snapshots=args.backfill_write_snapshots,
         no_rules_snapshot=args.no_rules_snapshot,
         no_cache=args.no_cache,
