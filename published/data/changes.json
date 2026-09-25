@@ -3,11 +3,65 @@
   "changes": {
     "strict": {
       "new_in": [],
-      "removed": []
+      "removed": [
+        {
+          "ts_code": "601311.SH",
+          "name": "骆驼股份"
+        },
+        {
+          "ts_code": "002081.SZ",
+          "name": "金螳螂"
+        }
+      ]
     },
     "extended": {
       "new_in": [],
-      "removed": []
+      "removed": [
+        {
+          "ts_code": "601311.SH",
+          "name": "骆驼股份"
+        },
+        {
+          "ts_code": "002081.SZ",
+          "name": "金螳螂"
+        },
+        {
+          "ts_code": "688152.SH",
+          "name": "麒麟信安"
+        },
+        {
+          "ts_code": "603586.SH",
+          "name": "金麒麟"
+        },
+        {
+          "ts_code": "601928.SH",
+          "name": "凤凰传媒"
+        },
+        {
+          "ts_code": "600716.SH",
+          "name": "凤凰股份"
+        },
+        {
+          "ts_code": "600679.SH",
+          "name": "上海凤凰"
+        },
+        {
+          "ts_code": "600071.SH",
+          "name": "凤凰光学"
+        },
+        {
+          "ts_code": "002984.SZ",
+          "name": "森麒麟"
+        },
+        {
+          "ts_code": "002069.SZ",
+          "name": "獐子岛"
+        },
+        {
+          "ts_code": "000520.SZ",
+          "name": "凤凰航运"
+        }
+      ]
     }
   },
   "suspected_noise": {
@@ -667,11 +721,6 @@
         "ts_code": "002154.SZ",
         "name": "报喜鸟",
         "keyword": "鸟"
-      },
-      {
-        "ts_code": "002069.SZ",
-        "name": "獐子岛",
-        "keyword": "獐"
       },
       {
         "ts_code": "002068.SZ",
