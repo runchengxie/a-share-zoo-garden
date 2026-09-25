@@ -51,6 +51,42 @@ def test_missing_cache_file_returns_none(tmp_path: Path) -> None:
     assert client._read_cache(tmp_path / "missing.parquet", ttl=60) is None
 
 
+def test_namechange_fetches_all_pages_and_replaces_truncated_cache(tmp_path: Path) -> None:
+    client = _client(tmp_path)
+    old = pd.DataFrame({"ts_code": [f"{n:06d}.SZ" for n in range(10000)], "name": ["旧名"] * 10000})
+    old.to_parquet(tmp_path / "namechange.parquet", index=False)
+    calls: list[int] = []
+
+    def fake_api(method: str, **kwargs: object) -> pd.DataFrame:
+        assert method == "namechange"
+        offset = kwargs["offset"]
+        assert isinstance(offset, int)
+        calls.append(offset)
+        if offset == 0:
+            return pd.DataFrame(
+                {
+                    "ts_code": [f"{n:06d}.SZ" for n in range(10000)],
+                    "name": ["新名"] * 10000,
+                    "start_date": ["20200101"] * 10000,
+                    "end_date": [None] * 10000,
+                }
+            )
+        return pd.DataFrame(
+            {
+                "ts_code": ["999999.SZ"],
+                "name": ["补页"],
+                "start_date": ["20200101"],
+                "end_date": [None],
+            }
+        )
+
+    client._api = fake_api  # ty: ignore[invalid-assignment]
+    result = client.get_namechange()
+    assert calls == [0, 10000]
+    assert len(result) == 10001
+    assert len(pd.read_parquet(tmp_path / "namechange.parquet")) == 10001
+
+
 class _FakePro:
     def __init__(self, tag: str) -> None:
         self.tag = tag

@@ -217,11 +217,32 @@ class TushareClient:
     def get_namechange(self) -> pd.DataFrame:
         cache_path = self._cache_path("namechange.parquet")
         cached = self._read_cache(cache_path, ttl=self._reference_cache_ttl)
-        if cached is not None:
+        page_size = 10000
+        # 旧版单次全市场查询恰好命中接口上限时，缓存可能缺少后续页。
+        if cached is not None and len(cached) < page_size:
             return cached
-        df = self._api("namechange", fields="ts_code,name,start_date,end_date")
-        if not df.empty:
-            df = df.drop_duplicates()
+        pages: list[pd.DataFrame] = []
+        offset = 0
+        while True:
+            page = self._api(
+                "namechange",
+                fields="ts_code,name,start_date,end_date",
+                limit=page_size,
+                offset=offset,
+            )
+            if page.empty:
+                break
+            if pages and page.equals(pages[-1]):
+                raise ValueError("namechange pagination returned the same page twice")
+            pages.append(page)
+            if len(page) < page_size:
+                break
+            offset += page_size
+        df = (
+            pd.concat(pages, ignore_index=True).drop_duplicates()
+            if pages
+            else pd.DataFrame(columns=pd.Index(["ts_code", "name", "start_date", "end_date"]))
+        )
         self._write_cache(cache_path, df)
         return df
 
