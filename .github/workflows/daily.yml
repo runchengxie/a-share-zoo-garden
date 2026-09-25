@@ -5,14 +5,6 @@ on:
     - cron: "10 8 * * 1-5"
   workflow_dispatch:
     inputs:
-      cache_export:
-        description: "临时导出缺失的历史原始缓存"
-        required: false
-        default: "false"
-        type: choice
-        options:
-          - "false"
-          - "true"
       backfill_mode:
         description: "回填模式：missing 只补缺失日期，all 重算指定历史区间"
         required: false
@@ -37,67 +29,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  export-raw-cache:
-    if: inputs.cache_export == 'true' && github.ref != 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7.0.1
-      - uses: astral-sh/setup-uv@v10.0.1
-        with:
-          enable-cache: true
-      - run: uv sync --frozen
-      - name: Fetch missing raw dates
-        env:
-          TUSHARE_TOKEN: ${{ secrets.TUSHARE_TOKEN }}
-          TUSHARE_TOKEN_2: ${{ secrets.TUSHARE_TOKEN_2 }}
-          TUSHARE_API_URL: ${{ secrets.TUSHARE_API_URL }}
-        run: |
-          uv run python - <<'PY'
-          import os
-          from pathlib import Path
-          import pandas as pd
-          from zoo_index.data_sources.tushare import TushareClient
-
-          dates = []
-          root = Path('raw-export')
-          client = TushareClient(os.environ['TUSHARE_TOKEN'], cache_dir=root,
-              token2=os.getenv('TUSHARE_TOKEN_2') or None,
-              api_url2=os.getenv('TUSHARE_API_URL') or None)
-          stock_basic = client.get_stock_basic()
-          namechange = client.get_namechange()
-          if stock_basic.empty or namechange.empty:
-              raise RuntimeError('reference dataset is empty')
-          old_end = set(namechange.loc[namechange.end_date.astype(str) == '20061008', 'ts_code'])
-          next_start = set(namechange.loc[namechange.start_date.astype(str) == '20061009', 'ts_code'])
-          gaps = sorted(old_end - next_start)
-          supplements = []
-          for code in gaps:
-              frame = client._api('namechange', ts_code=code,
-                                  fields='ts_code,name,start_date,end_date')
-              supplements.append(frame)
-          supplement = pd.concat(supplements, ignore_index=True).drop_duplicates()
-          supplement.to_parquet(root / 'namechange_supplement.parquet', index=False)
-          print(f'Fetched individual name histories for {len(gaps)} gap symbols')
-          for date in dates:
-              if client.get_daily(date).empty or client.get_adj_factor(date).empty:
-                  raise RuntimeError(f'{date}: stock price/factor missing')
-              if client.get_fund_daily(date, '510300.SH').empty or client.get_fund_adj(date, '510300.SH').empty:
-                  raise RuntimeError(f'{date}: benchmark price/factor missing')
-          for date in sorted(set(dates + ['20210903'])):
-              df = client.get_suspension(date)
-              if df.empty:
-                  path = root / 'suspension' / f'{date}.parquet'
-                  path.parent.mkdir(parents=True, exist_ok=True)
-                  pd.DataFrame(columns=['ts_code', 'suspend_date', 'suspend_type']).to_parquet(path, index=False)
-          print(f'Exported {len(dates)} trading days and reference datasets')
-          PY
-      - uses: actions/upload-artifact@v4
-        with:
-          name: zoo-raw-cache-missing
-          path: raw-export/
-          retention-days: 1
   build-and-deploy:
-    if: inputs.cache_export != 'true'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
