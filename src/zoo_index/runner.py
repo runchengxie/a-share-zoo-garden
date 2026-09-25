@@ -422,8 +422,7 @@ def _anomalous_codes(
 ) -> tuple[set[str], dict[str, int]]:
     """检测持有成分中的异常，返回需剔除的代码与更新后的停牌连续天数。
 
-    异常三类：(1) 截至当日已退市（delist_date <= date）；(2) 当日名称含 ST；
-    (3) 连续停牌达到 max_susp_days（跨日累计，max_susp_days<=0 时关闭）。
+    异常包括退市、历史名称未知、当日名称含 ST，以及连续停牌达到阈值。
     """
     if held.empty:
         return set(), {}
@@ -451,6 +450,9 @@ def _anomalous_codes(
 
         delist_date = delist.get(code, 99999999)
         if delist_date <= as_of:
+            anomalies.add(code)
+            continue
+        if code not in name_map:
             anomalies.add(code)
             continue
         name = name_map.get(code, "")

@@ -262,13 +262,13 @@ def load_rules_asof(
 ) -> Rules:
     """按生效日选取规则版本，支持 point-in-time 回放。
 
-    rules.yml 视作最新版本（effective_from 视为最大）。若存在 rules_history.yml，
+    当前规则文件视作最新版本。若存在同名前缀的历史规则文件，
     其中每个条目含 effective_from 与该时点生效的规则，选取 effective_from <= as_of
     中最大的一条；若 as_of 早于所有历史版本，则取最早一条，避免把当前规则
     错配到没有对应历史记录的远古区间。
     """
     if history_path is None:
-        history_path = rules_path.with_name("rules_history.yml")
+        history_path = rules_path.with_name(f"{rules_path.stem}_history.yml")
 
     history_versions: list[tuple[str, Rules]] = []
     default_theme = load_rules(rules_path).theme

@@ -87,6 +87,39 @@ def test_namechange_fetches_all_pages_and_replaces_truncated_cache(tmp_path: Pat
     assert len(pd.read_parquet(tmp_path / "namechange.parquet")) == 10001
 
 
+def test_namechange_repairs_missing_20061009_interval(tmp_path: Path) -> None:
+    client = _client(tmp_path)
+    calls: list[str] = []
+
+    def fake_api(method: str, **kwargs: object) -> pd.DataFrame:
+        assert method == "namechange"
+        code = kwargs.get("ts_code")
+        if code is None:
+            return pd.DataFrame(
+                [
+                    {
+                        "ts_code": "600336.SH",
+                        "name": "G澳柯玛",
+                        "start_date": "20051212",
+                        "end_date": "20061008",
+                    }
+                ]
+            )
+        assert isinstance(code, str)
+        calls.append(code)
+        return pd.DataFrame(
+            [{"ts_code": code, "name": "澳柯玛", "start_date": "20061009", "end_date": None}]
+        )
+
+    client._api = fake_api  # ty: ignore[invalid-assignment]
+    result = client.get_namechange()
+    assert calls == ["600336.SH"]
+    assert len(result) == 2
+    assert (result["start_date"] == "20061009").any()
+    assert len(client.get_namechange()) == 2
+    assert calls == ["600336.SH"]
+
+
 class _FakePro:
     def __init__(self, tag: str) -> None:
         self.tag = tag

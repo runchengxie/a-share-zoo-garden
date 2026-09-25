@@ -75,10 +75,10 @@ def _filter_listed_asof(df: pd.DataFrame, as_of: str) -> pd.DataFrame:
 
 def _apply_namechange(df: pd.DataFrame, namechange: pd.DataFrame, as_of: str) -> pd.DataFrame:
     if namechange.empty:
-        return df.copy()
+        return df.iloc[0:0].copy()
     required = ["ts_code", "name", "start_date", "end_date"]
     if not set(required).issubset(namechange.columns):
-        return df.copy()
+        return df.iloc[0:0].copy()
     changes = namechange[required].copy()
     changes["start_date_int"] = _normalize_date_series(changes["start_date"], 0)
     changes["end_date_int"] = _normalize_date_series(changes["end_date"], 99999999)
@@ -87,15 +87,14 @@ def _apply_namechange(df: pd.DataFrame, namechange: pd.DataFrame, as_of: str) ->
         (changes["start_date_int"] <= as_of_value) & (changes["end_date_int"] >= as_of_value)
     ]
     if active.empty:
-        return df.copy()
+        return df.iloc[0:0].copy()
     active = (
         active.sort_values(["ts_code", "start_date_int"])
         .drop_duplicates(subset=["ts_code"], keep="last")
         .loc[:, ["ts_code", "name"]]
     )
-    merged = df.merge(active, on="ts_code", how="left", suffixes=("", "_asof"))
-    merged["name"] = merged["name_asof"].fillna(merged["name"])
-    return merged.drop(columns=["name_asof"])
+    # 历史名称缺失时，该股票无法按时点评估 ST 与词表，不能借用最新简称。
+    return df.drop(columns=["name"]).merge(active, on="ts_code", how="inner")
 
 
 def _filter_min_listing_age(df: pd.DataFrame, as_of: str, min_listing_days: int) -> pd.DataFrame:

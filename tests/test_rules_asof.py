@@ -83,3 +83,10 @@ def test_repository_rules_keep_new_terms_out_of_earlier_rebalances() -> None:
     assert "螳螂" in after.strict_keywords
     assert "麒麟" not in before.extended_keywords
     assert "麒麟" in after.extended_keywords
+
+
+def test_plant_rules_do_not_read_animal_history() -> None:
+    rules_path = Path(__file__).resolve().parent.parent / "plant_rules.yml"
+    rules = load_rules_asof("20210906", rules_path)
+    assert "兰花" in rules.strict_keywords
+    assert "熊猫" not in rules.strict_keywords

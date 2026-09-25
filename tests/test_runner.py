@@ -96,7 +96,10 @@ class FakeClient:
         )
 
     def get_namechange(self) -> pd.DataFrame:
-        return pd.DataFrame(columns=["ts_code", "name", "start_date", "end_date"])  # ty: ignore[invalid-argument-type]
+        basic = self.get_stock_basic()[["ts_code", "name"]].copy()
+        basic["start_date"] = "20200101"
+        basic["end_date"] = None
+        return basic
 
     def get_daily(self, trade_date: str) -> pd.DataFrame:
         as_prev = trade_date == self.prev_date
@@ -412,15 +415,25 @@ class TwoMonthClient:
         )
 
     def get_namechange(self) -> pd.DataFrame:
-        return pd.DataFrame(
+        basic = self.get_stock_basic()[["ts_code", "name"]].copy()
+        basic["start_date"] = "20200101"
+        basic["end_date"] = None
+        basic.loc[basic["ts_code"] == "000009.SZ", "end_date"] = "20240131"
+        return pd.concat(
             [
-                {
-                    "ts_code": "000009.SZ",
-                    "name": "海豚",
-                    "start_date": "20240201",
-                    "end_date": "99999999",
-                }
-            ]
+                basic,
+                pd.DataFrame(
+                    [
+                        {
+                            "ts_code": "000009.SZ",
+                            "name": "海豚",
+                            "start_date": "20240201",
+                            "end_date": "99999999",
+                        }
+                    ]
+                ),
+            ],
+            ignore_index=True,
         )
 
     def get_daily(self, trade_date: str) -> pd.DataFrame:
@@ -576,15 +589,21 @@ def test_new_st_status_changes_next_day_holdings_not_same_day_return() -> None:
             )
 
         def get_namechange(self) -> pd.DataFrame:
-            return pd.DataFrame(
+            return pd.concat(
                 [
-                    {
-                        "ts_code": "000001.SZ",
-                        "name": "ST金龙鱼",
-                        "start_date": "20240103",
-                        "end_date": "99999999",
-                    },
-                ]
+                    super().get_namechange(),
+                    pd.DataFrame(
+                        [
+                            {
+                                "ts_code": "000001.SZ",
+                                "name": "ST金龙鱼",
+                                "start_date": "20240103",
+                                "end_date": "99999999",
+                            },
+                        ]
+                    ),
+                ],
+                ignore_index=True,
             )
 
     client = StClient()
