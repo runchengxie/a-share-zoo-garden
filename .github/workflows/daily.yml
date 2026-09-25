@@ -63,10 +63,21 @@ jobs:
           client = TushareClient(os.environ['TUSHARE_TOKEN'], cache_dir=root,
               token2=os.getenv('TUSHARE_TOKEN_2') or None,
               api_url2=os.getenv('TUSHARE_API_URL') or None)
-          for reference in (client.get_stock_basic, client.get_namechange):
-              df = reference()
-              if df.empty:
-                  raise RuntimeError('reference dataset is empty')
+          stock_basic = client.get_stock_basic()
+          namechange = client.get_namechange()
+          if stock_basic.empty or namechange.empty:
+              raise RuntimeError('reference dataset is empty')
+          old_end = set(namechange.loc[namechange.end_date.astype(str) == '20061008', 'ts_code'])
+          next_start = set(namechange.loc[namechange.start_date.astype(str) == '20061009', 'ts_code'])
+          gaps = sorted(old_end - next_start)
+          supplements = []
+          for code in gaps:
+              frame = client._api('namechange', ts_code=code,
+                                  fields='ts_code,name,start_date,end_date')
+              supplements.append(frame)
+          supplement = pd.concat(supplements, ignore_index=True).drop_duplicates()
+          supplement.to_parquet(root / 'namechange_supplement.parquet', index=False)
+          print(f'Fetched individual name histories for {len(gaps)} gap symbols')
           for date in dates:
               if client.get_daily(date).empty or client.get_adj_factor(date).empty:
                   raise RuntimeError(f'{date}: stock price/factor missing')
