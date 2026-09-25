@@ -198,14 +198,16 @@ def _compute_benchmark_daily_return(close: float, pre_close: float) -> float:
 
 
 def _adj_factor_value(df: pd.DataFrame | None, code: str) -> float:
-    """提取复权因子，缺失或非正时回退为 1.0（不影响收益口径）。"""
+    """提取复权因子；缺失时不能把含分红收益静默降为价格收益。"""
     if df is None or df.empty or "adj_factor" not in df.columns:
-        return 1.0
+        raise ValueError(f"基准复权因子缺失：{code}")
     row = df[df["ts_code"].astype(str) == str(code)]
     if row.empty:
-        return 1.0
+        raise ValueError(f"基准复权因子缺失：{code}")
     value = pd.to_numeric(row.iloc[0]["adj_factor"], errors="coerce")
-    return 1.0 if pd.isna(value) or value <= 0 else float(value)
+    if pd.isna(value) or value <= 0:
+        raise ValueError(f"基准复权因子异常：{code}")
+    return float(value)
 
 
 def _index_benchmark_return(client: BenchmarkSourceLike, trade_date: str, code: str) -> float:
@@ -227,14 +229,15 @@ def _fund_benchmark_return(
     if df.empty or prev_df.empty:
         raise ValueError("基准行情为空")
     row = df.iloc[0]
-    if pd.isna(row["pre_close"]):
+    prev_row = prev_df.iloc[0]
+    if pd.isna(prev_row["close"]) or float(prev_row["close"]) <= 0:
         raise ValueError("基准前收异常")
     close = float(row["close"])
-    pre_close = float(row["pre_close"])
+    prev_close = float(prev_row["close"])
     adj = _adj_factor_value(client.get_fund_adj(trade_date, code), code)
     prev_adj = _adj_factor_value(client.get_fund_adj(prev_date, code), code)
-    # 基准与指数同口径：close*adj / (pre_close*prev_adj) - 1。
-    return close * adj / (pre_close * prev_adj) - 1
+    # pre_close 在除息日已除权，必须使用前一交易日实际收盘价，避免重复计算分红。
+    return close * adj / (prev_close * prev_adj) - 1
 
 
 def _stock_benchmark_return(
@@ -247,16 +250,18 @@ def _stock_benchmark_return(
     if daily_prices is None:
         daily_prices = client.get_daily(trade_date)
     row_slice = daily_prices[daily_prices["ts_code"] == code]
-    if row_slice.empty:
+    prev_slice = client.get_daily(prev_date)
+    prev_slice = prev_slice[prev_slice["ts_code"] == code]
+    if row_slice.empty or prev_slice.empty:
         raise ValueError("基准行情为空")
     row = row_slice.iloc[0]
-    if pd.isna(row["pre_close"]):
+    prev_close = pd.to_numeric(prev_slice.iloc[0]["close"], errors="coerce")
+    if pd.isna(prev_close) or prev_close <= 0:
         raise ValueError("基准前收异常")
     close = float(row["close"])
-    pre_close = float(row["pre_close"])
     adj = _adj_factor_value(client.get_adj_factor(trade_date), code)
     prev_adj = _adj_factor_value(client.get_adj_factor(prev_date), code)
-    return close * adj / (pre_close * prev_adj) - 1
+    return close * adj / (float(prev_close) * prev_adj) - 1
 
 
 def _get_benchmark_return(
