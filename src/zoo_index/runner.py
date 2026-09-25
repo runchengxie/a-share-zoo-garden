@@ -94,6 +94,7 @@ class RunConfig:
     backfill_years: int = 0
     backfill_days: int = 0
     backfill_mode: str = "missing"
+    start_date: str = ""
     backfill_write_snapshots: bool = False
     no_rules_snapshot: bool = False
     no_cache: bool = False
@@ -1139,6 +1140,7 @@ def _backfill_run_days(
     rules_path: Path | None = None,
     prev_state: PortfolioState | None = None,
     backtest: BacktestConfig | None = None,
+    inception_date: str = "",
 ) -> tuple[list[dict], DailyResult | None]:
     constituents_cache: dict[str, tuple[pd.DataFrame, pd.DataFrame]] = {}
     ret_rows: list[dict] = []
@@ -1158,20 +1160,24 @@ def _backfill_run_days(
             prev_state=state,
             backtest=backtest,
         )
-        ret_rows.append(
-            {
-                "date": result.date,
-                "zoo_strict_ret": result.strict_ret,
-                "zoo_extended_ret": result.extended_ret,
-                "benchmark_ret": result.benchmark_ret,
-                "zoo_strict_net_ret": result.strict_net_ret,
-                "zoo_extended_net_ret": result.extended_net_ret,
-                "zoo_strict_turnover": result.strict_turnover,
-                "zoo_extended_turnover": result.extended_turnover,
-                "zoo_strict_cost": result.strict_cost,
-                "zoo_extended_cost": result.extended_cost,
-            }
-        )
+        row = {
+            "date": result.date,
+            "zoo_strict_ret": result.strict_ret,
+            "zoo_extended_ret": result.extended_ret,
+            "benchmark_ret": result.benchmark_ret,
+            "zoo_strict_net_ret": result.strict_net_ret,
+            "zoo_extended_net_ret": result.extended_net_ret,
+            "zoo_strict_turnover": result.strict_turnover,
+            "zoo_extended_turnover": result.extended_turnover,
+            "zoo_strict_cost": result.strict_cost,
+            "zoo_extended_cost": result.extended_cost,
+        }
+        if trade_date == inception_date and state is None:
+            # 首日收盘后建仓。保留当日持仓和价格标记，收益从下一交易日起计算。
+            for column in row:
+                if column != "date":
+                    row[column] = 0.0
+        ret_rows.append(row)
         # 每日写入 holdings 快照，供后续 run_daily 重建状态（去前视）。
         save_holdings(
             (output_dir / "manifests") / f"holdings_{trade_date}.csv",
@@ -1205,7 +1211,10 @@ def _resolve_backfill_dates(client: TushareLike, config: RunConfig) -> list[str]
             return []
 
     try:
-        if config.backfill_years > 0:
+        if config.start_date:
+            datetime.strptime(config.start_date, "%Y%m%d")
+            open_dates = _get_open_dates_in_range(client, config.start_date, end_date)
+        elif config.backfill_years > 0:
             start_date = _shift_years(end_date, config.backfill_years)
             open_dates = _get_open_dates_in_range(client, start_date, end_date)
         else:
@@ -1330,6 +1339,7 @@ def run_backfill(config: RunConfig, client: TushareLike | None = None) -> int:
             rules_path=config.rules_path,
             prev_state=prev_state,
             backtest=config.backtest,
+            inception_date=config.start_date,
         )
     except Exception as exc:
         print(f"回填计算失败：{exc}")

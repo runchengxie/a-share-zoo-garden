@@ -4,6 +4,8 @@
 
 把 A 股简称里含动物词或植物词的股票收编成主题组合，按固定规则每日更新，并与沪深300对比。动物园与植物园分别维护严格、扩展两层候选组合。
 
+两套指数和沪深300 ETF 基准统一从 2021 年 1 月 4 日收盘净值 1 开始，首日建仓，下一交易日起计算收益。早于已知词表版本的历史区间属于事后规则回放。
+
 > 本项目仅供娱乐与研究，不构成任何投资建议。
 
 ## 它能做什么
@@ -61,6 +63,7 @@ npm run dev
 | --- | --- |
 | `uv run zoo-index` | 更新最近一个交易日 |
 | `uv run zoo-index --backfill` | 回填最近 5 年历史 |
+| `uv run zoo-index --start-date 20210104 --backfill-mode all` | 从共同起点全量重算，首日收盘净值为 1 |
 | `uv run zoo-chart` | 仅重绘图表，不调用 Tushare |
 | `uv run zoo-audit --date YYYYMMDD` | 生成确定性收录审核候选 |
 | `make daily` / `make backfill` / `make chart` / `make test` | Makefile 快捷命令 |
