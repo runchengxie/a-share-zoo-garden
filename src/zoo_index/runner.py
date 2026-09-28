@@ -470,6 +470,23 @@ def _anomalous_codes(
     return anomalies, new_streak
 
 
+def _require_delisting_marks(
+    held: pd.DataFrame,
+    stock_basic: pd.DataFrame,
+    daily_prices: pd.DataFrame,
+    date: str,
+) -> None:
+    """Refuse a delisting-day holding without a price or settlement event."""
+    if held.empty or "delist_date" not in stock_basic:
+        return
+    delist = stock_basic.set_index("ts_code")["delist_date"]
+    quoted = set(daily_prices["ts_code"].astype(str))
+    for code in held["ts_code"].astype(str):
+        raw_date = pd.to_numeric(delist.get(code), errors="coerce")
+        if pd.notna(raw_date) and int(raw_date) <= int(date) and code not in quoted:
+            raise ValueError(f"{date} 退市持仓 {code} 缺少行情和可核实的结算事件")
+
+
 def _month_first_open_date(client: TushareLike, date: str, cache: dict[str, str]) -> str:
     month_key = date[:6]
     if month_key in cache:
@@ -813,6 +830,9 @@ def compute_day(
             prev_state.extended.constituents,
             prev_state.extended.weights,
         )
+
+    _require_delisting_marks(held_strict, stock_basic, daily_prices, date)
+    _require_delisting_marks(held_extended, stock_basic, daily_prices, date)
 
     # 异常检测（退市 / ST / 长期停牌），并累计停牌连续天数。
     strict_anom, strict_streak = _anomalous_codes(

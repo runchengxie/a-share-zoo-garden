@@ -7,7 +7,7 @@ import pytest
 
 from zoo_index.config import Rules, load_rules
 from zoo_index.data_sources.tushare import TradeCalendarEntry
-from zoo_index.runner import _anomalous_codes, compute_day
+from zoo_index.runner import _anomalous_codes, _require_delisting_marks, compute_day
 
 
 def _rules() -> Rules:
@@ -38,6 +38,16 @@ def test_anomalous_codes_detects_delist() -> None:
     )
     assert anom == {"000001.SZ"}
     assert streak.get("000001.SZ") == 0
+
+
+def test_delisting_without_price_or_settlement_refuses_index_return() -> None:
+    held = pd.DataFrame([{"ts_code": "000001.SZ"}])
+    basic = pd.DataFrame([{"ts_code": "000001.SZ", "delist_date": "20240102"}])
+    with pytest.raises(ValueError, match="缺少行情和可核实的结算事件"):
+        _require_delisting_marks(
+            held, basic, pd.DataFrame(columns=pd.Index(["ts_code"])), "20240102"
+        )
+    _require_delisting_marks(held, basic, pd.DataFrame({"ts_code": ["000001.SZ"]}), "20240102")
 
 
 def test_anomalous_codes_detects_st() -> None:
