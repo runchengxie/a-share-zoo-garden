@@ -1,3 +1,5 @@
+import TaxonomyDisclosure from "../components/TaxonomyDisclosure";
+
 export default function Methodology() {
   return (
     <div className="page-methodology">
@@ -19,6 +21,8 @@ export default function Methodology() {
         排除项用于过滤名称中包含主题词、但与主题无关的地名、品牌或行业词。
         另提供按 ts_code 的强制纳入与强制剔除名单，用于人工纠偏。
       </p>
+      <TaxonomyDisclosure theme="animal" />
+      <TaxonomyDisclosure theme="plant" />
 
       <h3>复权与收益</h3>
       <p>

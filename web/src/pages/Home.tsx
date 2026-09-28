@@ -13,6 +13,7 @@ import {
 } from "../api";
 import ChangesList from "../components/ChangesList";
 import NavCards from "../components/NavCards";
+import TaxonomyDisclosure from "../components/TaxonomyDisclosure";
 
 const ZooChart = lazy(() => import("../components/ZooChart"));
 
@@ -51,6 +52,7 @@ function ThemeDashboard({ theme, data }: { theme: IndexTheme; data: ThemeData })
 
       <section className="research-section" aria-labelledby={`${theme}-performance-heading`}>
         <div className="section-heading"><div><div className="section-kicker">表现 / 标准化净值</div><h3 id={`${theme}-performance-heading`}>净值与基准</h3><p className="section-deck">比较严格{themeLabel}、扩展{themeLabel}和基准。缩放区间只改变视图，不改变指数口径。</p></div></div>
+        <TaxonomyDisclosure theme={theme} />
         <Suspense fallback={<div className="zoo-chart zoo-chart-loading" role="status">加载图表…</div>}>
           <ZooChart history={data.history} benchmarkLabel={data.latest.benchmark_label} themeLabel={themeLabel} />
         </Suspense>
