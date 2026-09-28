@@ -373,6 +373,14 @@ h2 {
   font-size: 12px;
 }
 
+.research-alert {
+  margin: 0 0 24px;
+  padding: 12px 16px;
+  border-left: 3px solid var(--red);
+  background: var(--surface-soft);
+  color: var(--ink-soft);
+}
+
 .metric-strip {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));

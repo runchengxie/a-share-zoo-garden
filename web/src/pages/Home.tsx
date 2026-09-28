@@ -45,6 +45,12 @@ function ThemeDashboard({ theme, data }: { theme: IndexTheme; data: ThemeData })
         <span className="section-asof">截至 {data.latest.date}</span>
       </div>
 
+      {theme === "animal" && (
+        <p className="research-alert" role="status">
+          历史净值在 2026 年 6 月和 7 月遇到退市成分缺价，相关日期后的曲线尚待结算数据重建，请勿据此比较收益。
+        </p>
+      )}
+
       <section className="index-snapshot" aria-labelledby={`${theme}-snapshot-heading`}>
         <div className="section-heading compact-heading"><div><div className="section-kicker">指数快照</div><h3 id={`${theme}-snapshot-heading`}>今日数据</h3></div></div>
         <NavCards latest={data.latest} strictCount={data.constituents.strict.length} extendedCount={data.constituents.extended.length} themeLabel={themeLabel} />

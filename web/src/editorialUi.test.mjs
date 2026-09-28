@@ -6,6 +6,7 @@ const app = readFileSync(new URL("./App.tsx", import.meta.url), "utf8");
 const theme = readFileSync(new URL("./theme.ts", import.meta.url), "utf8");
 const themeToggle = readFileSync(new URL("./components/ThemeToggle.tsx", import.meta.url), "utf8");
 const home = readFileSync(new URL("./pages/Home.tsx", import.meta.url), "utf8");
+const methodology = readFileSync(new URL("./pages/Methodology.tsx", import.meta.url), "utf8");
 const historyPage = readFileSync(new URL("./pages/History.tsx", import.meta.url), "utf8");
 const styles = readFileSync(new URL("./styles.css", import.meta.url), "utf8");
 const chart = readFileSync(new URL("./components/ZooChart.tsx", import.meta.url), "utf8");
@@ -40,6 +41,13 @@ test("home page leads with a research question and index snapshot", () => {
   assert.match(home, /id=\{`\$\{theme\}-panel`\}/);
   assert.match(home, /research-section/);
   assert.match(home, /植物园/);
+});
+
+test("unpriced delisting is disclosed with the historical NAV", () => {
+  assert.match(home, /research-alert/);
+  assert.match(home, /退市成分缺价/);
+  assert.match(methodology, /退市持仓缺少行情和可核实结算事件/);
+  assert.doesNotMatch(methodology, /剩余成分重新等权/);
 });
 
 test("home page lazy-loads the chart without changing its data contract", () => {

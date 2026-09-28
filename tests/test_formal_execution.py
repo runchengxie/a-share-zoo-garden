@@ -45,3 +45,12 @@ def test_optional_published_limits_block_unknown_inputs(tmp_path) -> None:
     )
     with pytest.raises(ValueError, match="unknown daily price limits"):
         _pricing(_SuspendedClient(), ["20251223"], {"A.SZ"}, tmp_path)
+
+
+def test_pricing_refuses_unpriced_delisting() -> None:
+    class NoBarClient(_SuspendedClient):
+        def get_daily(self, day: str) -> pd.DataFrame:
+            return pd.DataFrame({"ts_code": ["B.SZ"], "close": [5.0], "amount": [1000.0]})
+
+    with pytest.raises(ValueError, match="unpriced delisting"):
+        _pricing(NoBarClient(), ["20251223"], {"A.SZ"}, delist_dates={"A.SZ": "20251223"})

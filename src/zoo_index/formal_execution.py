@@ -88,16 +88,36 @@ class _PricingClient(Protocol):
     def get_suspension(self, trade_date: str, /) -> pd.DataFrame: ...
 
 
+def _reject_unpriced_delists(
+    daily: pd.DataFrame,
+    day: str,
+    symbols: set[str],
+    delist_dates: dict[str, str] | None,
+) -> None:
+    if not delist_dates:
+        return
+    quoted = set(daily.ts_code.astype(str))
+    missing = [
+        symbol
+        for symbol, delist in delist_dates.items()
+        if symbol in symbols and delist <= day and symbol not in quoted
+    ]
+    if missing:
+        raise ValueError(f"{day} has unpriced delisting without settlement: {missing}")
+
+
 def _pricing(
     client: _PricingClient,
     days: list[str],
     symbols: set[str],
     limit_asset: Path | None = None,
+    delist_dates: dict[str, str] | None = None,
 ) -> pd.DataFrame:
     frames: list[pd.DataFrame] = []
     for day in days:
         daily = client.get_daily(day)
         daily = daily.loc[daily.ts_code.isin(symbols)].copy()
+        _reject_unpriced_delists(daily, day, symbols, delist_dates)
         if daily.empty:
             continue
         factors = client.get_adj_factor(day)[["ts_code", "adj_factor"]]
@@ -153,9 +173,28 @@ def run_diagnostic(
     days = [day for day in client.dates if start <= day <= end]
     if len(days) < 2:
         raise ValueError("at least two cached sessions are required")
-    targets = _targets(client, rules_path, days)
-    symbols = {str(row["symbol"]) for rows in targets.values() for row in rows}
-    pricing = _pricing(client, days[1:], symbols, limit_asset)
+    try:
+        targets = _targets(client, rules_path, days)
+        symbols = {str(row["symbol"]) for rows in targets.values() for row in rows}
+        basic = client.get_stock_basic()
+        delist_dates = {
+            str(row["ts_code"]): str(row["delist_date"])
+            for row in basic[["ts_code", "delist_date"]].to_dict("records")
+            if pd.notna(row["delist_date"]) and str(row["delist_date"]).isdigit()
+        }
+        pricing = _pricing(client, days[1:], symbols, limit_asset, delist_dates)
+    except (ValueError, FileNotFoundError) as error:
+        output_dir.mkdir(parents=True, exist_ok=True)
+        (output_dir / "summary.json").write_text(
+            json.dumps(
+                {"evidence_tier": "blocked", "start": start, "end": end, "reason": str(error)},
+                ensure_ascii=False,
+                indent=2,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        raise
     config = execution_sim.ExecutionSimConfig(
         enabled=True,
         portfolio_value=1_000_000.0,
