@@ -20,6 +20,7 @@ from zoo_index.index import (
     PortfolioState,
     VariantState,
     _apply_namechange,
+    _delisting_watch_codes,
     _equal_weights,
     build_constituents,
     compute_equal_weight_return,
@@ -428,7 +429,7 @@ def _anomalous_codes(
 ) -> tuple[set[str], dict[str, int]]:
     """检测持有成分中的异常，返回需剔除的代码与更新后的停牌连续天数。
 
-    异常包括退市、历史名称未知、当日名称含 ST，以及连续停牌达到阈值。
+    异常包括退市整理期、退市、历史名称未知、当日名称含 ST，以及连续停牌达到阈值。
     """
     if held.empty:
         return set(), {}
@@ -447,6 +448,7 @@ def _anomalous_codes(
                 delist[code] = 99999999 if pd.isna(value) else int(value)
 
     as_of = int(date)
+    delisting_watch = _delisting_watch_codes(namechange, date)
     new_streak: dict[str, int] = {}
     anomalies: set[str] = set()
     for code in held["ts_code"]:
@@ -455,7 +457,7 @@ def _anomalous_codes(
         new_streak[code] = streak
 
         delist_date = delist.get(code, 99999999)
-        if delist_date <= as_of:
+        if delist_date <= as_of or code in delisting_watch:
             anomalies.add(code)
             continue
         if code not in name_map:

@@ -589,7 +589,13 @@ def test_resumption_books_price_move_after_suspended_days(tmp_path: Path) -> Non
     assert recovered.strict_ret == pytest.approx(-0.1)
 
 
-def test_new_st_status_changes_next_day_holdings_not_same_day_return() -> None:
+@pytest.mark.parametrize(
+    ("new_name", "change_reason"),
+    [("ST金龙鱼", "ST"), ("退市金龙鱼", "退市整理期")],
+)
+def test_new_st_status_changes_next_day_holdings_not_same_day_return(
+    new_name: str, change_reason: str
+) -> None:
     class StClient(FakeClient):
         def __init__(self) -> None:
             super().__init__(["20240101", "20240102", "20240103"], {})
@@ -616,9 +622,11 @@ def test_new_st_status_changes_next_day_holdings_not_same_day_return() -> None:
                         [
                             {
                                 "ts_code": "000001.SZ",
-                                "name": "ST金龙鱼",
+                                "name": new_name,
                                 "start_date": "20240103",
                                 "end_date": "99999999",
+                                "ann_date": "20240102",
+                                "change_reason": change_reason,
                             },
                         ]
                     ),
