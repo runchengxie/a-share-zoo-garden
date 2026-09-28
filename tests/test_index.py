@@ -52,11 +52,19 @@ def test_delisting_watch_uses_effective_and_announced_dates() -> None:
                 "ann_date": "20260701",
                 "change_reason": "退市整理期",
             },
+            {
+                "ts_code": "300090.SZ",
+                "start_date": "20260618",
+                "end_date": "20260625",
+                "ann_date": "20260618",
+                "change_reason": "退市整理期",
+            },
         ]
     )
     assert _delisting_watch_codes(events, "20260531") == set()
     assert _delisting_watch_codes(events, "20260601") == {"600599.SH"}
     assert _delisting_watch_codes(events, "20260618") == {"600599.SH", "300029.SZ"}
+    assert "300090.SZ" in _delisting_watch_codes(events, "20260619")
     assert _delisting_watch_codes(events, "20260626") == {"300029.SZ"}
 
 

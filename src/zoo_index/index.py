@@ -106,7 +106,7 @@ def _delisting_watch_codes(namechange: pd.DataFrame, as_of: str) -> set[str]:
     active = namechange.loc[namechange["change_reason"].eq("退市整理期")].copy()
     active = active.loc[_normalize_date_series(active.start_date, 99999999) <= as_of_value]
     if "ann_date" in active.columns:
-        active = active.loc[_normalize_date_series(active.ann_date, 99999999) <= as_of_value]
+        active = active.loc[_normalize_date_series(active.ann_date, 99999999) < as_of_value]
     if "end_date" in active.columns:
         active = active.loc[_normalize_date_series(active.end_date, 99999999) >= as_of_value]
     return set(active.ts_code.astype(str))
