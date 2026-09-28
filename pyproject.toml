@@ -14,11 +14,18 @@ dependencies = [
   "matplotlib",
 ]
 
+[project.optional-dependencies]
+formal = [
+  "quant-platform @ git+https://github.com/runchengxie/quant-platform.git@70073b9e3566125f00b74d094b9d5a9f08e51c49 ; python_version >= '3.12'",
+  "research-contracts @ git+https://github.com/runchengxie/quant-platform.git@70073b9e3566125f00b74d094b9d5a9f08e51c49#subdirectory=packages/research-contracts ; python_version >= '3.12'",
+]
+
 [project.scripts]
 zoo-index = "zoo_index.cli:main"
 zoo-chart = "redraw_chart:main"
 zoo-audit = "zoo_index.cli:audit_main"
 zoo-rule-comparison = "zoo_index.rule_comparison:main"
+zoo-formal-diagnostic = "zoo_index.formal_execution:main"
 
 [tool.setuptools]
 package-dir = { "" = "src" }
