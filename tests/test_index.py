@@ -1,7 +1,11 @@
 import pandas as pd
 import pytest
 
-from zoo_index.index import _apply_namechange, compute_equal_weight_return
+from zoo_index.index import (
+    _apply_namechange,
+    _delisting_watch_codes,
+    compute_equal_weight_return,
+)
 
 
 def _frame(rows: list[dict]) -> pd.DataFrame:
@@ -22,6 +26,38 @@ def test_asof_name_does_not_fall_back_to_current_name() -> None:
     )
     result = _apply_namechange(stocks, history, "20210101")
     assert result.to_dict("records") == [{"ts_code": "000001.SZ", "name": "熊猫"}]
+
+
+def test_delisting_watch_uses_effective_and_announced_dates() -> None:
+    events = _frame(
+        [
+            {
+                "ts_code": "600599.SH",
+                "start_date": "20260601",
+                "end_date": "20260625",
+                "ann_date": "20260523",
+                "change_reason": "退市整理期",
+            },
+            {
+                "ts_code": "300029.SZ",
+                "start_date": "20260618",
+                "end_date": "20260709",
+                "ann_date": "20260610",
+                "change_reason": "退市整理期",
+            },
+            {
+                "ts_code": "000001.SZ",
+                "start_date": "20260501",
+                "end_date": None,
+                "ann_date": "20260701",
+                "change_reason": "退市整理期",
+            },
+        ]
+    )
+    assert _delisting_watch_codes(events, "20260531") == set()
+    assert _delisting_watch_codes(events, "20260601") == {"600599.SH"}
+    assert _delisting_watch_codes(events, "20260618") == {"600599.SH", "300029.SZ"}
+    assert _delisting_watch_codes(events, "20260626") == {"300029.SZ"}
 
 
 def test_compute_equal_weight_return_keeps_suspended_stock() -> None:

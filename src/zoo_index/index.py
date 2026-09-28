@@ -97,6 +97,21 @@ def _apply_namechange(df: pd.DataFrame, namechange: pd.DataFrame, as_of: str) ->
     return df.drop(columns=["name"]).merge(active, on="ts_code", how="inner")
 
 
+def _delisting_watch_codes(namechange: pd.DataFrame, as_of: str) -> set[str]:
+    """Use effective delisting-period events known by the decision date."""
+    required = {"ts_code", "start_date", "change_reason"}
+    if not required.issubset(namechange.columns):
+        return set()
+    as_of_value = int(as_of)
+    active = namechange.loc[namechange["change_reason"].eq("退市整理期")].copy()
+    active = active.loc[_normalize_date_series(active.start_date, 99999999) <= as_of_value]
+    if "ann_date" in active.columns:
+        active = active.loc[_normalize_date_series(active.ann_date, 99999999) <= as_of_value]
+    if "end_date" in active.columns:
+        active = active.loc[_normalize_date_series(active.end_date, 99999999) >= as_of_value]
+    return set(active.ts_code.astype(str))
+
+
 def _filter_min_listing_age(df: pd.DataFrame, as_of: str, min_listing_days: int) -> pd.DataFrame:
     if min_listing_days <= 0 or "list_date" not in df.columns:
         return df.copy()
@@ -115,6 +130,7 @@ def prepare_universe_asof(
 ) -> pd.DataFrame:
     filtered = _filter_listed_asof(stock_basic, as_of)
     filtered = _apply_namechange(filtered, namechange, as_of)
+    filtered = filtered.loc[~filtered.ts_code.isin(_delisting_watch_codes(namechange, as_of))]
     filtered = _filter_exchange(filtered, rules.allow_beijing)
     filtered = _filter_st(filtered, rules.exclude_st)
     filtered = _filter_min_listing_age(filtered, as_of, rules.min_listing_days)
