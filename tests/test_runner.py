@@ -144,6 +144,26 @@ def test_compute_day_reports_opt_in_trade_costs() -> None:
     assert result.strict_net_ret == pytest.approx(result.strict_ret - 0.001)
 
 
+def test_compute_day_rejects_unavailable_suspension_data() -> None:
+    class FailedSuspensionClient(FakeClient):
+        def get_suspension(self, trade_date: str) -> pd.DataFrame:
+            raise OSError("source unavailable")
+
+    client = FailedSuspensionClient(
+        ["20240101", "20240102"],
+        {"000001.SZ": (1.01, 1.0), "600000.SH": (1.01, 1.0)},
+    )
+    with pytest.raises(RuntimeError, match="停牌信息读取失败"):
+        compute_day(
+            client,
+            _rules(),
+            BenchmarkConfig("000300.SH", "index", "HS300"),
+            "20240102",
+            client.get_stock_basic(),
+            client.get_namechange(),
+        )
+
+
 def test_compute_day_does_not_charge_monthly_costs_on_hold_days() -> None:
     client = FakeClient(
         ["20240101", "20240102", "20240103"],
