@@ -42,7 +42,7 @@ from zoo_index.outputs import (
     save_holdings,
     update_nav,
 )
-from zoo_index.trading import TradeCostConfig, compute_trade_accounting
+from zoo_index.runtime_jobs import run_trade_accounting_job
 
 DEFAULT_BACKFILL_YEARS = 5
 DEFAULT_COMPLETE_LOOKBACK = 10
@@ -735,6 +735,8 @@ def _resolve_day_variants(
 
 
 def _trade_metrics(
+    date: str,
+    variant: str,
     target: pd.DataFrame,
     previous: VariantState | None,
     daily_prices: pd.DataFrame,
@@ -744,7 +746,7 @@ def _trade_metrics(
 ) -> tuple[float, float]:
     if not config.enabled:
         return 0.0, 0.0
-    target_weights = _equal_weights(target)
+    target_weights = pd.Series(_equal_weights(target), dtype=float)
     current = daily_prices.set_index("ts_code")["close"]
     previous_prices = prev_daily.set_index("ts_code")["close"]
     if previous is not None and previous.last_marks:
@@ -753,19 +755,29 @@ def _trade_metrics(
         previous_prices = previous_prices.fillna(marked)
     tradable = pd.Series(True, index=target_weights.keys(), dtype=bool)
     tradable.loc[tradable.index.isin(suspended)] = False
-    accounting = compute_trade_accounting(
-        previous.weights if previous is not None else None,
-        target_weights,
-        previous_prices,
-        current,
-        tradable,
-        TradeCostConfig(
-            commission_rate=config.commission_rate,
-            stamp_tax_rate=config.stamp_tax_rate,
-            slippage_rate=config.slippage_rate,
-        ),
+    old_weights = (
+        pd.Series(previous.weights, dtype=float) if previous is not None else pd.Series(dtype=float)
     )
-    return accounting.turnover, accounting.total_cost
+    symbols = old_weights.index.union(target_weights.index)
+    frame = pd.DataFrame(
+        {
+            "symbol": symbols.astype(str),
+            "previous_weight": old_weights.reindex(symbols).to_numpy(),
+            "target_weight": target_weights.reindex(symbols).to_numpy(),
+            "previous_price": previous_prices.reindex(symbols).to_numpy(),
+            "current_price": current.reindex(symbols).to_numpy(),
+            "tradable": tradable.reindex(symbols, fill_value=False).to_numpy(),
+        }
+    )
+    turnover, cost, _job_id = run_trade_accounting_job(
+        date,
+        variant,
+        frame,
+        commission_rate=config.commission_rate,
+        stamp_tax_rate=config.stamp_tax_rate,
+        slippage_rate=config.slippage_rate,
+    )
+    return turnover, cost
 
 
 def compute_day(
@@ -930,6 +942,8 @@ def compute_day(
     )
     if prev_state is None or is_rebalance or strict_anom:
         strict_turnover, strict_cost = _trade_metrics(
+            date,
+            "strict",
             strict_target,
             prev_state.strict if prev_state else None,
             daily_prices,
@@ -941,6 +955,8 @@ def compute_day(
         strict_turnover, strict_cost = 0.0, 0.0
     if prev_state is None or is_rebalance or extended_anom:
         extended_turnover, extended_cost = _trade_metrics(
+            date,
+            "extended",
             extended_target,
             prev_state.extended if prev_state else None,
             daily_prices,

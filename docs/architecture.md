@@ -98,7 +98,7 @@ uv run zoo-audit --date 20260904 --mode all --llm --batch-size 200
 
 审核命令可以使用 `--input stock_basic.parquet` 和 `--namechange-input namechange.parquet` 离线运行。它只写 `artifacts/audit/`，不会修改 `rules.yml`、`plant_rules.yml` 或 `published/`。`--llm` 使用 Gemini 作为首选，随后尝试配置的 OpenRouter 固定模型，最后才尝试 `openrouter/free`。
 
-可交易回测参数位于仓库根目录 `backtest.yml`，默认 `enabled: false` 且各项成本率为 0。启用后，`nav.csv` 会增加 `zoo_*_net_ret`、`zoo_*_net_nav`、`zoo_*_turnover` 和 `zoo_*_cost` 字段。
+可交易回测参数位于仓库根目录 `backtest.yml`，默认 `enabled: false` 且各项成本率为 0。启用后，每次成本结算均通过仓库外 `ZOO_BACKTEST_RUNTIME_ROOT` 中的 runtime 作业执行；`nav.csv` 会增加 `zoo_*_net_ret`、`zoo_*_net_nav`、`zoo_*_turnover` 和 `zoo_*_cost` 字段。
 
 仅重绘图表（不调用 Tushare）：
 

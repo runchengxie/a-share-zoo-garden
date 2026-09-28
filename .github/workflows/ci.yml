@@ -18,19 +18,19 @@ jobs:
           enable-cache: true
 
       - name: Install dependencies
-        run: uv sync --frozen
+        run: uv sync --frozen --extra formal
 
       - name: Ruff format check
-        run: uv run ruff format --check .
+        run: uv run --extra formal ruff format --check .
 
       - name: Ruff lint
-        run: uv run ruff check .
+        run: uv run --extra formal ruff check .
 
       - name: Ty type check
-        run: uv run ty check
+        run: uv run --extra formal ty check
 
       - name: Pytest
-        run: uv run pytest
+        run: uv run --extra formal pytest
 
       - name: uv audit
         run: uv audit --frozen
