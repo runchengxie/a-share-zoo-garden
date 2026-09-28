@@ -791,13 +791,13 @@ def compute_day(
         raise ValueError(f"{date} 复权因子为空，无法计算指数。")
 
     prev_daily = client.get_daily(prev_date)
-    suspended: set[str] = set()
     try:
         suspension_df = client.get_suspension(date)
-        if not suspension_df.empty and "ts_code" in suspension_df.columns:
-            suspended = set(suspension_df["ts_code"].astype(str).tolist())
     except Exception as exc:
-        print(f"获取停牌信息失败，当日按无停牌处理：{exc}")
+        raise RuntimeError(f"{date} 停牌信息读取失败，不能按无停牌继续回测") from exc
+    if "ts_code" not in suspension_df.columns:
+        raise ValueError(f"{date} 停牌信息缺少 ts_code 字段")
+    suspended = set(suspension_df["ts_code"].astype(str).tolist())
 
     is_new_month = prev_state is None or prev_state.date[:6] != date[:6]
     is_rebalance = is_new_month
