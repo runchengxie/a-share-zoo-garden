@@ -18068,5 +18068,18 @@
     "zoo_extended_net_ret": -0.00915505,
     "zoo_strict_net_nav": 1.3667,
     "zoo_extended_net_nav": 1.809436
+  },
+  {
+    "date": "20260928",
+    "zoo_strict_ret": -0.01884962,
+    "zoo_extended_ret": -0.01902673,
+    "benchmark_ret": -0.02170543,
+    "zoo_strict_nav": 1.340938,
+    "zoo_extended_nav": 1.775009,
+    "benchmark_nav": 0.927404,
+    "zoo_strict_net_ret": -0.01884962,
+    "zoo_extended_net_ret": -0.01902673,
+    "zoo_strict_net_nav": 1.340938,
+    "zoo_extended_net_nav": 1.775009
   }
 ]
