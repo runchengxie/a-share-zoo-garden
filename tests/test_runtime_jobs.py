@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict
+from importlib import import_module
 
 import pandas as pd
 import pytest
@@ -12,7 +13,7 @@ from zoo_index.runtime_jobs import publish_verified_frames, run_sequenced_job
 
 def test_sequenced_job_publishes_verified_daily_ledger(tmp_path) -> None:
     pytest.importorskip("backtest_runtime")
-    from portfolio_backtester.execution_sim import ExecutionSimConfig
+    execution_sim = import_module("portfolio_backtester.execution_sim")
 
     positions = pd.DataFrame(
         {
@@ -46,7 +47,7 @@ def test_sequenced_job_publishes_verified_daily_ledger(tmp_path) -> None:
             "trading_calendar_ref": "synthetic-calendar",
         }
     }
-    config = ExecutionSimConfig(
+    config = execution_sim.ExecutionSimConfig(
         enabled=True,
         portfolio_value=100_000.0,
         participation_rate=1.0,
