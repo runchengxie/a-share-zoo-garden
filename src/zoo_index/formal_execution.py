@@ -90,22 +90,42 @@ class _PricingClient(Protocol):
     def get_suspension(self, trade_date: str, /) -> pd.DataFrame: ...
 
 
-def _reject_unpriced_delists(
+def _actual_pricing(
+    client: _PricingClient,
     daily: pd.DataFrame,
     day: str,
-    symbols: set[str],
+    limit_asset: Path | None,
     delist_dates: dict[str, str] | None,
-) -> None:
-    if not delist_dates:
-        return
-    quoted = set(daily.ts_code.astype(str))
-    missing = [
-        symbol
-        for symbol, delist in delist_dates.items()
-        if symbol in symbols and delist <= day and symbol not in quoted
-    ]
-    if missing:
-        raise ValueError(f"{day} has unpriced delisting without settlement: {missing}")
+    columns: list[str],
+) -> pd.DataFrame:
+    if daily.empty:
+        return pd.DataFrame(columns=pd.Index(columns))
+    factors = client.get_adj_factor(day)[["ts_code", "adj_factor"]]
+    daily = daily.merge(factors, on="ts_code", how="left", validate="one_to_one")
+    if daily[["close", "adj_factor", "amount"]].isna().any().any():
+        raise ValueError(f"{day} has incomplete adjusted-price or liquidity input")
+    suspended = set(client.get_suspension(day).ts_code.astype(str))
+    if limit_asset is not None:
+        files = sorted((limit_asset / "data" / f"trade_date={day}").glob("*.parquet"))
+        if not files:
+            raise FileNotFoundError(f"{day} has no published limit-status partition")
+        limits = pd.concat(
+            [
+                pd.read_parquet(path, columns=["ts_code", "up_limit", "down_limit"])
+                for path in files
+            ],
+            ignore_index=True,
+        )
+        daily = daily.merge(limits, on="ts_code", how="left", validate="one_to_one")
+        if daily[["up_limit", "down_limit"]].isna().any().any():
+            raise ValueError(f"{day} has unknown daily price limits")
+        daily["limit_up"] = daily.close.ge(daily.up_limit - 0.005)
+        daily["limit_down"] = daily.close.le(daily.down_limit + 0.005)
+    daily["adjusted_close"] = daily.close * daily.adj_factor
+    delisted = daily.ts_code.map(delist_dates or {}).fillna("99999999").le(day)
+    daily["tradable"] = daily.amount.gt(0) & ~daily.ts_code.isin(suspended) & ~delisted
+    daily["trade_date"] = day
+    return daily.rename(columns={"ts_code": "symbol"})[columns]
 
 
 def _pricing(
@@ -116,41 +136,42 @@ def _pricing(
     delist_dates: dict[str, str] | None = None,
 ) -> pd.DataFrame:
     frames: list[pd.DataFrame] = []
+    last_marks: dict[str, float] = {}
     for day in days:
         daily = client.get_daily(day)
         daily = daily.loc[daily.ts_code.isin(symbols)].copy()
-        _reject_unpriced_delists(daily, day, symbols, delist_dates)
-        if daily.empty:
-            continue
-        factors = client.get_adj_factor(day)[["ts_code", "adj_factor"]]
-        daily = daily.merge(factors, on="ts_code", how="left", validate="one_to_one")
-        required = ["close", "adj_factor", "amount"]
-        if daily[required].isna().any().any():
-            raise ValueError(f"{day} has incomplete adjusted-price or liquidity input")
-        suspended = set(client.get_suspension(day).ts_code.astype(str))
-        if limit_asset is not None:
-            files = sorted((limit_asset / "data" / f"trade_date={day}").glob("*.parquet"))
-            if not files:
-                raise FileNotFoundError(f"{day} has no published limit-status partition")
-            limits = pd.concat(
-                [
-                    pd.read_parquet(path, columns=["ts_code", "up_limit", "down_limit"])
-                    for path in files
-                ],
-                ignore_index=True,
-            )
-            daily = daily.merge(limits, on="ts_code", how="left", validate="one_to_one")
-            if daily[["up_limit", "down_limit"]].isna().any().any():
-                raise ValueError(f"{day} has unknown daily price limits")
-            daily["limit_up"] = daily.close.ge(daily.up_limit - 0.005)
-            daily["limit_down"] = daily.close.le(daily.down_limit + 0.005)
-        daily["adjusted_close"] = daily.close * daily.adj_factor
-        daily["tradable"] = daily.amount.gt(0) & ~daily.ts_code.isin(suspended)
-        daily["trade_date"] = day
         columns = ["trade_date", "symbol", "adjusted_close", "amount", "tradable"]
         if limit_asset is not None:
             columns.extend(("limit_up", "limit_down"))
-        frames.append(daily.rename(columns={"ts_code": "symbol"})[columns])
+        frame = _actual_pricing(client, daily, day, limit_asset, delist_dates, columns)
+        last_marks.update(
+            zip(frame.symbol.astype(str), frame.adjusted_close.astype(float), strict=True)
+        )
+        missing = [
+            symbol
+            for symbol, delist in (delist_dates or {}).items()
+            if symbol in symbols and delist <= day and symbol not in set(frame.symbol)
+        ]
+        if missing:
+            if any(symbol not in last_marks for symbol in missing):
+                raise ValueError(f"{day} has unpriced delisting without prior mark: {missing}")
+            carried = pd.DataFrame(
+                [
+                    {
+                        "trade_date": day,
+                        "symbol": symbol,
+                        "adjusted_close": last_marks[symbol],
+                        "amount": 0.0,
+                        "tradable": False,
+                        "limit_up": False,
+                        "limit_down": False,
+                    }
+                    for symbol in missing
+                ]
+            )
+            frame = pd.concat([frame, carried[columns]], ignore_index=True)
+        if not frame.empty:
+            frames.append(frame)
     if not frames:
         raise ValueError("no pricing for target symbols")
     return pd.concat(frames, ignore_index=True)
@@ -211,6 +232,9 @@ def run_diagnostic(
     )
     output_dir.mkdir(parents=True, exist_ok=True)
     summaries: dict[str, object] = {}
+    pending: dict[
+        str, tuple[Path, dict[str, object], dict[str, dict[str, str]], list[dict[str, object]]]
+    ] = {}
     for variant, rows in targets.items():
         if not rows:
             raise ValueError(f"{variant} has no target changes")
@@ -230,6 +254,30 @@ def run_diagnostic(
             asdict(config),
             enforce_limits=limit_asset is not None,
         )
+        try:
+            exit_audit = execution_sim.audit_delisting_exits(
+                pd.read_parquet(result_dir / "fills.parquet"),
+                pricing,
+                {
+                    symbol: day
+                    for symbol, day in delist_dates.items()
+                    if symbol in set(positions.symbol)
+                },
+                price_col="adjusted_close",
+            )
+        except ValueError as error:
+            (output_dir / "summary.json").write_text(
+                json.dumps(
+                    {"evidence_tier": "blocked", "start": start, "end": end, "reason": str(error)},
+                    ensure_ascii=False,
+                    indent=2,
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            raise
+        pending[variant] = (result_dir, receipt, clocks, exit_audit.to_dict("records"))
+    for variant, (result_dir, receipt, clocks, exit_rows) in pending.items():
         folder = output_dir / variant
         publish_verified_frames(result_dir, folder)
         (folder / "decision_clocks.json").write_text(
@@ -242,6 +290,7 @@ def run_diagnostic(
                 / config.portfolio_value
             ),
             "runtime_job_id": receipt["job_id"],
+            "delisting_exit_audit": exit_rows,
         }
     report: dict[str, object] = {
         "evidence_tier": "diagnostic",

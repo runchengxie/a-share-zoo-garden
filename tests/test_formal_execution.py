@@ -54,3 +54,23 @@ def test_pricing_refuses_unpriced_delisting() -> None:
 
     with pytest.raises(ValueError, match="unpriced delisting"):
         _pricing(NoBarClient(), ["20251223"], {"A.SZ"}, delist_dates={"A.SZ": "20251223"})
+
+
+def test_pricing_carries_nontradable_mark_after_delisting() -> None:
+    class DelistedClient(_SuspendedClient):
+        def get_daily(self, day: str) -> pd.DataFrame:
+            if day == "20251224":
+                return pd.DataFrame({"ts_code": ["B.SZ"], "close": [5.0], "amount": [1000.0]})
+            return super().get_daily(day)
+
+    pricing = _pricing(
+        DelistedClient(),
+        ["20251223", "20251224"],
+        {"A.SZ"},
+        delist_dates={"A.SZ": "20251224"},
+    )
+    carried = pricing.loc[pricing.trade_date.eq("20251224") & pricing.symbol.eq("A.SZ")]
+    assert len(carried) == 1
+    assert carried.iloc[0].adjusted_close == 10.0
+    assert not bool(carried.iloc[0].tradable)
+    assert carried.iloc[0].amount == 0.0
