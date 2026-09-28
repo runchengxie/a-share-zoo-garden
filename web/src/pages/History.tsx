@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 import { fetchHistory, fetchLatest, NavPoint, Latest } from "../api";
+import TaxonomyDisclosure from "../components/TaxonomyDisclosure";
 
 const ZooChart = lazy(() => import("../components/ZooChart"));
 
@@ -23,6 +24,7 @@ export default function History() {
   return (
     <div className="page-history">
       <h2>历史净值</h2>
+      <TaxonomyDisclosure theme="animal" />
       <Suspense fallback={<div className="zoo-chart zoo-chart-loading" role="status">加载图表…</div>}>
         <ZooChart history={state.history} benchmarkLabel={state.latest.benchmark_label} />
       </Suspense>
