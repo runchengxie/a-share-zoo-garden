@@ -16,9 +16,9 @@ dependencies = [
 
 [project.optional-dependencies]
 formal = [
-  "quant-backtest-runtime @ git+https://github.com/runchengxie/quant-backtest-runtime.git@af5444874561002f8471caa136e1053db6a97246 ; python_version >= '3.12'",
-  "quant-platform @ git+https://github.com/runchengxie/quant-platform.git@59c432baf5395f8fdd8cffe2dd7d02276c2526ae ; python_version >= '3.12'",
-  "research-contracts @ git+https://github.com/runchengxie/quant-platform.git@59c432baf5395f8fdd8cffe2dd7d02276c2526ae#subdirectory=packages/research-contracts ; python_version >= '3.12'",
+  "quant-backtest-runtime @ git+https://github.com/runchengxie/quant-backtest-runtime.git@50a883d3eeb5787af6e966da54c31bde2da7f992 ; python_version >= '3.12'",
+  "quant-platform @ git+https://github.com/runchengxie/quant-platform.git@5ae3766fe8141585a2fcdfba47d85e3e5fd7ed83 ; python_version >= '3.12'",
+  "research-contracts @ git+https://github.com/runchengxie/quant-platform.git@5ae3766fe8141585a2fcdfba47d85e3e5fd7ed83#subdirectory=packages/research-contracts ; python_version >= '3.12'",
 ]
 
 [project.scripts]
