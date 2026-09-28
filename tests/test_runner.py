@@ -125,7 +125,9 @@ def _rules() -> Rules:
     return load_rules(Path(__file__).resolve().parent.parent / "rules.yml")
 
 
-def test_compute_day_reports_opt_in_trade_costs() -> None:
+def test_compute_day_reports_opt_in_trade_costs(tmp_path, monkeypatch) -> None:
+    pytest.importorskip("backtest_runtime")
+    monkeypatch.setenv("ZOO_BACKTEST_RUNTIME_ROOT", str(tmp_path / "runtime"))
     client = FakeClient(
         ["20240101", "20240102", "20240103"],
         {"000001.SZ": (1.01, 1.0), "600000.SH": (1.01, 1.0)},
@@ -164,7 +166,9 @@ def test_compute_day_rejects_unavailable_suspension_data() -> None:
         )
 
 
-def test_compute_day_does_not_charge_monthly_costs_on_hold_days() -> None:
+def test_compute_day_does_not_charge_monthly_costs_on_hold_days(tmp_path, monkeypatch) -> None:
+    pytest.importorskip("backtest_runtime")
+    monkeypatch.setenv("ZOO_BACKTEST_RUNTIME_ROOT", str(tmp_path / "runtime"))
     client = FakeClient(
         ["20240101", "20240102", "20240103"],
         {"000001.SZ": (1.01, 1.0), "600000.SH": (1.01, 1.0)},

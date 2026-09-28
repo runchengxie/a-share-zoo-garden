@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -125,3 +126,56 @@ def publish_verified_frames(result_dir: Path, destination: Path) -> None:
     destination.mkdir()
     for name in ("performance", "positions", "orders", "fills", "daily_ledger"):
         shutil.copy2(result_dir / f"{name}.parquet", destination / f"{name}.parquet")
+
+
+def run_trade_accounting_job(
+    date: str,
+    variant: str,
+    frame: pd.DataFrame,
+    *,
+    commission_rate: float,
+    stamp_tax_rate: float,
+    slippage_rate: float,
+) -> tuple[float, float, str]:
+    """Settle one opt-in cost calculation with a durable verified runtime Job."""
+    configured = os.environ.get("ZOO_BACKTEST_RUNTIME_ROOT")
+    if not configured or not Path(configured).is_absolute():
+        raise ValueError("ZOO_BACKTEST_RUNTIME_ROOT must be an external absolute directory")
+    root = Path(configured).resolve()
+    root.mkdir(parents=True, exist_ok=True)
+    reference = _store_frame(
+        root / "artifacts", frame, root / f"{date}-{variant}-accounting.parquet"
+    )
+    request = {
+        "schema_version": 4,
+        "idempotency_key": "",
+        "backend": "native.trade_accounting",
+        "evidence_tier": "diagnostic",
+        "inputs": {"accounting_ref": reference},
+        "config": {
+            "commission_rate": commission_rate,
+            "stamp_tax_rate": stamp_tax_rate,
+            "slippage_rate": slippage_rate,
+        },
+        "execution": {},
+        "budgets": {"wall_seconds": 120, "memory_mb": 8192},
+    }
+    fingerprint = hashlib.sha256(json.dumps(request, sort_keys=True).encode()).hexdigest()[:24]
+    request["idempotency_key"] = f"zoo-cost-{date}-{variant}-{fingerprint}"
+    manifest = root / f"{date}-{variant}-accounting-request.json"
+    manifest.write_text(json.dumps(request, ensure_ascii=False, sort_keys=True) + "\n")
+    receipt = _runtime_command(root, "submit", str(manifest))
+    job_id = str(receipt["job_id"])
+    deadline = time.monotonic() + 130
+    while time.monotonic() < deadline:
+        status = _runtime_command(root, "status", job_id)
+        if status["status"] == "SUCCEEDED":
+            verified = _runtime_command(root, "result", job_id)
+            if verified.get("backend") != "native.trade_accounting":
+                raise ValueError("unexpected trade accounting runtime backend")
+            summary = verified["summary"]
+            return float(summary["turnover"]), float(summary["total_cost"]), job_id
+        if status["status"] in {"FAILED", "CANCELLED"}:
+            raise RuntimeError(f"backtest job {job_id} {status['status']}: {status['error_code']}")
+        time.sleep(0.1)
+    raise TimeoutError(f"backtest job {job_id} did not finish within its budget")

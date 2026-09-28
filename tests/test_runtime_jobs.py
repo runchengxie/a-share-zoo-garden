@@ -8,7 +8,24 @@ from importlib import import_module
 import pandas as pd
 import pytest
 
-from zoo_index.runtime_jobs import publish_verified_frames, run_sequenced_job
+from zoo_index.runtime_jobs import (
+    publish_verified_frames,
+    run_sequenced_job,
+    run_trade_accounting_job,
+)
+
+
+def test_opt_in_cost_job_requires_external_runtime_root(monkeypatch) -> None:
+    monkeypatch.delenv("ZOO_BACKTEST_RUNTIME_ROOT", raising=False)
+    with pytest.raises(ValueError, match="ZOO_BACKTEST_RUNTIME_ROOT"):
+        run_trade_accounting_job(
+            "20260105",
+            "strict",
+            pd.DataFrame(),
+            commission_rate=0.0,
+            stamp_tax_rate=0.0,
+            slippage_rate=0.0,
+        )
 
 
 def test_sequenced_job_publishes_verified_daily_ledger(tmp_path) -> None:
