@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+from dataclasses import asdict
 from importlib import import_module
 from pathlib import Path
 from typing import Protocol
@@ -13,6 +14,7 @@ import pandas as pd
 from zoo_index.config import load_rules
 from zoo_index.rule_comparison import OfflineCacheClient
 from zoo_index.runner import BenchmarkConfig, PortfolioState, compute_day
+from zoo_index.runtime_jobs import publish_verified_frames, run_sequenced_job
 
 
 def _iso(day: str) -> str:
@@ -164,7 +166,6 @@ def run_diagnostic(
     end: str,
     limit_asset: Path | None = None,
 ) -> dict[str, object]:
-    backends = import_module("portfolio_backtester.backends")
     execution_sim = import_module("portfolio_backtester.execution_sim")
 
     if output_dir.exists() and any(output_dir.iterdir()):
@@ -220,29 +221,27 @@ def run_diagnostic(
             )
             for row in rows
         }
-        result = backends.SequencedExecutionBackend().run(
-            backends.SequencedExecutionRequest(
-                positions=positions,
-                pricing=pricing,
-                decision_clocks=clocks,
-                config=config,
-                price_col="adjusted_close",
-                tradable_col="tradable",
-                limit_up_col="limit_up" if limit_asset is not None else None,
-                limit_down_col="limit_down" if limit_asset is not None else None,
-                price_basis="adjusted_close_proxy",
-            )
+        result_dir, receipt = run_sequenced_job(
+            output_dir / ".runtime",
+            variant,
+            positions,
+            pricing,
+            clocks,
+            asdict(config),
+            enforce_limits=limit_asset is not None,
         )
         folder = output_dir / variant
-        folder.mkdir()
-        for name, frame in result.frames().items():
-            frame.to_parquet(folder / f"{name}.parquet", index=False)
+        publish_verified_frames(result_dir, folder)
         (folder / "decision_clocks.json").write_text(
             json.dumps(clocks, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
         )
         summaries[variant] = {
             "decision_count": len(clocks),
-            "terminal_nav": float(result.daily_ledger.nav.iloc[-1] / config.portfolio_value),
+            "terminal_nav": float(
+                pd.read_parquet(folder / "daily_ledger.parquet").nav.iloc[-1]
+                / config.portfolio_value
+            ),
+            "runtime_job_id": receipt["job_id"],
         }
     report: dict[str, object] = {
         "evidence_tier": "diagnostic",
