@@ -18,6 +18,7 @@ dependencies = [
 zoo-index = "zoo_index.cli:main"
 zoo-chart = "redraw_chart:main"
 zoo-audit = "zoo_index.cli:audit_main"
+zoo-rule-comparison = "zoo_index.rule_comparison:main"
 
 [tool.setuptools]
 package-dir = { "" = "src" }
