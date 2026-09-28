@@ -45,7 +45,10 @@ test("home page leads with a research question and index snapshot", () => {
 
 test("unpriced delisting is disclosed with the historical NAV", () => {
   assert.match(home, /research-alert/);
-  assert.match(home, /退市成分缺价/);
+  assert.match(home, /zooHistoryBeforeUnpricedDelist/);
+  assert.match(home, /animalSnapshotBlocked/);
+  assert.match(historyPage, /zooHistoryBeforeUnpricedDelist/);
+  assert.match(historyPage, /待结算数据重建/);
   assert.match(methodology, /退市持仓缺少行情和可核实结算事件/);
   assert.doesNotMatch(methodology, /剩余成分重新等权/);
 });

@@ -14,6 +14,7 @@ import {
 import ChangesList from "../components/ChangesList";
 import NavCards from "../components/NavCards";
 import TaxonomyDisclosure from "../components/TaxonomyDisclosure";
+import { ZOO_UNPRICED_DELIST_CUTOFF, zooHistoryBeforeUnpricedDelist } from "../researchBoundary";
 
 const ZooChart = lazy(() => import("../components/ZooChart"));
 
@@ -34,6 +35,8 @@ async function fetchThemeData(theme: IndexTheme): Promise<ThemeData> {
 
 function ThemeDashboard({ theme, data }: { theme: IndexTheme; data: ThemeData }) {
   const themeLabel = THEME_LABELS[theme];
+  const animalSnapshotBlocked = theme === "animal" && data.latest.date > ZOO_UNPRICED_DELIST_CUTOFF;
+  const displayHistory = theme === "animal" ? zooHistoryBeforeUnpricedDelist(data.history) : data.history;
   return (
     <section className={`theme-dashboard theme-dashboard-${theme}`} id={`${theme}-panel`} aria-labelledby={`${theme}-dashboard-heading`}>
       <div className="theme-dashboard-heading">
@@ -47,20 +50,20 @@ function ThemeDashboard({ theme, data }: { theme: IndexTheme; data: ThemeData })
 
       {theme === "animal" && (
         <p className="research-alert" role="status">
-          历史净值在 2026 年 6 月和 7 月遇到退市成分缺价，相关日期后的曲线尚待结算数据重建，请勿据此比较收益。
+          退市成分缺价后，动物园净值自 2026-06-26 起待结算数据重建。下方曲线只展示此前的历史，当前净值暂不展示。
         </p>
       )}
 
       <section className="index-snapshot" aria-labelledby={`${theme}-snapshot-heading`}>
-        <div className="section-heading compact-heading"><div><div className="section-kicker">指数快照</div><h3 id={`${theme}-snapshot-heading`}>今日数据</h3></div></div>
-        <NavCards latest={data.latest} strictCount={data.constituents.strict.length} extendedCount={data.constituents.extended.length} themeLabel={themeLabel} />
+        <div className="section-heading compact-heading"><div><div className="section-kicker">指数快照</div><h3 id={`${theme}-snapshot-heading`}>{animalSnapshotBlocked ? "当前净值待核实" : "今日数据"}</h3></div></div>
+        {animalSnapshotBlocked ? <p className="muted">源数据截至 {data.latest.date}，退市结算缺失，当前净值和超额收益暂不展示。成分仍可在成分页查看。</p> : <NavCards latest={data.latest} strictCount={data.constituents.strict.length} extendedCount={data.constituents.extended.length} themeLabel={themeLabel} />}
       </section>
 
       <section className="research-section" aria-labelledby={`${theme}-performance-heading`}>
         <div className="section-heading"><div><div className="section-kicker">表现 / 标准化净值</div><h3 id={`${theme}-performance-heading`}>净值与基准</h3><p className="section-deck">比较严格{themeLabel}、扩展{themeLabel}和基准。缩放区间只改变视图，不改变指数口径。</p></div></div>
         <TaxonomyDisclosure theme={theme} />
         <Suspense fallback={<div className="zoo-chart zoo-chart-loading" role="status">加载图表…</div>}>
-          <ZooChart history={data.history} benchmarkLabel={data.latest.benchmark_label} themeLabel={themeLabel} />
+          <ZooChart history={displayHistory} benchmarkLabel={data.latest.benchmark_label} themeLabel={themeLabel} />
         </Suspense>
       </section>
 
