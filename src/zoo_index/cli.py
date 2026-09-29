@@ -66,6 +66,12 @@ def _parse_args() -> argparse.Namespace:
         help="回填时写每日持仓快照",
     )
     parser.add_argument(
+        "--delisting-policy",
+        choices=("strict", "last_price_proxy"),
+        default="strict",
+        help="退市缺少结算价时的处理：strict 阻塞，last_price_proxy 仅生成研究代理序列",
+    )
+    parser.add_argument(
         "--no-rules-snapshot",
         action="store_true",
         help="回填时不写规则快照",
@@ -179,6 +185,7 @@ def build_run_config(args: argparse.Namespace, repo_root: Path) -> RunConfig | N
         no_rules_snapshot=args.no_rules_snapshot,
         no_cache=args.no_cache,
         force_refresh=args.force_refresh,
+        delisting_policy=args.delisting_policy,
         backtest=load_backtest_config(repo_root / "backtest.yml"),
     )
 
