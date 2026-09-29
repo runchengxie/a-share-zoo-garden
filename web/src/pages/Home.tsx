@@ -41,11 +41,12 @@ async function fetchThemeData(theme: IndexTheme): Promise<ThemeData> {
 
 function ThemeDashboard({ theme, data }: { theme: IndexTheme; data: ThemeData }) {
   const { locale } = useLocale();
+  const [settlementView, setSettlementView] = useState<"proxy" | "strict">("proxy");
   const english = locale === "en-US";
   const themeLabel = english ? theme === "plant" ? "Garden" : "Zoo" : THEME_LABELS[theme];
   const isResearchProxy = theme === "animal" && data.metadata.evidence_tier === "research_proxy";
-  const animalSnapshotBlocked = theme === "animal" && !isResearchProxy && data.latest.date > ZOO_UNPRICED_DELIST_CUTOFF;
-  const displayHistory = theme === "animal" && !isResearchProxy ? zooHistoryBeforeUnpricedDelist(data.history) : data.history;
+  const animalSnapshotBlocked = theme === "animal" && (settlementView === "strict" || !isResearchProxy) && data.latest.date > ZOO_UNPRICED_DELIST_CUTOFF;
+  const displayHistory = theme === "animal" && (!isResearchProxy || settlementView === "strict") ? zooHistoryBeforeUnpricedDelist(data.history) : data.history;
   return (
     <section className={`theme-dashboard theme-dashboard-${theme}`} id={`${theme}-panel`} aria-labelledby={`${theme}-dashboard-heading`}>
       <div className="theme-dashboard-heading">
@@ -59,7 +60,7 @@ function ThemeDashboard({ theme, data }: { theme: IndexTheme; data: ThemeData })
 
       {theme === "animal" && (
         <p className="research-alert" role="status">
-          {isResearchProxy ? (english ? "Research proxy: delisted constituents use the last valid adjusted price as proxy settlement and are removed on the delisting date. It is not verifiable cash settlement or formal tradable performance." : "当前曲线为研究代理版：退市成分使用退市前最后有效复权价格作为代理结算，并在退市日移除。它不代表可核实的现金结算或正式可交易业绩。") : (english ? "Settlement data for delisted constituents is incomplete from 2026-06-26. The chart shows earlier history only and current NAV is withheld." : "退市成分缺价后，动物园净值自 2026-06-26 起待结算数据重建。下方曲线只展示此前的历史，当前净值暂不展示。")}
+          {isResearchProxy && settlementView === "proxy" ? (english ? "Research proxy: delisted constituents use the last valid adjusted price as proxy settlement and are removed on the delisting date. It is not verifiable cash settlement or formal tradable performance." : "当前曲线为研究代理版：退市成分使用退市前最后有效复权价格作为代理结算，并在退市日移除。它不代表可核实的现金结算或正式可交易业绩。") : (english ? "Strict view stops at 2026-06-25 because delisting settlement is not verifiable. It is retained for comparison with the research proxy." : "严格截止版停在 2026-06-25，因为退市结算不可核实，仅用于与研究代理版对照。")}
         </p>
       )}
 
@@ -70,6 +71,7 @@ function ThemeDashboard({ theme, data }: { theme: IndexTheme; data: ThemeData })
 
       <section className="research-section" aria-labelledby={`${theme}-performance-heading`}>
         <div className="section-heading"><div><div className="section-kicker">{english ? "Performance / normalized NAV" : "表现 / 标准化净值"}</div><h3 id={`${theme}-performance-heading`}>{english ? "NAV and benchmark" : "净值与基准"}</h3><p className="section-deck">{english ? `Compare strict ${themeLabel}, extended ${themeLabel}, and the benchmark. Zoom changes the view, not the index definition.` : `比较严格${themeLabel}、扩展${themeLabel}和基准。缩放区间只改变视图，不改变指数口径。`}</p></div></div>
+        {theme === "animal" && isResearchProxy ? <div className="view-toggle" role="group" aria-label={english ? "Settlement view" : "结算口径视图"}><button type="button" className="text-link" aria-pressed={settlementView === "proxy"} onClick={() => setSettlementView("proxy")}>{english ? "Research proxy" : "研究代理版"}</button><button type="button" className="text-link" aria-pressed={settlementView === "strict"} onClick={() => setSettlementView("strict")}>{english ? "Strict cutoff" : "严格截止版"}</button></div> : null}
         <TaxonomyDisclosure theme={theme} />
         <Suspense fallback={<div className="zoo-chart zoo-chart-loading" role="status">{english ? "Loading chart…" : "加载图表…"}</div>}>
           <ZooChart history={displayHistory} benchmarkLabel={data.latest.benchmark_label} themeLabel={themeLabel} />

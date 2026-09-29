@@ -14,15 +14,22 @@ def _read(path: Path) -> dict[str, object]:
     return value
 
 
-def main() -> int:
+def main() -> int:  # noqa: C901
     root = Path(__file__).resolve().parents[1]
     data = root / "published" / "data"
     metadata = _read(data / "metadata.json")
     audit = _read(data / "delisting_audit.json")
+    provenance = _read(data / "provenance.json")
     if metadata.get("evidence_tier") != "research_proxy":
         raise SystemExit("animal metadata must declare evidence_tier=research_proxy")
     if metadata.get("delisting_policy") != "last_price_proxy":
         raise SystemExit("animal metadata must declare delisting_policy=last_price_proxy")
+    if metadata.get("provenance_file") != "provenance.json":
+        raise SystemExit("animal metadata must point to provenance.json")
+    if provenance.get("evidence_tier") != metadata.get("evidence_tier"):
+        raise SystemExit("provenance and metadata evidence tiers differ")
+    if provenance.get("delisting_policy") != metadata.get("delisting_policy"):
+        raise SystemExit("provenance and metadata delisting policies differ")
     if audit.get("evidence_tier") != metadata.get("evidence_tier"):
         raise SystemExit("delisting audit and metadata evidence tiers differ")
     events = audit.get("events")
