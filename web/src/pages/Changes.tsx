@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { fetchThemeChanges, type Changes as ChangesData, type IndexTheme } from "../api";
 import ChangesList from "../components/ChangesList";
-
-const THEME_LABELS: Record<IndexTheme, string> = { animal: "动物园", plant: "植物园" };
+import { useLocale } from "../i18n";
 
 type State =
   | { status: "loading" }
@@ -10,6 +9,9 @@ type State =
   | { status: "ok"; changes: Record<IndexTheme, ChangesData> };
 
 export default function Changes() {
+  const { locale } = useLocale();
+  const english = locale === "en-US";
+  const labels = { animal: english ? "Zoo" : "动物园", plant: english ? "Garden" : "植物园" } as Record<IndexTheme, string>;
   const [state, setState] = useState<State>({ status: "loading" });
 
   useEffect(() => {
@@ -18,17 +20,17 @@ export default function Changes() {
       .catch((err) => setState({ status: "error", message: String(err) }));
   }, []);
 
-  if (state.status === "loading") return <p>数据加载中…</p>;
-  if (state.status === "error") return <p className="muted">数据加载失败：{state.message}</p>;
+  if (state.status === "loading") return <p>{english ? "Loading data…" : "数据加载中…"}</p>;
+  if (state.status === "error") return <p className="muted">{english ? "Data load failed: " : "数据加载失败："}{state.message}</p>;
 
   return (
     <div className="page-changes">
-      <h2>调仓记录</h2>
-      <p className="muted">动物园与植物园分别展示最近一次成分变化及疑似误匹配。</p>
+      <h2>{english ? "Rebalance history" : "调仓记录"}</h2>
+      <p className="muted">{english ? "The Zoo and Garden sections show their latest constituent changes and suspected false matches." : "动物园与植物园分别展示最近一次成分变化及疑似误匹配。"}</p>
       {(["animal", "plant"] as IndexTheme[]).map((theme) => (
         <section className="theme-record" key={theme}>
-          <h3>{THEME_LABELS[theme]}</h3>
-          <ChangesList changes={state.changes[theme]} themeLabel={THEME_LABELS[theme]} />
+          <h3>{labels[theme]}</h3>
+          <ChangesList changes={state.changes[theme]} themeLabel={labels[theme]} />
         </section>
       ))}
     </div>
