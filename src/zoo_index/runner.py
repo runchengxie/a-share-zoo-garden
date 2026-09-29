@@ -518,7 +518,7 @@ def _apply_delisting_proxy(
         raw_date = pd.to_numeric(delist.get(code), errors="coerce")
         if pd.isna(raw_date) or int(raw_date) > int(date) or code in quoted:
             continue
-        row = {column: pd.NA for column in daily_prices.columns}
+        row: dict[str, object] = {str(column): None for column in daily_prices.columns}
         row.update({"ts_code": code, "close": close, "pre_close": close, "amount": 0.0})
         rows.append(row)
         factor_rows.append({"ts_code": code, "adj_factor": factor})
