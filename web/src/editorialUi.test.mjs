@@ -16,6 +16,7 @@ const changesPage = readFileSync(new URL("./pages/Changes.tsx", import.meta.url)
 const constituentsPage = readFileSync(new URL("./pages/Constituents.tsx", import.meta.url), "utf8");
 const api = readFileSync(new URL("./api.ts", import.meta.url), "utf8");
 const audit = readFileSync(new URL("./components/DelistingAudit.tsx", import.meta.url), "utf8");
+const i18n = readFileSync(new URL("./i18n.ts", import.meta.url), "utf8");
 
 test("site shell exposes an editorial masthead and research navigation", () => {
   assert.match(app, /brand-kicker/);
@@ -132,6 +133,13 @@ test("site titles describe both themes", () => {
   assert.match(app, /A 股动物园与植物园 · 规则化研究/);
   assert.match(app, /<h1>A 股动物园与植物园<\/h1>/);
   assert.match(changesPage, /动物园与植物园分别展示最近一次成分变化/);
+});
+
+test("site exposes an English-first locale contract with a Chinese switch", () => {
+  assert.match(i18n, /Locale = "en-US" \| "zh-CN"/);
+  assert.match(i18n, /a-share-zoo-locale/);
+  assert.match(app, /locale-toggle/);
+  assert.match(app, /initialLocale/);
 });
 
 test("constituent page loads both themes", () => {

@@ -9,6 +9,7 @@ import {
 } from "echarts/components";
 import { CanvasRenderer } from "echarts/renderers";
 import { NavPoint } from "../api";
+import { useLocale } from "../i18n";
 
 echarts.use([
   LineChart,
@@ -31,6 +32,8 @@ function getThemeColor(name: string, fallback: string): string {
 }
 
 export default function ZooChart({ history, benchmarkLabel, themeLabel = "动物园" }: Props) {
+  const { locale } = useLocale();
+  const english = locale === "en-US";
   const ref = useRef<HTMLDivElement>(null);
   const [themeVersion, setThemeVersion] = useState(0);
 
@@ -70,7 +73,7 @@ export default function ZooChart({ history, benchmarkLabel, themeLabel = "动物
         },
       },
       legend: {
-        data: [`严格${themeLabel}`, `扩展${themeLabel}`, benchmarkLabel],
+        data: [english ? `Strict ${themeLabel}` : `严格${themeLabel}`, english ? `Extended ${themeLabel}` : `扩展${themeLabel}`, benchmarkLabel],
         top: 0,
         left: 0,
         itemWidth: 18,
@@ -116,7 +119,7 @@ export default function ZooChart({ history, benchmarkLabel, themeLabel = "动物
       ],
       series: [
         {
-          name: `严格${themeLabel}`,
+          name: english ? `Strict ${themeLabel}` : `严格${themeLabel}`,
           type: "line",
           data: strict,
           showSymbol: false,
@@ -125,7 +128,7 @@ export default function ZooChart({ history, benchmarkLabel, themeLabel = "动物
           emphasis: { focus: "series" },
         },
         {
-          name: `扩展${themeLabel}`,
+          name: english ? `Extended ${themeLabel}` : `扩展${themeLabel}`,
           type: "line",
           data: extended,
           showSymbol: false,
@@ -151,7 +154,7 @@ export default function ZooChart({ history, benchmarkLabel, themeLabel = "动物
       window.removeEventListener("resize", onResize);
       chart.dispose();
     };
-  }, [history, benchmarkLabel, themeVersion]);
+  }, [history, benchmarkLabel, themeVersion, english, themeLabel]);
 
-  return <div ref={ref} className="zoo-chart" role="img" aria-label={`${themeLabel}指数净值走势图`} />;
+  return <div ref={ref} className="zoo-chart" role="img" aria-label={english ? `${themeLabel} index NAV chart` : `${themeLabel}指数净值走势图`} />;
 }

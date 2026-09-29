@@ -1,15 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
 import { fetchThemeConstituents, type Constituents as ConstituentsData, type IndexTheme } from "../api";
 import ConstituentsTable from "../components/ConstituentsTable";
+import { useLocale } from "../i18n";
 
 type State =
   | { status: "loading" }
   | { status: "error"; message: string }
   | { status: "ok"; data: Record<IndexTheme, ConstituentsData> };
 
-const THEME_LABELS: Record<IndexTheme, string> = { animal: "动物园", plant: "植物园" };
-
 export default function Constituents() {
+  const { locale } = useLocale();
+  const english = locale === "en-US";
+  const labels = { animal: english ? "Zoo" : "动物园", plant: english ? "Garden" : "植物园" } as Record<IndexTheme, string>;
   const [state, setState] = useState<State>({ status: "loading" });
   const [query, setQuery] = useState("");
 
@@ -32,22 +34,22 @@ export default function Constituents() {
     };
   }, [state, query]);
 
-  if (state.status === "loading") return <p>数据加载中…</p>;
-  if (state.status === "error") return <p className="muted">数据加载失败：{state.message}</p>;
+  if (state.status === "loading") return <p>{english ? "Loading data…" : "数据加载中…"}</p>;
+  if (state.status === "error") return <p className="muted">{english ? "Data load failed: " : "数据加载失败："}{state.message}</p>;
 
   return (
     <div className="page-constituents">
-      <h2>当前成分</h2>
-      <p className="muted">动物园和植物园分别展示严格、扩展两组结果。展开分组查看成分明细。</p>
+      <h2>{english ? "Current constituents" : "当前成分"}</h2>
+      <p className="muted">{english ? "The Zoo and Garden sections show strict and extended results. Expand a group to inspect its constituents." : "动物园和植物园分别展示严格、扩展两组结果。展开分组查看成分明细。"}</p>
       <div className="toolbar">
-        <span className="toolbar-hint">搜索会同时筛选两个主题</span>
-        <input type="text" placeholder="筛选名称、代码或匹配词" value={query} onChange={(e) => setQuery(e.target.value)} />
+        <span className="toolbar-hint">{english ? "Search filters both themes" : "搜索会同时筛选两个主题"}</span>
+        <input type="text" placeholder={english ? "Filter name, code, or keyword" : "筛选名称、代码或匹配词"} value={query} onChange={(e) => setQuery(e.target.value)} />
       </div>
       {(["animal", "plant"] as IndexTheme[]).map((theme) => (
         <section className="theme-constituents" key={theme} aria-labelledby={`${theme}-constituents-heading`}>
-          <h3 id={`${theme}-constituents-heading`}>{THEME_LABELS[theme]}</h3>
-          <ConstituentsTable variant="strict" items={filtered[theme].strict} themeLabel={THEME_LABELS[theme]} />
-          <ConstituentsTable variant="extended" items={filtered[theme].extended} themeLabel={THEME_LABELS[theme]} />
+          <h3 id={`${theme}-constituents-heading`}>{labels[theme]}</h3>
+          <ConstituentsTable variant="strict" items={filtered[theme].strict} themeLabel={labels[theme]} />
+          <ConstituentsTable variant="extended" items={filtered[theme].extended} themeLabel={labels[theme]} />
         </section>
       ))}
     </div>

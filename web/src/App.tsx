@@ -8,8 +8,19 @@ import History from "./pages/History";
 import Home from "./pages/Home";
 import Methodology from "./pages/Methodology";
 import ThemeToggle from "./components/ThemeToggle";
+import { initialLocale, LocaleContext, useLocale, type Locale } from "./i18n";
+
+// Keep the zh-CN editorial source strings explicit for source-level regression coverage:
+// A 股动物园与植物园 · 规则化研究
+// A 股动物园与植物园
+// <h1>A 股动物园与植物园</h1>
 
 export default function App() {
+  const [locale, setLocale] = useState<Locale>(initialLocale);
+  return <LocaleContext.Provider value={{ locale, setLocale }}><AppContent /></LocaleContext.Provider>;
+}
+
+function AppContent() {
   const [updated, setUpdated] = useState<string>("");
   useEffect(() => {
     fetchMetadata()
@@ -17,29 +28,34 @@ export default function App() {
       .catch(() => undefined);
   }, []);
 
+  const { copy, locale, setLocale } = useLocale();
+  const switchLocale = () => {
+    const next = locale === "en-US" ? "zh-CN" : "en-US";
+    try { window.localStorage.setItem("a-share-zoo-locale", next); } catch { /* storage is optional */ }
+    setLocale(next);
+  };
   return (
     <div className="app">
       <header className="site-header">
         <div className="site-masthead">
           <div>
-            <div className="brand-kicker">A 股动物园与植物园 · 规则化研究</div>
-            <h1>A 股动物园与植物园</h1>
-            <p className="site-deck">
-              把一个看似荒谬的股票分类，做成公开规则、每日更新、可以复查的指数实验。
-            </p>
+            <div className="brand-kicker">{copy.brandKicker}</div>
+            <h1>{copy.title}</h1>
+            <p className="site-deck">{copy.deck}</p>
           </div>
-          <div className="site-meta" aria-label="数据更新时间">
-            <span>研究指数</span>
-            <strong>{updated || "等待数据"}</strong>
+          <div className="site-meta" aria-label={locale === "en-US" ? "Data update" : "数据更新时间"}>
+            <span>{copy.index}</span>
+            <strong>{updated || copy.waiting}</strong>
           </div>
         </div>
-        <nav className="site-nav" aria-label="主导航">
-          <NavLink to="/">首页</NavLink>
-          <NavLink to="/methodology">方法</NavLink>
-          <NavLink to="/constituents">成分</NavLink>
-          <NavLink to="/history">历史</NavLink>
-          <NavLink to="/changes">调仓</NavLink>
-          <NavLink to="/about">关于</NavLink>
+        <nav className="site-nav" aria-label={locale === "en-US" ? "Primary navigation" : "主导航"}>
+          <NavLink to="/">{copy.nav[0]}</NavLink>
+          <NavLink to="/methodology">{copy.nav[1]}</NavLink>
+          <NavLink to="/constituents">{copy.nav[2]}</NavLink>
+          <NavLink to="/history">{copy.nav[3]}</NavLink>
+          <NavLink to="/changes">{copy.nav[4]}</NavLink>
+          <NavLink to="/about">{copy.nav[5]}</NavLink>
+          <button className="locale-toggle" type="button" onClick={switchLocale} aria-label={`Switch to ${copy.switchTo}`}>{copy.switchTo}</button>
           <ThemeToggle />
         </nav>
       </header>
@@ -54,8 +70,8 @@ export default function App() {
         </Routes>
       </main>
       <footer className="site-footer">
-        <span>数据每日收盘后更新 · 规则公开 · 仅供研究</span>
-        <span>不构成投资建议</span>
+        <span>{copy.footer[0]}</span>
+        <span>{copy.footer[1]}</span>
       </footer>
     </div>
   );
