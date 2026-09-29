@@ -56,6 +56,8 @@ export interface Metadata {
   benchmark: { code: string; label: string; source: string };
   variants: string[];
   rebalance: string;
+  delisting_policy?: "strict" | "last_price_proxy";
+  evidence_tier?: "strict" | "research_proxy";
 }
 
 const DATA_BASE = import.meta.env.BASE_URL;
@@ -84,6 +86,7 @@ export const fetchThemeLatest = (theme: IndexTheme) => getThemeJson<Latest>(them
 export const fetchThemeHistory = (theme: IndexTheme) => getThemeJson<NavPoint[]>(theme, "history.json");
 export const fetchThemeConstituents = (theme: IndexTheme) => getThemeJson<Constituents>(theme, "constituents.json");
 export const fetchThemeChanges = (theme: IndexTheme) => getThemeJson<Changes>(theme, "changes.json");
+export const fetchThemeMetadata = (theme: IndexTheme) => getThemeJson<Metadata>(theme, "metadata.json");
 
 export function formatPercent(value: number): string {
   const sign = value > 0 ? "+" : "";

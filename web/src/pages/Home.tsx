@@ -10,6 +10,8 @@ import {
   fetchThemeConstituents,
   fetchThemeHistory,
   fetchThemeLatest,
+  fetchThemeMetadata,
+  Metadata,
 } from "../api";
 import ChangesList from "../components/ChangesList";
 import NavCards from "../components/NavCards";
@@ -18,7 +20,7 @@ import { ZOO_UNPRICED_DELIST_CUTOFF, zooHistoryBeforeUnpricedDelist } from "../r
 
 const ZooChart = lazy(() => import("../components/ZooChart"));
 
-type ThemeData = { latest: Latest; history: NavPoint[]; changes: Changes; constituents: Constituents };
+type ThemeData = { latest: Latest; history: NavPoint[]; changes: Changes; constituents: Constituents; metadata: Metadata };
 type State =
   | { status: "loading" }
   | { status: "error"; message: string }
@@ -27,16 +29,17 @@ type State =
 const THEME_LABELS: Record<IndexTheme, string> = { animal: "动物园", plant: "植物园" };
 
 async function fetchThemeData(theme: IndexTheme): Promise<ThemeData> {
-  const [latest, history, changes, constituents] = await Promise.all([
-    fetchThemeLatest(theme), fetchThemeHistory(theme), fetchThemeChanges(theme), fetchThemeConstituents(theme),
+  const [latest, history, changes, constituents, metadata] = await Promise.all([
+    fetchThemeLatest(theme), fetchThemeHistory(theme), fetchThemeChanges(theme), fetchThemeConstituents(theme), fetchThemeMetadata(theme),
   ]);
-  return { latest, history, changes, constituents };
+  return { latest, history, changes, constituents, metadata };
 }
 
 function ThemeDashboard({ theme, data }: { theme: IndexTheme; data: ThemeData }) {
   const themeLabel = THEME_LABELS[theme];
-  const animalSnapshotBlocked = theme === "animal" && data.latest.date > ZOO_UNPRICED_DELIST_CUTOFF;
-  const displayHistory = theme === "animal" ? zooHistoryBeforeUnpricedDelist(data.history) : data.history;
+  const isResearchProxy = theme === "animal" && data.metadata.evidence_tier === "research_proxy";
+  const animalSnapshotBlocked = theme === "animal" && !isResearchProxy && data.latest.date > ZOO_UNPRICED_DELIST_CUTOFF;
+  const displayHistory = theme === "animal" && !isResearchProxy ? zooHistoryBeforeUnpricedDelist(data.history) : data.history;
   return (
     <section className={`theme-dashboard theme-dashboard-${theme}`} id={`${theme}-panel`} aria-labelledby={`${theme}-dashboard-heading`}>
       <div className="theme-dashboard-heading">
@@ -50,7 +53,7 @@ function ThemeDashboard({ theme, data }: { theme: IndexTheme; data: ThemeData })
 
       {theme === "animal" && (
         <p className="research-alert" role="status">
-          退市成分缺价后，动物园净值自 2026-06-26 起待结算数据重建。下方曲线只展示此前的历史，当前净值暂不展示。
+          {isResearchProxy ? "当前曲线为研究代理版：退市成分使用退市前最后有效复权价格作为代理结算，并在退市日移除。它不代表可核实的现金结算或正式可交易业绩。" : "退市成分缺价后，动物园净值自 2026-06-26 起待结算数据重建。下方曲线只展示此前的历史，当前净值暂不展示。"}
         </p>
       )}
 

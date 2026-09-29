@@ -9,5 +9,7 @@
     "strict",
     "extended"
   ],
-  "rebalance": "monthly"
+  "rebalance": "monthly",
+  "delisting_policy": "last_price_proxy",
+  "evidence_tier": "research_proxy"
 }
