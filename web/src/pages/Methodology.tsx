@@ -39,10 +39,9 @@ export default function Methodology() {
         {english ? "When a confirmed suspension has no quote, the constituent weight is retained and valued at the last known price. Other missing prices do not redistribute weight to the remaining constituents. New strict-variant calculations stop when a delisted holding lacks both quotes and a verifiable settlement event." : "确认停牌但缺行情时，保留成分权重并以前一已知价格保持估值。其他缺价不会把权重重新分摊给剩余成分。严格版退市持仓缺少行情和可核实结算事件时，新计算会停止，相关日期后的收益不能视作已核实结果。"}
       </p>
       <p>
-        首页当前展示的动物园连续曲线属于研究代理版：缺少可核实现金结算时，使用退市前最后有效复权价格，退市日计为零收益并移除成分。
-        该序列用于观察研究，不代表正式可交易业绩。
+        {english ? "The continuous Zoo series on the home page uses a research proxy: when verifiable cash settlement is unavailable, it uses the last valid adjusted price before delisting, records zero return on the delisting date, and removes the constituent. This series is for research observation and does not represent formal tradable performance." : "首页当前展示的动物园连续曲线属于研究代理版：缺少可核实现金结算时，使用退市前最后有效复权价格，退市日计为零收益并移除成分。该序列用于观察研究，不代表正式可交易业绩。"}
       </p>
-      <p>每个退市事件的最后可观测日、代理结算日和严格版状态见首页的退市事件审计表。</p>
+      <p>{english ? "The home page delisting audit lists the last observable date, proxy settlement date, and strict status for each event." : "每个退市事件的最后可观测日、代理结算日和严格版状态见首页的退市事件审计表。"}</p>
     </div>
   );
 }

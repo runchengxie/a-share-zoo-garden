@@ -43,7 +43,7 @@ export default function History() {
               <th>{english ? "Date" : "日期"}</th>
               <th>{english ? "Strict NAV" : "严格净值"}</th>
               <th>{english ? "Extended NAV" : "扩展净值"}</th>
-              <th>{state.latest.benchmark_label}净值</th>
+              <th>{english ? `${state.latest.benchmark_label} NAV` : `${state.latest.benchmark_label}净值`}</th>
             </tr>
           </thead>
           <tbody>
