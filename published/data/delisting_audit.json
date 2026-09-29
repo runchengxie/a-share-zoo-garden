@@ -1,0 +1,28 @@
+{
+  "schema_version": "zoo.delisting_audit.v1",
+  "evidence_tier": "research_proxy",
+  "policy": "last_price_proxy",
+  "description": "退市缺少可核实现金结算时，使用退市前最后有效复权价格作为研究代理，退市日计为零收益并移除成分。",
+  "events": [
+    {
+      "ts_code": "600599.SH",
+      "name": "退市熊猫",
+      "delist_date": "20260626",
+      "last_observable_date": "20260625",
+      "proxy_settlement_date": "20260626",
+      "settlement_source": null,
+      "action": "last_price_proxy_zero_return_remove",
+      "strict_status": "blocked"
+    },
+    {
+      "ts_code": "300029.SZ",
+      "name": "退市天龙",
+      "delist_date": "20260710",
+      "last_observable_date": "20260709",
+      "proxy_settlement_date": "20260710",
+      "settlement_source": null,
+      "action": "last_price_proxy_zero_return_remove",
+      "strict_status": "blocked"
+    }
+  ]
+}
