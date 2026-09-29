@@ -73,6 +73,9 @@ jobs:
           BACKFILL_DAYS: ${{ inputs.backfill_days || '1' }}
         run: uv run python -m zoo_index --rules plant_rules.yml --output-dir published/plant --backfill "$BACKFILL_DAYS" --backfill-mode "$BACKFILL_MODE"
 
+      - name: Write published provenance
+        run: python scripts/write_published_provenance.py
+
       - name: Commit data
         if: ${{ inputs.publish_only != true }}
         run: |

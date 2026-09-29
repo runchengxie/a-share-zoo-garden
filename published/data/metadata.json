@@ -11,5 +11,7 @@
   ],
   "rebalance": "monthly",
   "delisting_policy": "last_price_proxy",
-  "evidence_tier": "research_proxy"
+  "evidence_tier": "research_proxy",
+  "provenance_file": "provenance.json",
+  "independent_recompute_through": null
 }

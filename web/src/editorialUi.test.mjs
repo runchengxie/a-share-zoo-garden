@@ -54,6 +54,8 @@ test("unpriced delisting is disclosed with the historical NAV", () => {
   assert.match(home, /fetchThemeMetadata/);
   assert.match(home, /fetchDelistingAudit/);
   assert.match(audit, /代理结算记录/);
+  assert.match(home, /Strict cutoff/);
+  assert.match(home, /严格截止版/);
   assert.match(historyPage, /zooHistoryBeforeUnpricedDelist/);
   assert.match(historyPage, /待结算数据重建/);
   assert.match(historyPage, /研究代理版/);
