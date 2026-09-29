@@ -54,12 +54,18 @@ test("unpriced delisting is disclosed with the historical NAV", () => {
   assert.match(home, /fetchThemeMetadata/);
   assert.match(home, /fetchDelistingAudit/);
   assert.match(audit, /代理结算记录/);
+  assert.match(audit, /Delisting event audit/);
+  assert.match(audit, /Proxy settlement date/);
+  assert.match(audit, /Blocked/);
   assert.match(home, /Strict cutoff/);
   assert.match(home, /严格截止版/);
   assert.match(historyPage, /zooHistoryBeforeUnpricedDelist/);
   assert.match(historyPage, /待结算数据重建/);
   assert.match(historyPage, /研究代理版/);
   assert.match(methodology, /退市持仓缺少行情和可核实结算事件/);
+  assert.match(methodology, /continuous Zoo series/);
+  assert.match(methodology, /home page delisting audit/);
+  assert.match(historyPage, /benchmark_label} NAV/);
   assert.doesNotMatch(methodology, /剩余成分重新等权/);
 });
 
