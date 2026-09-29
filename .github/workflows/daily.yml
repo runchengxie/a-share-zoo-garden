@@ -63,7 +63,7 @@ jobs:
           TUSHARE_TOKEN: ${{ secrets.TUSHARE_TOKEN }}
           BACKFILL_MODE: ${{ inputs.backfill_mode || 'missing' }}
           BACKFILL_DAYS: ${{ inputs.backfill_days || '1' }}
-        run: uv run python -m zoo_index --output-dir published --backfill "$BACKFILL_DAYS" --backfill-mode "$BACKFILL_MODE"
+        run: uv run python -m zoo_index --output-dir published --backfill "$BACKFILL_DAYS" --backfill-mode "$BACKFILL_MODE" --delisting-policy last_price_proxy
 
       - name: Compute plant index (更新最近交易日)
         if: ${{ inputs.publish_only != true }}
@@ -84,6 +84,9 @@ jobs:
       - name: Push data
         if: ${{ inputs.publish_only != true && success() }}
         run: git push
+
+      - name: Validate published evidence
+        run: python scripts/validate_published_evidence.py
 
       - name: Build web
         working-directory: web

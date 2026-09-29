@@ -11,16 +11,19 @@ import {
   fetchThemeHistory,
   fetchThemeLatest,
   fetchThemeMetadata,
+  fetchDelistingAudit,
+  DelistingAudit,
   Metadata,
 } from "../api";
 import ChangesList from "../components/ChangesList";
 import NavCards from "../components/NavCards";
 import TaxonomyDisclosure from "../components/TaxonomyDisclosure";
+import DelistingAuditTable from "../components/DelistingAudit";
 import { ZOO_UNPRICED_DELIST_CUTOFF, zooHistoryBeforeUnpricedDelist } from "../researchBoundary";
 
 const ZooChart = lazy(() => import("../components/ZooChart"));
 
-type ThemeData = { latest: Latest; history: NavPoint[]; changes: Changes; constituents: Constituents; metadata: Metadata };
+type ThemeData = { latest: Latest; history: NavPoint[]; changes: Changes; constituents: Constituents; metadata: Metadata; audit?: DelistingAudit };
 type State =
   | { status: "loading" }
   | { status: "error"; message: string }
@@ -29,10 +32,10 @@ type State =
 const THEME_LABELS: Record<IndexTheme, string> = { animal: "动物园", plant: "植物园" };
 
 async function fetchThemeData(theme: IndexTheme): Promise<ThemeData> {
-  const [latest, history, changes, constituents, metadata] = await Promise.all([
-    fetchThemeLatest(theme), fetchThemeHistory(theme), fetchThemeChanges(theme), fetchThemeConstituents(theme), fetchThemeMetadata(theme),
+  const [latest, history, changes, constituents, metadata, audit] = await Promise.all([
+    fetchThemeLatest(theme), fetchThemeHistory(theme), fetchThemeChanges(theme), fetchThemeConstituents(theme), fetchThemeMetadata(theme), theme === "animal" ? fetchDelistingAudit() : Promise.resolve(undefined),
   ]);
-  return { latest, history, changes, constituents, metadata };
+  return { latest, history, changes, constituents, metadata, audit };
 }
 
 function ThemeDashboard({ theme, data }: { theme: IndexTheme; data: ThemeData }) {
@@ -69,6 +72,8 @@ function ThemeDashboard({ theme, data }: { theme: IndexTheme; data: ThemeData })
           <ZooChart history={displayHistory} benchmarkLabel={data.latest.benchmark_label} themeLabel={themeLabel} />
         </Suspense>
       </section>
+
+      {theme === "animal" && isResearchProxy && data.audit ? <DelistingAuditTable audit={data.audit} /> : null}
 
       <div className="home-research-grid">
         <section className="research-section zoo-today" aria-labelledby={`${theme}-changes-heading`}>

@@ -15,6 +15,7 @@ const changesList = readFileSync(new URL("./components/ChangesList.tsx", import.
 const changesPage = readFileSync(new URL("./pages/Changes.tsx", import.meta.url), "utf8");
 const constituentsPage = readFileSync(new URL("./pages/Constituents.tsx", import.meta.url), "utf8");
 const api = readFileSync(new URL("./api.ts", import.meta.url), "utf8");
+const audit = readFileSync(new URL("./components/DelistingAudit.tsx", import.meta.url), "utf8");
 
 test("site shell exposes an editorial masthead and research navigation", () => {
   assert.match(app, /brand-kicker/);
@@ -49,6 +50,8 @@ test("unpriced delisting is disclosed with the historical NAV", () => {
   assert.match(home, /animalSnapshotBlocked/);
   assert.match(home, /research_proxy/);
   assert.match(home, /fetchThemeMetadata/);
+  assert.match(home, /fetchDelistingAudit/);
+  assert.match(audit, /代理结算记录/);
   assert.match(historyPage, /zooHistoryBeforeUnpricedDelist/);
   assert.match(historyPage, /待结算数据重建/);
   assert.match(historyPage, /研究代理版/);

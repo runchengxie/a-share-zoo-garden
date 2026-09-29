@@ -58,6 +58,26 @@ export interface Metadata {
   rebalance: string;
   delisting_policy?: "strict" | "last_price_proxy";
   evidence_tier?: "strict" | "research_proxy";
+  audit_file?: string;
+}
+
+export interface DelistingAuditEvent {
+  ts_code: string;
+  name: string;
+  delist_date: string;
+  last_observable_date: string;
+  proxy_settlement_date: string;
+  settlement_source: string | null;
+  action: string;
+  strict_status: string;
+}
+
+export interface DelistingAudit {
+  schema_version: string;
+  evidence_tier: string;
+  policy: string;
+  description: string;
+  events: DelistingAuditEvent[];
 }
 
 const DATA_BASE = import.meta.env.BASE_URL;
@@ -87,6 +107,7 @@ export const fetchThemeHistory = (theme: IndexTheme) => getThemeJson<NavPoint[]>
 export const fetchThemeConstituents = (theme: IndexTheme) => getThemeJson<Constituents>(theme, "constituents.json");
 export const fetchThemeChanges = (theme: IndexTheme) => getThemeJson<Changes>(theme, "changes.json");
 export const fetchThemeMetadata = (theme: IndexTheme) => getThemeJson<Metadata>(theme, "metadata.json");
+export const fetchDelistingAudit = () => getJson<DelistingAudit>("delisting_audit.json");
 
 export function formatPercent(value: number): string {
   const sign = value > 0 ? "+" : "";
