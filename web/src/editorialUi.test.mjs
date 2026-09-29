@@ -17,6 +17,7 @@ const constituentsPage = readFileSync(new URL("./pages/Constituents.tsx", import
 const api = readFileSync(new URL("./api.ts", import.meta.url), "utf8");
 const audit = readFileSync(new URL("./components/DelistingAudit.tsx", import.meta.url), "utf8");
 const i18n = readFileSync(new URL("./i18n.ts", import.meta.url), "utf8");
+const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
 
 test("site shell exposes an editorial masthead and research navigation", () => {
   assert.match(app, /brand-kicker/);
@@ -136,6 +137,7 @@ test("site titles describe both themes", () => {
 });
 
 test("site exposes an English-first locale contract with a Chinese switch", () => {
+  assert.match(html, /<html lang="en-US">/);
   assert.match(i18n, /Locale = "en-US" \| "zh-CN"/);
   assert.match(i18n, /a-share-zoo-locale/);
   assert.match(app, /locale-toggle/);
