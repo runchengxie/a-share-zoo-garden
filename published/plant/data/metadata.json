@@ -1,5 +1,5 @@
 {
-  "updated": "20260928",
+  "updated": "20260929",
   "benchmark": {
     "code": "510300.SH",
     "label": "HS300 ETF",
@@ -9,5 +9,7 @@
     "strict",
     "extended"
   ],
-  "rebalance": "monthly"
+  "rebalance": "monthly",
+  "delisting_policy": "strict",
+  "evidence_tier": "strict"
 }
