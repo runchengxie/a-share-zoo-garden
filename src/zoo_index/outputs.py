@@ -271,6 +271,7 @@ def generate_metadata_json(
     benchmark_label: str,
     benchmark_source: str,
     date: str,
+    delisting_policy: str = "strict",
 ) -> None:
     payload = {
         "updated": date,
@@ -281,6 +282,8 @@ def generate_metadata_json(
         },
         "variants": ["strict", "extended"],
         "rebalance": "monthly",
+        "delisting_policy": delisting_policy,
+        "evidence_tier": "research_proxy" if delisting_policy == "last_price_proxy" else "strict",
     }
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
 

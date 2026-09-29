@@ -100,6 +100,7 @@ class RunConfig:
     no_rules_snapshot: bool = False
     no_cache: bool = False
     force_refresh: bool = False
+    delisting_policy: str = "strict"
     backtest: BacktestConfig = field(default_factory=BacktestConfig)
 
 
@@ -489,6 +490,44 @@ def _require_delisting_marks(
             raise ValueError(f"{date} 退市持仓 {code} 缺少行情和可核实的结算事件")
 
 
+def _apply_delisting_proxy(
+    daily_prices: pd.DataFrame,
+    adj_factors: pd.DataFrame,
+    stock_basic: pd.DataFrame,
+    date: str,
+    prev_state: PortfolioState | None,
+    policy: str,
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Add last-mark rows for a separately labelled research-only proxy series."""
+    if policy == "strict":
+        return daily_prices, adj_factors
+    if policy != "last_price_proxy":
+        raise ValueError(f"unknown delisting policy: {policy}")
+    if prev_state is None or daily_prices.empty or adj_factors.empty:
+        return daily_prices, adj_factors
+    marks: dict[str, tuple[float, float]] = {}
+    for variant in (prev_state.strict, prev_state.extended):
+        marks.update(variant.last_marks)
+    if not marks or "delist_date" not in stock_basic.columns:
+        return daily_prices, adj_factors
+    delist = stock_basic.set_index("ts_code")["delist_date"]
+    quoted = set(daily_prices["ts_code"].astype(str))
+    rows: list[dict[str, object]] = []
+    factor_rows: list[dict[str, object]] = []
+    for code, (close, factor) in marks.items():
+        raw_date = pd.to_numeric(delist.get(code), errors="coerce")
+        if pd.isna(raw_date) or int(raw_date) > int(date) or code in quoted:
+            continue
+        row = {column: pd.NA for column in daily_prices.columns}
+        row.update({"ts_code": code, "close": close, "pre_close": close, "amount": 0.0})
+        rows.append(row)
+        factor_rows.append({"ts_code": code, "adj_factor": factor})
+    if rows:
+        daily_prices = pd.concat([daily_prices, pd.DataFrame(rows)], ignore_index=True)
+        adj_factors = pd.concat([adj_factors, pd.DataFrame(factor_rows)], ignore_index=True)
+    return daily_prices, adj_factors
+
+
 def _month_first_open_date(client: TushareLike, date: str, cache: dict[str, str]) -> str:
     month_key = date[:6]
     if month_key in cache:
@@ -791,6 +830,7 @@ def compute_day(
     rules_path: Path | None = None,
     prev_state: PortfolioState | None = None,
     backtest: BacktestConfig | None = None,
+    delisting_policy: str = "strict",
 ) -> DailyResult:
     """计算指定交易日的双指数收益与成分。daily 与 backfill 共用此函数。
 
@@ -820,6 +860,10 @@ def compute_day(
     prev_adj_factors = client.get_adj_factor(prev_date)
     if adj_factors.empty or prev_adj_factors.empty:
         raise ValueError(f"{date} 复权因子为空，无法计算指数。")
+
+    daily_prices, adj_factors = _apply_delisting_proxy(
+        daily_prices, adj_factors, stock_basic, date, prev_state, delisting_policy
+    )
 
     prev_daily = client.get_daily(prev_date)
     try:
@@ -996,6 +1040,7 @@ def _write_public_outputs(
     latest: pd.Series,
     result: DailyResult,
     benchmark_source: str,
+    delisting_policy: str = "strict",
 ) -> None:
     data_dir = output_dir / "data"
     badges_dir = data_dir / "badges"
@@ -1020,6 +1065,7 @@ def _write_public_outputs(
         result.benchmark_label,
         benchmark_source,
         result.date,
+        delisting_policy,
     )
     generate_badges(badges_dir, latest, result.benchmark_label)
     generate_chart(data_dir / "chart.png", nav_df, result.benchmark_label)
@@ -1127,6 +1173,7 @@ def run_daily(config: RunConfig, client: TushareLike | None = None) -> int:
             rules_path=config.rules_path,
             prev_state=prev_state,
             backtest=config.backtest,
+            delisting_policy=config.delisting_policy,
         )
     except Exception as exc:
         print(f"计算指数失败（{date}）：{exc}")
@@ -1155,7 +1202,14 @@ def run_daily(config: RunConfig, client: TushareLike | None = None) -> int:
         result.strict_holdings,
         result.extended_holdings,
     )
-    _write_public_outputs(config.output_dir, nav_df, latest, result, config.benchmark.source)
+    _write_public_outputs(
+        config.output_dir,
+        nav_df,
+        latest,
+        result,
+        config.benchmark.source,
+        config.delisting_policy,
+    )
 
     print(
         "已更新："
@@ -1179,6 +1233,7 @@ def _backfill_run_days(
     prev_state: PortfolioState | None = None,
     backtest: BacktestConfig | None = None,
     inception_date: str = "",
+    delisting_policy: str = "strict",
 ) -> tuple[list[dict], DailyResult | None]:
     constituents_cache: dict[str, tuple[pd.DataFrame, pd.DataFrame]] = {}
     ret_rows: list[dict] = []
@@ -1197,6 +1252,7 @@ def _backfill_run_days(
             rules_path=rules_path,
             prev_state=state,
             backtest=backtest,
+            delisting_policy=delisting_policy,
         )
         row = {
             "date": result.date,
@@ -1271,6 +1327,7 @@ def _write_backfill_outputs(
     ret_rows: list[dict],
     last_result: DailyResult,
     benchmark_source: str,
+    delisting_policy: str = "strict",
 ) -> int:
     existing_columns = [
         "date",
@@ -1306,7 +1363,9 @@ def _write_backfill_outputs(
         last_result.strict_holdings,
         last_result.extended_holdings,
     )
-    _write_public_outputs(output_dir, nav_df, latest, last_result, benchmark_source)
+    _write_public_outputs(
+        output_dir, nav_df, latest, last_result, benchmark_source, delisting_policy
+    )
 
     print(
         "回填完成："
@@ -1378,6 +1437,7 @@ def run_backfill(config: RunConfig, client: TushareLike | None = None) -> int:
             prev_state=prev_state,
             backtest=config.backtest,
             inception_date=config.start_date,
+            delisting_policy=config.delisting_policy,
         )
     except Exception as exc:
         print(f"回填计算失败：{exc}")
@@ -1388,7 +1448,13 @@ def run_backfill(config: RunConfig, client: TushareLike | None = None) -> int:
         return 1
 
     return _write_backfill_outputs(
-        output_dir, nav_path, existing_nav, ret_rows, last_result, config.benchmark.source
+        output_dir,
+        nav_path,
+        existing_nav,
+        ret_rows,
+        last_result,
+        config.benchmark.source,
+        config.delisting_policy,
     )
 
 
