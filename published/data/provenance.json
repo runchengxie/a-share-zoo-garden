@@ -1,16 +1,16 @@
 {
   "schema_version": "zoo.provenance.v1",
-  "generated_at": "2026-09-29T16:06:15.969020+00:00",
+  "generated_at": "2026-09-30T14:57:15.141585+00:00",
   "evidence_tier": "research_proxy",
   "delisting_policy": "last_price_proxy",
   "independent_recompute_through": null,
-  "published_snapshot_through": "20260929",
+  "published_snapshot_through": "20260930",
   "files": {
-    "published/data/metadata.json": "1468bf10df9d001842b102966765398f06edf723e6074f5a63eec5757accd61a",
-    "published/data/latest.json": "65638cf39a0a216b410fccf2bd26ca8cd184c6a38f8f8993f1590c38873c9e71",
-    "published/data/history.json": "1e82d1c6d28c1057a7c3c851fbd72e8763ee46ac480738606bba93c48c5c783a",
-    "published/data/constituents.json": "c7000061c61375cdd14b33fc7914b3af79ff415759da485898d8fcbcc1841385",
-    "published/data/changes.json": "255afa6e86d0d095b9f894d7f1f321835763274aa10a394b94b04de2530f8a2c",
+    "published/data/metadata.json": "16ae9170bb8d0da84589f2985a2486d92e1d7b1c97b9dc016e28b207d4a9784d",
+    "published/data/latest.json": "19aec5b4f38969e1e9d9ef7301cbb90113fadee5667fd85d9f13be973d43e4e5",
+    "published/data/history.json": "0bd22476ae647ceb865562b598fd98b265f566c88332049b425d7a57d015fbb1",
+    "published/data/constituents.json": "8ebf044127f4fda25b72f9b62eb95299dc858418d6eeabd0243c7097176ed54c",
+    "published/data/changes.json": "753911e400babd6a04f833f8d27537b3dcda3eb2896b3177970dcac9caea4a17",
     "published/data/delisting_audit.json": "606706ceed86996310e7c5508d1308a3e9295086044cb9a61528c01af10df338",
     "rules.yml": "891f7c53716d91d6548c931492160d39c11d776ddf782faef8eb2f9c96e70b22"
   }
