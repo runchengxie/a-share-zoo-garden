@@ -150,10 +150,16 @@ test("site titles describe both themes", () => {
 
 test("site exposes an English-first locale contract with a Chinese switch", () => {
   assert.match(html, /<html lang="en-US">/);
+  assert.match(html, /<title>A-share Zoo &amp; Garden · Rule-based research<\/title>/);
   assert.match(i18n, /Locale = "en-US" \| "zh-CN"/);
   assert.match(i18n, /a-share-zoo-locale/);
+  assert.match(i18n, /new URLSearchParams\(window\.location\.search\)/);
+  assert.match(i18n, /requested === "en-US" \|\| requested === "zh-CN"/);
   assert.match(app, /locale-toggle/);
   assert.match(app, /initialLocale/);
+  assert.match(app, /url\.searchParams\.set\("lang", next\)/);
+  assert.match(app, /document\.documentElement\.lang = locale/);
+  assert.match(app, /document\.title = copy\.documentTitle/);
 });
 
 test("constituent page loads both themes", () => {

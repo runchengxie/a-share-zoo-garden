@@ -29,9 +29,17 @@ function AppContent() {
   }, []);
 
   const { copy, locale, setLocale } = useLocale();
+  useEffect(() => {
+    document.documentElement.lang = locale;
+    document.title = copy.documentTitle;
+  }, [copy.documentTitle, locale]);
+
   const switchLocale = () => {
     const next = locale === "en-US" ? "zh-CN" : "en-US";
     try { window.localStorage.setItem("a-share-zoo-locale", next); } catch { /* storage is optional */ }
+    const url = new URL(window.location.href);
+    url.searchParams.set("lang", next);
+    window.history.replaceState(null, "", url);
     setLocale(next);
   };
   return (
