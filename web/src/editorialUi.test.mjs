@@ -69,6 +69,10 @@ test("unpriced delisting is disclosed with the historical NAV", () => {
   assert.doesNotMatch(methodology, /剩余成分重新等权/);
 });
 
+test("English delisting audit shows stable security codes without Chinese issuer names", () => {
+  assert.match(audit, /english \? event\.ts_code : `\$\{event\.ts_code\} \$\{event\.name\}`/);
+});
+
 test("home page lazy-loads the chart without changing its data contract", () => {
   assert.match(home, /lazy/);
   assert.match(home, /Suspense/);
