@@ -6,6 +6,7 @@ const COPY = {
   "en-US": {
     brandKicker: "A-share zoo & garden · rule-based research",
     title: "A-share Zoo & Garden",
+    documentTitle: "A-share Zoo & Garden · Rule-based research",
     deck: "Turn a seemingly arbitrary stock-name classification into a public, daily-updated, reproducible index experiment.",
     index: "Research index",
     waiting: "Waiting for data",
@@ -16,6 +17,7 @@ const COPY = {
   "zh-CN": {
     brandKicker: "A 股动物园与植物园 · 规则化研究",
     title: "A 股动物园与植物园",
+    documentTitle: "A 股动物园与植物园 · 规则化研究",
     deck: "把一个看似荒谬的股票分类，做成公开规则、每日更新、可以复查的指数实验。",
     index: "研究指数",
     waiting: "等待数据",
@@ -37,6 +39,8 @@ export function useLocale() {
 
 export function initialLocale(): Locale {
   try {
+    const requested = new URLSearchParams(window.location.search).get("lang");
+    if (requested === "en-US" || requested === "zh-CN") return requested;
     return window.localStorage.getItem("a-share-zoo-locale") === "zh-CN" ? "zh-CN" : "en-US";
   } catch {
     return "en-US";
