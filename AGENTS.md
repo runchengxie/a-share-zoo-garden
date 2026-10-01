@@ -1,5 +1,9 @@
 # 维护须知
 
+## PR review 例外
+
+由用户本人提交，或由用户明确委托 agent 完成的 PR，无需单独的人工 review；这是持续有效的授权，不需要逐个 PR 确认，并覆盖本文件中的一般 PR review 要求。必需检查仍须通过，冲突必须解决；不得绕过 GitHub 分支保护或 ruleset 强制要求的审批。
+
 本文件供参与本仓库维护的协作者与自动化工具阅读，说明关键约束与约定。
 
 ## 目录职责
@@ -91,7 +95,7 @@ npm run build
 
 ## 多 agent 协作与 Git 流程
 
-* `main` 只接收经过审查的 PR，不直接在 `main` 上开发。
+* `main` 只接收 PR，不直接在 `main` 上开发。由用户本人提交或明确委托 agent 完成的 PR 无需单独 review，但仍须通过必需检查并遵守分支保护。
 * 每个独立任务必须从最新 `main` 创建独立 worktree 和分支，分支命名建议为 `feat/<topic>`、`fix/<topic>` 或 `data/<topic>`。
 * 不同 agent 不得共用同一个 worktree，不得同时修改同一分支或直接互相覆盖文件。
 * 每个 worktree 内完成测试、构建和数据边界检查后推送分支并创建 PR。
