@@ -11,6 +11,12 @@ from pathlib import Path
 def main() -> int:
     root = Path(__file__).resolve().parents[1]
     data = root / "published" / "data"
+    metadata_path = data / "metadata.json"
+    metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+    metadata["provenance_file"] = "provenance.json"
+    metadata_path.write_text(
+        json.dumps(metadata, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
     paths = [
         data / "metadata.json",
         data / "latest.json",
@@ -31,7 +37,7 @@ def main() -> int:
         "evidence_tier": "research_proxy",
         "delisting_policy": "last_price_proxy",
         "independent_recompute_through": None,
-        "published_snapshot_through": json.loads((data / "metadata.json").read_text())["updated"],
+        "published_snapshot_through": metadata["updated"],
         "files": files,
     }
     (data / "provenance.json").write_text(

@@ -76,6 +76,9 @@ jobs:
       - name: Write published provenance
         run: python scripts/write_published_provenance.py
 
+      - name: Validate published evidence
+        run: python scripts/validate_published_evidence.py
+
       - name: Commit data
         if: ${{ inputs.publish_only != true }}
         run: |
@@ -87,9 +90,6 @@ jobs:
       - name: Push data
         if: ${{ inputs.publish_only != true && success() }}
         run: git push
-
-      - name: Validate published evidence
-        run: python scripts/validate_published_evidence.py
 
       - name: Build web
         working-directory: web
