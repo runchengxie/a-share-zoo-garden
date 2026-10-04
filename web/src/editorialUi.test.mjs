@@ -57,6 +57,9 @@ test("unpriced delisting is disclosed with the historical NAV", () => {
   assert.match(audit, /Delisting event audit/);
   assert.match(audit, /Proxy settlement date/);
   assert.match(audit, /Blocked/);
+  assert.match(audit, /event\.strict_status === "blocked" \? \(english \? "Blocked" : "无法核实"\)/);
+  const delistingData = readFileSync(new URL("../../published/data/delisting_audit.json", import.meta.url), "utf8");
+  assert.match(delistingData, /"strict_status": "blocked"/);
   assert.match(home, /Strict cutoff/);
   assert.match(home, /严格截止版/);
   assert.match(historyPage, /zooHistoryBeforeUnpricedDelist/);
