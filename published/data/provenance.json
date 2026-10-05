@@ -1,12 +1,12 @@
 {
   "schema_version": "zoo.provenance.v1",
-  "generated_at": "2026-10-02T14:41:25.032495+00:00",
+  "generated_at": "2026-10-05T17:04:53.509234+00:00",
   "evidence_tier": "research_proxy",
   "delisting_policy": "last_price_proxy",
   "independent_recompute_through": null,
   "published_snapshot_through": "20260930",
   "files": {
-    "published/data/metadata.json": "16ae9170bb8d0da84589f2985a2486d92e1d7b1c97b9dc016e28b207d4a9784d",
+    "published/data/metadata.json": "7a9d64dabfe417a1bc15b2617176d40a4e17abab4029e22e7ffac42dc7f05028",
     "published/data/latest.json": "19aec5b4f38969e1e9d9ef7301cbb90113fadee5667fd85d9f13be973d43e4e5",
     "published/data/history.json": "0bd22476ae647ceb865562b598fd98b265f566c88332049b425d7a57d015fbb1",
     "published/data/constituents.json": "8ebf044127f4fda25b72f9b62eb95299dc858418d6eeabd0243c7097176ed54c",
