@@ -1,6 +1,6 @@
 {
   "schema_version": "zoo.provenance.v1",
-  "generated_at": "2026-10-06T15:02:26.458000+00:00",
+  "generated_at": "2026-10-07T15:29:37.608130+00:00",
   "evidence_tier": "research_proxy",
   "delisting_policy": "last_price_proxy",
   "independent_recompute_through": null,
