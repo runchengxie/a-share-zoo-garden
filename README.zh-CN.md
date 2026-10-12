@@ -92,7 +92,11 @@ npm run dev
 Python 计算与数据逻辑：
 
 ```bash
-uv run pytest
+uv sync --frozen --extra formal
+uv run --extra formal ruff format --check .
+uv run --extra formal ruff check .
+uv run --extra formal ty check
+uv run --extra formal pytest
 ```
 
 前端视觉契约与生产构建：
@@ -104,4 +108,6 @@ npm test
 npm run build
 ```
 
-质量门禁由 `.github/workflows/ci.yml` 在每次推送与 PR 时执行，包括 ruff、ty、pytest、uv audit，以及前端 Node 契约测试与 Vite production build。
+`formal` extra 在 Python 3.12 及以上安装固定版本的执行与契约依赖。较旧的受支持 Python 版本会跳过需要 `backtest_runtime` 的测试。`.github/workflows/ci.yml` 执行上述 Python 检查和前端检查。`uv audit --frozen` 报告依赖漏洞，但不阻断 CI。pytest 输出覆盖率，当前没有最低覆盖率门槛。
+
+网页默认使用 `en-US`，并提供 `zh-CN` 切换。有效的 `?lang=` 参数优先于保存的 `a-share-zoo-locale` 偏好。未知值使用已保存的偏好，或回退到英文。语言只改变同一份公开 JSON 快照的展示。

@@ -60,11 +60,17 @@ The project deploys to GitHub Pages and Cloudflare Pages. Daily production calcu
 ## Verification
 
 ```bash
-uv run pytest
+uv sync --frozen --extra formal
+uv run --extra formal ruff format --check .
+uv run --extra formal ruff check .
+uv run --extra formal ty check
+uv run --extra formal pytest
 cd web
 npm ci
 npm test
 npm run build
 ```
 
-[Chinese README](README.zh-CN.md)
+The `formal` extra installs the pinned execution and contract dependencies on Python 3.12+. On older supported Python versions, tests requiring `backtest_runtime` are skipped. CI runs the Python checks above and the frontend checks. `uv audit --frozen` reports dependency vulnerabilities without blocking CI. Coverage is reported by pytest; no minimum is configured.
+
+The website defaults to `en-US` and provides a `zh-CN` switch. A valid `?lang=` query takes precedence over the saved `a-share-zoo-locale` preference. Unknown values use the saved preference or fall back to English. The locale changes presentation of the same public JSON snapshots.
