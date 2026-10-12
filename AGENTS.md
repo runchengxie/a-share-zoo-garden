@@ -22,11 +22,11 @@
 ## 标准开发命令
 
 ```bash
-uv sync
-uv run ruff format .
-uv run ruff check .
-uv run ty check
-uv run pytest
+uv sync --frozen --extra formal
+uv run --extra formal ruff format --check .
+uv run --extra formal ruff check .
+uv run --extra formal ty check
+uv run --extra formal pytest
 ```
 
 前端检查：
@@ -80,7 +80,7 @@ npm run build
 
 ## CI 门禁
 
-`.github/workflows/ci.yml` 在推送与 PR 时执行 Python 质量门禁与前端质量门禁。Python 包括 ruff format 检查、ruff check、ty、pytest、uv audit。前端包括 `npm test` 与 `npm run build`。
+`.github/workflows/ci.yml` 在推送与 PR 时执行 Python 质量门禁与前端质量门禁。Python 阻断门禁包括 ruff format 检查、ruff check、ty 和 pytest，使用 `formal` extra。`uv audit --frozen` 仅报告依赖漏洞，不阻断 CI。前端包括 `npm test` 与 `npm run build`。
 `.github/workflows/daily.yml` 在交易日计算并部署到 GitHub Pages，main 分支不提交任何生成物。
 
 ## 动物园与植物园数据管理
