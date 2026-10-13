@@ -39,7 +39,7 @@ def _parse_args() -> argparse.Namespace:
         "--output-dir",
         type=str,
         default="",
-        help="产物输出目录（默认仓库 docs 目录）",
+        help="产物输出目录（默认仓库 artifacts 目录）",
     )
     parser.add_argument(
         "--backfill",

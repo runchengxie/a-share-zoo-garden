@@ -36,7 +36,7 @@ uv sync
 export TUSHARE_TOKEN=你的token
 ```
 
-主 Token 偶发限流或失败时，可再设一个备用 Token 走转发代理，由程序自动回退（机制见 [docs/architecture.md](docs/architecture.md#数据源与-token)）：
+主 Token 偶发限流或失败时，可再设一个备用 Token 走转发代理，由程序自动回退（机制见 [docs/architecture.zh-CN.md](docs/architecture.zh-CN.md#数据源与-token)）：
 
 ```bash
 export TUSHARE_TOKEN_2=转发代理给你的key
@@ -70,7 +70,7 @@ npm run dev
 | `uv run zoo-audit --date YYYYMMDD` | 生成确定性收录审核候选 |
 | `make daily` / `make backfill` / `make chart` / `make test` | Makefile 快捷命令 |
 
-更多命令行参数（回填天数、缓存、基准切换、快照等）见 [docs/architecture.md](docs/architecture.md#使用细节)。
+更多命令行参数（回填天数、缓存、基准切换、快照等）见 [docs/architecture.zh-CN.md](docs/architecture.zh-CN.md#使用细节)。
 
 名称审计默认只生成本地 `artifacts/audit/` 报告，不修改规则和指数成分。配置 `GEMINI_API_KEY` 或 `OPENROUTER_API_KEY` 后，可追加 `--llm` 进行批量语义复核，LLM 失败不会影响 `zoo-index`。
 
@@ -80,12 +80,12 @@ npm run dev
 
 ## 规则、产物与架构
 
-- 收录规则与指数方法：见 [docs/methodology.md](docs/methodology.md)
-- 产物结构、数据流、部署与 Token 机制：见 [docs/architecture.md](docs/architecture.md)
+- 收录规则与指数方法：见 [docs/methodology.zh-CN.md](docs/methodology.zh-CN.md)
+- 产物结构、数据流、部署与 Token 机制：见 [docs/architecture.zh-CN.md](docs/architecture.zh-CN.md)
 
 ## 部署
 
-项目同时部署到 GitHub Pages 和 Cloudflare Pages。`.github/workflows/daily.yml` 在每个交易日收盘后计算数据并部署 GitHub Pages。`.github/workflows/deploy-cloudflare.yml` 在 `main` 更新后使用仓库中的 `published/data` 构建并部署 Cloudflare Pages。GitHub Actions 需要配置 `TUSHARE_TOKEN`、`CLOUDFLARE_API_TOKEN` 与 `CLOUDFLARE_ACCOUNT_ID`。细节见 [docs/architecture.md](docs/architecture.md#部署)。
+项目同时部署到 GitHub Pages 和 Cloudflare Pages。`.github/workflows/daily.yml` 在每个交易日收盘后计算数据并部署 GitHub Pages。`.github/workflows/deploy-cloudflare.yml` 在 `main` 更新后使用仓库中的 `published/data` 构建并部署 Cloudflare Pages。GitHub Actions 需要配置 `TUSHARE_TOKEN`、`CLOUDFLARE_API_TOKEN` 与 `CLOUDFLARE_ACCOUNT_ID`。细节见 [docs/architecture.zh-CN.md](docs/architecture.zh-CN.md#部署)。
 
 ## 开发与测试
 

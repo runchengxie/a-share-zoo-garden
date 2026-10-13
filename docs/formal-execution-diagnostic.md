@@ -1,5 +1,7 @@
 # 动物园公共执行模拟诊断
 
+本页保留严格策略的历史诊断，不表示当前网站仍停留在该发布状态。`daily.yml` 目前将动物园的 `last_price_proxy` 序列发布到 `published/`，metadata 和网页均标记为研究代理。植物园使用默认 `strict` 策略。当前发布边界见[架构与运维](architecture.zh-CN.md#部署)。
+
 `zoo-formal-diagnostic` 从固定离线缓存逐日恢复严格版和扩展版目标。每次目标变更记录独立的 `research.clock.v1`，次一交易日才允许提交订单。目标、行情和时钟以内容哈希输入提交给 `quant-backtest-runtime` 的多决策任务，worker 调用 `quant-platform` 的逐日执行模拟器计算订单、成交和账本。诊断产物写在仓库外的空目录，不覆盖公开指数净值。
 
 ```bash
@@ -27,7 +29,7 @@ uv run --extra formal zoo-formal-diagnostic \
 
 ### 研究版退市代理序列
 
-若需要在缺少可核实现金结算时继续观察曲线，可使用 `--delisting-policy last_price_proxy`。程序会将持仓在退市前最后一个有效复权价格作为代理结算价，在退市日计为零收益并按异常再平衡规则移除成分。该输出写入独立目录时，`metadata.json` 标记为 `evidence_tier=research_proxy`，不得覆盖严格版公开净值，也不得解释为真实可交易业绩。默认 `strict` 行为保持不变。
+若需要在缺少可核实现金结算时继续观察曲线，可使用 `--delisting-policy last_price_proxy`。程序会将持仓在退市前最后一个有效复权价格作为代理结算价，在退市日计为零收益并按异常再平衡规则移除成分。该输出的 `metadata.json` 标记为 `evidence_tier=research_proxy`。手动对照实验应使用独立目录，避免覆盖待审核的结果；代理估值不得解释为真实现金结算或可交易业绩。默认 `strict` 行为保持不变。
 
 ## 跨项目市场事件契约
 
