@@ -28,6 +28,8 @@ uv run zoo-index
 
 For a local web preview:
 
+Use Node.js 20.19+ or 22.12+ (or a newer supported release) for the Vite 8 toolchain. CI and deployment use Node.js 22. The frontend uses React 18, React Router 7 in declarative `HashRouter` mode, and ECharts 6 with its v5 compatibility theme. Updating the frontend does not recompute the published snapshots.
+
 ```bash
 cd web
 npm ci
