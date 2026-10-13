@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import * as echarts from "echarts/core";
+import "echarts/theme/v5";
 import { LineChart } from "echarts/charts";
 import {
   DataZoomComponent,
@@ -45,7 +46,7 @@ export default function ZooChart({ history, benchmarkLabel, themeLabel = "动物
 
   useEffect(() => {
     if (!ref.current) return;
-    const chart = echarts.init(ref.current);
+    const chart = echarts.init(ref.current, "v5");
     const dates = history.map((point) => point.date);
     const strict = history.map((point) => point.zoo_strict_nav);
     const extended = history.map((point) => point.zoo_extended_nav);
@@ -80,7 +81,7 @@ export default function ZooChart({ history, benchmarkLabel, themeLabel = "动物
         itemHeight: 2,
         textStyle: { color: mutedColor, fontSize: 11 },
       },
-      grid: { left: 52, right: 24, top: 44, bottom: 58 },
+      grid: { left: 52, right: 24, top: 44, bottom: 58, outerBoundsMode: "none" },
       xAxis: {
         type: "category",
         boundaryGap: false,

@@ -53,9 +53,11 @@ uv run zoo-index
 
 ### 4. 看结果（本地预览网页）
 
+Vite 8 工具链要求 Node.js 20.19 及以上或 22.12 及以上，也支持符合要求的更新版本。CI 和部署使用 Node.js 22。前端使用 React 18、React Router 7 的声明式 `HashRouter` 和 ECharts 6 的 v5 兼容主题。前端升级不会重新计算已发布快照。
+
 ```bash
 cd web
-npm install
+npm ci
 npm run dev
 ```
 
