@@ -1,129 +1,53 @@
-# 方法说明
+# Index methodology
 
-技术细节收录于此，README 仅保留上手所需的最低信息。
+[简体中文](methodology.zh-CN.md)
 
-## 计算方法
+Animal and plant indices classify historical security names using separate rule files. They share market-data, eligibility, return, and state-management code. A thematic name match is separate from investable index eligibility.
 
-动物园和植物园统一以 2021 年首个交易日 1 月 4 日收盘为起点，当日净值设为 1。当天收盘后确定初始篮子，收益从下一交易日开始累计。两套沪深300 ETF 基准也采用同一日期和归一化口径，可直接比较。
+## Rules and historical availability
 
-指数采用月度调仓持有模型。成分在每月首个交易日重算，等权赋予固定权重 `1/N`，月内持有该篮子不再每日再平衡。
+`rules.yml` and `plant_rules.yml` define strict/extended keywords, `exclude_patterns`, and ts_code-only `force_include`/`force_exclude` lists. Extended matching includes strict keywords. Strict rules emphasize unambiguous real animal or plant names; extended rules can include ambiguous, collective, or mythical terms. Industry membership alone does not qualify a security whose name has no matching term.
 
-相邻交易日的收益按上一篮子计算，再平衡日当天仍用旧篮子（去前视），新篮子从下一交易日生效。这样避免用当日才确定的新成分去赚取当日收益这一前视漏洞。
+Historical names use `namechange` as-of records. The provider paginates name history and supplements missing 2006 intervals. Unknown historical names cannot be replaced with the current `stock_basic.name`. `list_date`/`delist_date` filter the historical universe. ST, exchange, minimum listing age, and liquidity constraints further restrict eligibility.
 
-成分简称使用 `namechange` 的 as-of 口径（用历史时点名称，避免用现在的名字去套过去的行情）。
+| Configuration key | Meaning |
+| --- | --- |
+| `min_listing_days` | Minimum calendar days since listing; 0 disables the minimum |
+| `min_daily_amount` | Minimum rebalance-day traded amount; 0 disables the threshold |
+| `max_suspension_days` | Consecutive suspended trading days triggering removal; 0 disables it |
 
-更名记录分页拉取；对全市场接口遗漏的 2006 年名称区间按股票代码补取。若指定日期仍没有可确认的历史简称，该股票不进入当期候选池，不能用当前 `stock_basic.name` 回填。
+Rule versions use `effective_from` and the history files. Animal terms added on 2026-09-07 or 2026-09-25 do not enter earlier historical baskets. The earliest known animal rule date is 2025-12-22. Earlier replay reuses that known vocabulary as a retrospective assumption. The plant history preserves the 2026-09-05 vocabulary and applies the 2026-09-25 additions only from their effective date. A common 2021-01-04 chart origin does not establish that either vocabulary existed then.
 
-回填使用 `list_date / delist_date` 过滤存量股票，减少幸存者偏差。
+## State and returns
 
-上市时间与流动性约束（P2-3）：成分还需满足上市满 `min_listing_days` 个自然日，且再平衡日成交额不低于 `min_daily_amount`，低流动性股票在再平衡时被剔除。
+The common origin is the close of 2021-01-04 with NAV 1. Initial holdings are selected at that close and returns begin on the next trading day. Baskets are recomputed on each month's first trading day, assigned equal fixed weights, and held between rebalances. The old basket earns the rebalance-day return; new weights start the following day.
 
-历史时点规则（P2-2）：`rules_history.yml` 保存已知旧版，`rules.yml` 声明当前版本的 `effective_from`。规则按再平衡日选取，2026 年 9 月 7 日新增的词不会进入更早的篮子。已知最早版本于 2025 年 12 月 22 日生效。此前区间沿用最早已知词表，仅属于事后假设，不能作为当时可执行的历史时点表现。
+Stock and ETF returns use the adjusted-price ratio:
 
-植物园 2026 年 9 月 5 日的词表已保存为历史版本；更早区间仍使用这版规则回放，属于事后假设。2026 年 9 月 25 日新增的词只从该日起生效，不回填到更早的篮子。因此统一起点提升了图表可比性，但不表示 2021 年的主题词表在当时已存在。
+```text
+(close_t * adj_t) / (last_traded_close * last_traded_adj) - 1
+```
 
-基准口径（P2-1）：股票和 ETF 收益用复权因子还原分红送转，基准与主题指数同口径。Tushare 的股票复权因子采用分红再投模式；这里计算的是复权总收益近似值，没有模拟现金红利到账、税费和实际再投资交易。
+Confirmed suspension keeps the holding and weight with zero daily return. Resumption realizes the adjusted-price change from the last valid observation. Other missing quotes keep the holding's weight and contribute zero rather than reallocating it. Missing delisting quotes have the separate strict/proxy boundary below. The stateless single-day helper has its own missing-price normalization and is not the stateful daily-index calculation.
 
-## 收益与停牌处理
+Index return is the weighted sum of holding returns. Corporate-action adjustment factors approximate reinvested total returns; this is not explicit cash-dividend receipt, taxation, or reinvestment accounting. ETF calculation requires `fund_adj`; absent factors fail rather than becoming 1. Index benchmarks use `close / pre_close - 1` directly. Do not multiply already adjusted ETF `pre_close` by another adjustment ratio.
 
-每日收益按最近一次有效交易价格的复权价比率计算：
+## Exceptional rebalance and delisting
 
-`(close_t * adj_t) / (last_traded_close * last_traded_adj) - 1`
+A holding can trigger removal when delisted, in an announced/effective delisting period, newly ST, or suspended for the configured duration. That day still uses old holdings; the remaining basket is reweighted for the next trading day. Date-only announcements become available for decisions on the following day, and the monthly universe also excludes known delisting-period securities.
 
-这个公式直接体现分红送转带来的跳变，不需要再用 `close/pre_close` 额外乘复权因子（那样会把分红重复计算一次）。
+`--delisting-policy strict` is the CLI default. A missing delisting quote without verified settlement blocks calculation across that date. `last_price_proxy` is a research alternative: it uses the last valid adjusted valuation as a proxy, records zero return on the delisting day, and removes the holding. It marks metadata `evidence_tier=research_proxy`; that valuation is not verified cash settlement. [Architecture](architecture.md#deployment) records the actual scheduled policies for both gardens. See the [delisting contract](delisting-event-contract.md) and dated [formal diagnostic](formal-execution-diagnostic.md).
 
-行情缺失分两种情况：
+## Optional transaction-cost layer
 
-- 停牌（无行情，且经 `suspend_d` 确认）：成分保留，当日收益计 0，权重不变。
-- 复牌：用停牌前最后一次有效价格与复权因子计算跨停牌期收益，计入复牌当日。
-- 真实缺失（无行情且非停牌，多为接口漏数）：成分保留，权重不变，当日收益贡献 0，不静默把它的权重重新均分给其他成分。
+`backtest.yml` defaults to `enabled: false` with zero `commission_rate`, `stamp_tax_rate`, and `slippage_rate`. Enabling it retains gross index returns and adds turnover, cost, net-return, and net-NAV fields to NAV and public snapshots.
 
-指数收益等于各持有成分权重与当日收益之积的总和。固定权重下某成分缺失只令该部分当日零收益，其余成分权重维持不变。
+The formal extra pins `quant-backtest-runtime` v4 and the `quant-platform` accounting provider. It requires Python 3.12+ and an external absolute `ZOO_BACKTEST_RUNTIME_ROOT` for job inputs, database, and outputs. Missing configuration rejects the run. Strict and extended rebalance settlement is submitted separately.
 
-异常调样（P1-3）：理论指数持有成分若满足以下任一条件，当日仍按旧持仓计算收益，剔除触发成分后对剩余重新等权，新固定权重从下一交易日生效：
+Before comparison with equal targets, previous weights drift with prices. Turnover is half the sum of absolute executed weight changes. Commission and slippage apply to executed changes; stamp tax applies to sells. Suspended securities cannot execute and remain pending. This cost layer does not by itself establish historical input availability or actual tradability.
 
-- 截至当日已退市（`delist_date` 早于或等于当日）
-- 已进入公告可知且生效的退市整理期（`namechange.change_reason`）
-- 当日简称含 ST（经 `namechange` as-of 口径）
-- 连续停牌达到 `max_suspension_days`（跨交易日累计，该值为 0 时关闭）
+## Name review and evidence
 
-月度候选池也排除已进入退市整理期且公告日早于决策日的证券。公告日缺少日内时刻，当日公告从次日决策起生效。此规则只决定目标权重，可交易回测仍需核对退出成交和剩余持仓。
+`zoo-audit` distinguishes thematic membership from index eligibility. Deterministic results can be reviewed with optional Gemini/OpenRouter model suggestions. Reports record input and rule hashes, provider/model identity, and prompt version. Model agreement only prioritizes review, and `confidence` is not a calibrated probability. Approve rules explicitly with an effective date; audit JSON does not directly become an index rule.
 
-## 基准
-
-基准默认取沪深300 ETF（510300.SH），也可在运行时改为沪深300 指数（000300.SH）或某只 A 股。基准净值与指数同口径：
-
-- 股票源：以 `close_t * adj_t / (close_{t-1} * adj_{t-1}) - 1` 计算，复权因子来自 `adj_factor`。
-- ETF 源（fund）：复权因子来自 `fund_adj`，使用同一公式。除息日的 `pre_close` 可能已经除权，不能再乘复权因子，否则会重复计算分红。复权因子缺失时计算报错，不按 1.0 替代。
-- 指数源（index）：`pre_close` 已是交易所复权价，直接以 `close / pre_close - 1` 计算。
-
-## 收录规则
-
-### 严格动物园
-
-设计初衷是追求精准、减少误伤，只收录多字、明确的动物名称。
-
-收录关键词以 `rules.yml` 的 `strict_keywords` 为准。2026 年 9 月 25 日新增狮头、锦鸡、紫燕、鹭燕。
-
-特点：关键词通常由两个或以上汉字组成，极少出现歧义。例如熊猫几乎只指代动物，不会像单字马那样容易匹配到马钢等非动物股。
-
-### 扩展动物园
-
-设计初衷是追求热闹、覆盖面广，收录了大量单字、泛指的动物名称。
-
-收录关键词以 `rules.yml` 的 `extended_keywords` 为准。2026 年 9 月 25 日新增凤、雁、羚、鸥、羊、狮。
-
-特点：包含大量单字，容易产生噪音（误伤）。扩展动物园默认合并严格关键词，因此扩展必然包含严格。规则里只需维护各自词表即可。
-
-植物园于 2026 年 9 月 25 日起在严格层新增燕麦、红豆、李子，在扩展层新增草坪、百花、金枫、蒙草、西麦、永杉、春兰。宽泛单字如兰、麦、贝仍需逐项审核，避免把地名、人名或音译品牌误当植物名。
-
-### 通用规则
-
-两套指数都遵循以下通用过滤：
-
-- 排除规则（exclude_patterns）：剔除马钢、龙湖、龙光等已知非动物的干扰项。
-- 强制名单（force_include / force_exclude）：可在 `rules.yml` 中通过 ts_code 强制将某只股票同时加入或踢出两个动物园。
-- 排除 ST：默认排除 ST 股票。
-- 交易所：默认包含沪深，可选是否包含北交所。
-
-简而言之，严格是精品小团，扩展是热闹大群（纳入规则更松散）。
-
-## 可交易回测
-
-理论指数与可交易回测分层。理论指数保留固定权重和复权收益口径，作为公开历史序列；可交易回测只在 `backtest.yml` 的 `enabled` 为 `true` 时计算。启用后，每次再平衡的严格版与扩展版成本结算分别提交给 `quant-backtest-runtime` v4，由 `quant-platform` 的通用交易会计后端计算，校验后的换手及总成本再写入当日结果。
-
-可交易回测需要 Python 3.12 及 `formal` 额外依赖，并须将 `ZOO_BACKTEST_RUNTIME_ROOT` 设置为仓库外的绝对目录，用于保存任务数据库、输入和结果。未配置时会拒绝回测，不会在公开快照目录落盘任务资料。
-
-可交易层在再平衡时先把上一期权重按价格变化漂移，再与新的等权目标比较。换手率为已执行交易权重绝对值之和的一半，佣金和滑点按已执行交易权重计算，印花税只按卖出权重计算。停牌股票不计入当日可执行交易，相关交易记为待处理。
-
-成本参数均为比例小数，默认值为 0：
-
-- `commission_rate`：佣金率
-- `stamp_tax_rate`：卖出印花税率
-- `slippage_rate`：滑点率
-
-## 名称审计与分类边界
-
-主题成员身份和指数可投资资格分开计算。证券简称可以因为含有动物或植物词而成为主题成员，但仍可能因为 ST、交易所、上市时间或流动性规则不能进入当前指数。`zoo-audit` 会同时展示这两个结果。
-
-严格层优先收录低歧义的现实生物名称。扩展层可以收录高歧义词、集合概念和神话生物。龙在本项目中标记为 `mythical`，属于扩展动物园候选，不属于严格现实动物层。凤凰、麒麟、鹏等按同一原则处理。
-
-公司主营业务与名称没有直接关系时，不因行业相关而收录。例如养殖公司名称本身没有动物词，不属于名称主题指数。
-
-`zoo-audit` 先用确定性 matcher 生成已命中和未命中候选，再可选调用 Gemini、固定 OpenRouter 免费模型及 `openrouter/free` fallback。LLM 结果只写入带输入哈希、规则哈希、模型和 prompt 版本的审核报告，人工批准后才修改规则文件。
-
-成本后字段写入 `nav.csv`、`latest.json` 与 `history.json`，不会覆盖毛收益字段。
-
-## 规则配置
-
-`rules.yml` 控制动物词、排除项、强制收编与剔除等规则：
-
-- `strict_keywords`：明确动物词（严格动物园）
-- `extended_keywords`：扩展词（扩展动物园，可能噪声更高）
-- `exclude_patterns`：包含这些词的简称会被剔除
-- `force_include / force_exclude`：仅支持 ts_code 强制处理
-- `min_listing_days`：成分上市自然日下限，0 表示不限制
-- `min_daily_amount`：再平衡日成交额下限，0 表示不限制
-- `max_suspension_days`：连续停牌触发异常再平衡的阈值，0 表示关闭
-
-历史规则版本写入 `rules_history.yml`，每条含 `effective_from` 与对应的规则字段，供 point-in-time 回放使用。
+Dated [rule comparisons](rule-list-comparison-20260928.md) preserve their sample periods and withdrawn-performance limits. Synthetic contract tests verify engineering behavior, not historical returns. No real-data backfill or new numerical finding was produced by this documentation audit.

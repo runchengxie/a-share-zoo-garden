@@ -17,7 +17,8 @@
 * `src/zoo_index/data_sources/tushare.py`：Tushare 客户端与缓存；`TushareLike` 是其结构化接口协议。
 * `rules.yml`：动物词表、排除项、强制名单（字段名保持英文，注释用中文）。
 * `web/`：TypeScript 前端，只展示公开 JSON，不接触 Token，不在浏览器计算指数。
-* `docs/`、`web/dist/`、`web/public/data/`、`.build/`：生成物，不入库。
+* `docs/`：入库维护的方法、架构与研究证据说明。
+* `web/dist/`、`web/public/data/`、`.build/`：生成物，不入库。
 
 ## 标准开发命令
 
