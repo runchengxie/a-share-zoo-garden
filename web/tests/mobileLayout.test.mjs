@@ -1,0 +1,56 @@
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
+import test from "node:test";
+import { fileURLToPath } from "node:url";
+import { chromium } from "playwright";
+import { createServer } from "vite";
+
+const repositoryRoot = fileURLToPath(new URL("../../", import.meta.url));
+
+test("mobile dashboards fit supported locales and fallback while evidence tables remain scrollable", async () => {
+  const server = await createServer({ server: { host: "127.0.0.1", port: 0, hmr: false }, logLevel: "error" });
+  let browser;
+  try {
+    await server.listen();
+    const address = server.httpServer.address();
+    assert.ok(address && typeof address !== "string");
+    const origin = `http://127.0.0.1:${address.port}`;
+    browser = await chromium.launch({ headless: true });
+    for (const locale of ["en-US", "zh-CN", "fr"]) {
+      const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+      await page.addInitScript(() => localStorage.setItem("a-share-zoo-locale", "fr"));
+      const errors = [];
+      page.on("pageerror", (error) => errors.push(error.message));
+      await page.route("**/*", async (route) => {
+        const url = new URL(route.request().url());
+        if (url.origin !== origin) {
+          if (url.hostname === "fonts.googleapis.com") {
+            return route.fulfill({ contentType: "text/css", body: "" });
+          }
+          return route.abort();
+        }
+        const match = url.pathname.match(/^\/data\/(plant\/)?([a-z_]+\.json)$/u);
+        if (match) {
+          const fixture = path.join(repositoryRoot, "published", match[1] ? "plant" : "", "data", match[2]);
+          return route.fulfill({ contentType: "application/json", body: await readFile(fixture, "utf8") });
+        }
+        return route.continue();
+      });
+      await page.goto(`${origin}/?lang=${locale}`, { waitUntil: "domcontentloaded" });
+      const canvas = page.locator(".zoo-chart canvas").first();
+      await canvas.waitFor();
+      assert.equal(await page.locator("html").getAttribute("lang"), locale === "zh-CN" ? "zh-CN" : "en-US");
+      const bounds = await canvas.boundingBox();
+      assert.ok(bounds && bounds.width > 100 && bounds.width <= 390, `${locale}: chart must fit the viewport`);
+      const layout = await page.evaluate(() => ({ width: document.documentElement.scrollWidth, viewport: innerWidth }));
+      assert.ok(layout.width <= layout.viewport, `${locale}: page width ${layout.width}px exceeds ${layout.viewport}px`);
+      assert.ok(await page.locator(".delisting-audit table").evaluate((table) => table.scrollWidth > table.clientWidth), `${locale}: wide evidence must scroll inside its table`);
+      assert.deepEqual(errors, []);
+      await page.close();
+    }
+  } finally {
+    await browser?.close();
+    await server.close();
+  }
+});

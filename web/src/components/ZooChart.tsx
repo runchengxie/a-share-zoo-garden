@@ -10,6 +10,7 @@ import {
 } from "echarts/components";
 import { CanvasRenderer } from "echarts/renderers";
 import { NavPoint } from "../api";
+import { formatChartMonth } from "../chartDates";
 import { useLocale } from "../i18n";
 
 echarts.use([
@@ -92,7 +93,7 @@ export default function ZooChart({ history, benchmarkLabel, themeLabel = "动物
           color: mutedColor,
           fontSize: 10,
           hideOverlap: true,
-          formatter: (value: string) => value.slice(0, 7),
+          formatter: formatChartMonth,
         },
       },
       yAxis: {
