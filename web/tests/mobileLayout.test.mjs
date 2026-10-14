@@ -17,9 +17,16 @@ test("mobile dashboards fit supported locales and fallback while evidence tables
     assert.ok(address && typeof address !== "string");
     const origin = `http://127.0.0.1:${address.port}`;
     browser = await chromium.launch({ headless: true });
-    for (const locale of ["en-US", "zh-CN", "fr"]) {
+    const cases = [
+      { query: "en-US", stored: "zh-CN", expected: "en-US" },
+      { query: "zh-CN", stored: "fr", expected: "zh-CN" },
+      { query: "fr", stored: "fr", expected: "en-US" },
+      { query: "fr", stored: "zh-CN", expected: "zh-CN" },
+      { query: "", stored: "zh-CN", expected: "zh-CN" },
+    ];
+    for (const { query, stored, expected } of cases) {
       const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
-      await page.addInitScript(() => localStorage.setItem("a-share-zoo-locale", "fr"));
+      await page.addInitScript((value) => localStorage.setItem("a-share-zoo-locale", value), stored);
       const errors = [];
       page.on("pageerror", (error) => errors.push(error.message));
       await page.route("**/*", async (route) => {
@@ -37,15 +44,16 @@ test("mobile dashboards fit supported locales and fallback while evidence tables
         }
         return route.continue();
       });
-      await page.goto(`${origin}/?lang=${locale}`, { waitUntil: "domcontentloaded" });
+      await page.goto(`${origin}/${query ? `?lang=${query}` : ""}`, { waitUntil: "domcontentloaded" });
       const canvas = page.locator(".zoo-chart canvas").first();
       await canvas.waitFor();
-      assert.equal(await page.locator("html").getAttribute("lang"), locale === "zh-CN" ? "zh-CN" : "en-US");
+      assert.equal(await page.locator("html").getAttribute("lang"), expected);
+      assert.equal(await page.locator(".site-nav a").first().textContent(), expected === "zh-CN" ? "首页" : "Home");
       const bounds = await canvas.boundingBox();
-      assert.ok(bounds && bounds.width > 100 && bounds.width <= 390, `${locale}: chart must fit the viewport`);
+      assert.ok(bounds && bounds.width > 100 && bounds.width <= 390, `${query || "saved preference"}: chart must fit the viewport`);
       const layout = await page.evaluate(() => ({ width: document.documentElement.scrollWidth, viewport: innerWidth }));
-      assert.ok(layout.width <= layout.viewport, `${locale}: page width ${layout.width}px exceeds ${layout.viewport}px`);
-      assert.ok(await page.locator(".delisting-audit table").evaluate((table) => table.scrollWidth > table.clientWidth), `${locale}: wide evidence must scroll inside its table`);
+      assert.ok(layout.width <= layout.viewport, `${query || "saved preference"}: page width ${layout.width}px exceeds ${layout.viewport}px`);
+      assert.ok(await page.locator(".delisting-audit table").evaluate((table) => table.scrollWidth > table.clientWidth), `${query || "saved preference"}: wide evidence must scroll inside its table`);
       assert.deepEqual(errors, []);
       await page.close();
     }
