@@ -21,7 +21,7 @@ const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
 
 test("site shell exposes an editorial masthead and research navigation", () => {
   assert.match(app, /brand-kicker/);
-  assert.match(app, /A 股动物园与植物园/);
+  assert.match(i18n, /title: "A 股动物园与植物园"/);
   assert.match(app, /site-deck/);
   assert.match(app, /site-nav/);
   assert.match(app, /ThemeToggle/);
@@ -36,14 +36,14 @@ test("theme state is presentation-only and persists the user preference", () => 
 
 test("home page leads with a research question and index snapshot", () => {
   assert.match(home, /home-hero/);
-  assert.match(home, /名字里的动物和植物/);
+  assert.match(i18n, /heroTitle: "名字里的动物和植物/);
   assert.match(home, /index-snapshot/);
   assert.match(home, /fetchThemeConstituents/);
   assert.match(home, /fetchThemeData\("animal"\)/);
   assert.match(home, /fetchThemeData\("plant"\)/);
   assert.match(home, /id=\{`\$\{theme\}-panel`\}/);
   assert.match(home, /research-section/);
-  assert.match(home, /植物园/);
+  assert.match(i18n, /themePlant: "植物园"/);
 });
 
 test("unpriced delisting is disclosed with the historical NAV", () => {
@@ -53,33 +53,35 @@ test("unpriced delisting is disclosed with the historical NAV", () => {
   assert.match(home, /research_proxy/);
   assert.match(home, /fetchThemeMetadata/);
   assert.match(home, /fetchDelistingAudit/);
-  assert.match(audit, /代理结算记录/);
-  assert.match(audit, /Delisting event audit/);
-  assert.match(audit, /Proxy settlement date/);
-  assert.match(audit, /Blocked/);
-  assert.match(audit, /event\.strict_status === "blocked" \? \(english \? "Blocked" : "无法核实"\)/);
+  assert.match(i18n, /subheading: "代理结算记录"/);
+  assert.match(i18n, /heading: "Delisting event audit"/);
+  assert.match(i18n, /proxySettlementDate: "Proxy settlement date"/);
+  assert.match(i18n, /blocked: "Blocked"/);
+  assert.match(audit, /event\.strict_status === "blocked"/);
   const delistingData = readFileSync(new URL("../../published/data/delisting_audit.json", import.meta.url), "utf8");
   assert.match(delistingData, /"strict_status": "blocked"/);
-  assert.match(home, /Strict cutoff/);
-  assert.match(home, /严格截止版/);
+  assert.match(i18n, /strictCutoff: "Strict cutoff"/);
+  assert.match(i18n, /strictCutoff: "严格截止版"/);
   assert.match(historyPage, /zooHistoryBeforeUnpricedDelist/);
-  assert.match(historyPage, /待结算数据重建/);
-  assert.match(historyPage, /研究代理版/);
-  assert.match(methodology, /退市持仓缺少行情和可核实结算事件/);
-  assert.match(methodology, /continuous Zoo series/);
-  assert.match(methodology, /home page delisting audit/);
-  assert.match(historyPage, /benchmark_label} NAV/);
+  assert.match(i18n, /待结算数据重建/);
+  assert.match(i18n, /researchProxy: "当前为研究代理版/);
+  assert.match(i18n, /退市持仓缺少行情和可核实结算事件/);
+  assert.match(i18n, /continuous Zoo series/);
+  assert.match(i18n, /home page delisting audit/);
+  assert.match(historyPage, /copy\.historyPage\.benchmarkNav/);
   assert.doesNotMatch(methodology, /剩余成分重新等权/);
 });
 
 test("English delisting audit shows stable security codes without Chinese issuer names", () => {
-  assert.match(audit, /english \? event\.ts_code : `\$\{event\.ts_code\} \$\{event\.name\}`/);
+  assert.match(audit, /formatCopy\(text\.codeValue/);
+  assert.match(i18n, /codeValue: "\{code\}"/);
+  assert.match(i18n, /codeValue: "\{code\} \{name\}"/);
 });
 
 test("home page lazy-loads the chart without changing its data contract", () => {
   assert.match(home, /lazy/);
   assert.match(home, /Suspense/);
-  assert.match(home, /加载图表/);
+  assert.match(i18n, /loadingChart: "加载图表…"/);
 });
 
 test("history page shares the lazy chart boundary", () => {
@@ -89,7 +91,7 @@ test("history page shares the lazy chart boundary", () => {
 });
 
 test("theme data is loaded from an independent plant snapshot", () => {
-  assert.match(home, /植物园/);
+  assert.match(i18n, /themePlant: "植物园"/);
   assert.match(api, /plant\//);
 });
 
@@ -141,14 +143,14 @@ test("change groups are collapsed by default", () => {
 test("change page loads both themes", () => {
   assert.match(changesPage, /fetchThemeChanges\("animal"\)/);
   assert.match(changesPage, /fetchThemeChanges\("plant"\)/);
-  assert.match(changesPage, /植物园/);
-  assert.match(changesPage, /动物园与植物园/);
+  assert.match(i18n, /garden: "植物园"/);
+  assert.match(i18n, /动物园与植物园分别展示最近一次成分变化/);
 });
 
 test("site titles describe both themes", () => {
-  assert.match(app, /A 股动物园与植物园 · 规则化研究/);
-  assert.match(app, /<h1>A 股动物园与植物园<\/h1>/);
-  assert.match(changesPage, /动物园与植物园分别展示最近一次成分变化/);
+  assert.match(i18n, /documentTitle: "A 股动物园与植物园 · 规则化研究"/);
+  assert.match(app, /<h1>\{copy\.title\}<\/h1>/);
+  assert.match(i18n, /动物园与植物园分别展示最近一次成分变化/);
 });
 
 test("site exposes an English-first locale contract with a Chinese switch", () => {

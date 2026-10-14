@@ -11,7 +11,7 @@ import {
 import { CanvasRenderer } from "echarts/renderers";
 import { NavPoint } from "../api";
 import { formatChartMonth } from "../chartDates";
-import { useLocale } from "../i18n";
+import { formatCopy, useLocale } from "../i18n";
 
 echarts.use([
   LineChart,
@@ -33,9 +33,12 @@ function getThemeColor(name: string, fallback: string): string {
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
 }
 
-export default function ZooChart({ history, benchmarkLabel, themeLabel = "动物园" }: Props) {
-  const { locale } = useLocale();
+export default function ZooChart({ history, benchmarkLabel, themeLabel }: Props) {
+  const { locale, copy } = useLocale();
   const english = locale === "en-US";
+  const label = themeLabel ?? copy.home.themeAnimal;
+  const strictLabel = formatCopy(copy.chart.strict, { theme: label });
+  const extendedLabel = formatCopy(copy.chart.extended, { theme: label });
   const ref = useRef<HTMLDivElement>(null);
   const [themeVersion, setThemeVersion] = useState(0);
 
@@ -75,7 +78,7 @@ export default function ZooChart({ history, benchmarkLabel, themeLabel = "动物
         },
       },
       legend: {
-        data: [english ? `Strict ${themeLabel}` : `严格${themeLabel}`, english ? `Extended ${themeLabel}` : `扩展${themeLabel}`, benchmarkLabel],
+        data: [strictLabel, extendedLabel, benchmarkLabel],
         top: 0,
         left: 0,
         itemWidth: 18,
@@ -121,7 +124,7 @@ export default function ZooChart({ history, benchmarkLabel, themeLabel = "动物
       ],
       series: [
         {
-          name: english ? `Strict ${themeLabel}` : `严格${themeLabel}`,
+          name: strictLabel,
           type: "line",
           data: strict,
           showSymbol: false,
@@ -130,7 +133,7 @@ export default function ZooChart({ history, benchmarkLabel, themeLabel = "动物
           emphasis: { focus: "series" },
         },
         {
-          name: english ? `Extended ${themeLabel}` : `扩展${themeLabel}`,
+          name: extendedLabel,
           type: "line",
           data: extended,
           showSymbol: false,
@@ -158,5 +161,5 @@ export default function ZooChart({ history, benchmarkLabel, themeLabel = "动物
     };
   }, [history, benchmarkLabel, themeVersion, english, themeLabel]);
 
-  return <div ref={ref} className="zoo-chart" role="img" aria-label={english ? `${themeLabel} index NAV chart` : `${themeLabel}指数净值走势图`} />;
+  return <div ref={ref} className="zoo-chart" role="img" aria-label={formatCopy(copy.chart.ariaLabel, { theme: label })} />;
 }

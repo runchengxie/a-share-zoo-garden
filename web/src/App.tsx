@@ -10,11 +10,6 @@ import Methodology from "./pages/Methodology";
 import ThemeToggle from "./components/ThemeToggle";
 import { initialLocale, LocaleContext, useLocale, type Locale } from "./i18n";
 
-// Keep the zh-CN editorial source strings explicit for source-level regression coverage:
-// A 股动物园与植物园 · 规则化研究
-// A 股动物园与植物园
-// <h1>A 股动物园与植物园</h1>
-
 export default function App() {
   const [locale, setLocale] = useState<Locale>(initialLocale);
   return <LocaleContext.Provider value={{ locale, setLocale }}><AppContent /></LocaleContext.Provider>;
@@ -51,19 +46,19 @@ function AppContent() {
             <h1>{copy.title}</h1>
             <p className="site-deck">{copy.deck}</p>
           </div>
-          <div className="site-meta" aria-label={locale === "en-US" ? "Data update" : "数据更新时间"}>
+          <div className="site-meta" aria-label={copy.shell.dataUpdate}>
             <span>{copy.index}</span>
             <strong>{updated || copy.waiting}</strong>
           </div>
         </div>
-        <nav className="site-nav" aria-label={locale === "en-US" ? "Primary navigation" : "主导航"}>
+        <nav className="site-nav" aria-label={copy.shell.primaryNavigation}>
           <NavLink to="/">{copy.nav[0]}</NavLink>
           <NavLink to="/methodology">{copy.nav[1]}</NavLink>
           <NavLink to="/constituents">{copy.nav[2]}</NavLink>
           <NavLink to="/history">{copy.nav[3]}</NavLink>
           <NavLink to="/changes">{copy.nav[4]}</NavLink>
           <NavLink to="/about">{copy.nav[5]}</NavLink>
-          <button className="locale-toggle" type="button" onClick={switchLocale} aria-label={`Switch to ${copy.switchTo}`}>{copy.switchTo}</button>
+          <button className="locale-toggle" type="button" onClick={switchLocale} aria-label={copy.shell.switchToLanguage.replace("{language}", copy.switchTo)}>{copy.switchTo}</button>
           <ThemeToggle />
         </nav>
       </header>
