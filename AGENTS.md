@@ -35,7 +35,9 @@ uv run --extra formal pytest
 ```bash
 cd web
 npm ci
+npx playwright install chromium
 npm test
+npm run test:browser
 npm run build
 ```
 

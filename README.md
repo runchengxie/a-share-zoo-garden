@@ -30,6 +30,8 @@ For a local web preview:
 
 Use Node.js 20.19+ or 22.12+ (or a newer supported release) for the Vite 8 toolchain. CI and deployment use Node.js 22. The frontend uses React 18, React Router 7 in declarative `HashRouter` mode, and ECharts 6 with its v5 compatibility theme. Updating the frontend does not recompute the published snapshots.
 
+Run the full frontend verification suite on Node.js 22 (22.18 or later) or 24+. The Node tests import TypeScript directly, using the native type stripping enabled by default in [Node.js 22.18](https://nodejs.org/en/blog/release/v22.18.0).
+
 ```bash
 cd web
 npm ci
@@ -69,10 +71,14 @@ uv run --extra formal ty check
 uv run --extra formal pytest
 cd web
 npm ci
+npx playwright install chromium
 npm test
+npm run test:browser
 npm run build
 ```
 
 The `formal` extra installs the pinned execution and contract dependencies on Python 3.12+. On older supported Python versions, tests requiring `backtest_runtime` are skipped. CI runs the Python checks above and the frontend checks. `uv audit --frozen` reports dependency vulnerabilities without blocking CI. Coverage is reported by pytest; no minimum is configured.
+
+Browser regressions start a local Vite server, read public snapshot fixtures, and block external requests. They verify narrow layouts in both locales and the unknown stored-locale fallback, while keeping wide evidence tables scrollable. They do not validate live font delivery or provider access. Chromium must be installed; Linux hosts may need `npx playwright install --with-deps chromium` for system dependencies.
 
 The website defaults to `en-US` and provides a `zh-CN` switch. A valid `?lang=` query takes precedence over the saved `a-share-zoo-locale` preference. Unknown values use the saved preference or fall back to English. The locale changes presentation of the same public JSON snapshots.

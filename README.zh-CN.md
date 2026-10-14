@@ -55,6 +55,8 @@ uv run zoo-index
 
 Vite 8 工具链要求 Node.js 20.19 及以上或 22.12 及以上，也支持符合要求的更新版本。CI 和部署使用 Node.js 22。前端使用 React 18、React Router 7 的声明式 `HashRouter` 和 ECharts 6 的 v5 兼容主题。前端升级不会重新计算已发布快照。
 
+完整前端检查应使用 Node.js 22.18 及以上的 22.x 版本，或 24 及以上版本。Node 测试直接导入 TypeScript，所需的内置执行支持在 [Node.js 22.18](https://nodejs.org/en/blog/release/v22.18.0) 默认启用。
+
 ```bash
 cd web
 npm ci
@@ -106,10 +108,14 @@ uv run --extra formal pytest
 ```bash
 cd web
 npm ci
+npx playwright install chromium
 npm test
+npm run test:browser
 npm run build
 ```
 
 `formal` extra 在 Python 3.12 及以上安装固定版本的执行与契约依赖。较旧的受支持 Python 版本会跳过需要 `backtest_runtime` 的测试。`.github/workflows/ci.yml` 执行上述 Python 检查和前端检查。`uv audit --frozen` 报告依赖漏洞，但不阻断 CI。pytest 输出覆盖率，当前没有最低覆盖率门槛。
+
+浏览器回归启动本地 Vite 服务，读取公开快照作为测试数据，并拦截外部请求。它检查中英文及未知语言偏好回退时的窄屏布局，保留证据表格的内部滚动，不验证线上字体或供应商服务。运行前需安装 Chromium；Linux 主机可能需要用 `npx playwright install --with-deps chromium` 安装系统依赖。
 
 网页默认使用 `en-US`，并提供 `zh-CN` 切换。有效的 `?lang=` 参数优先于保存的 `a-share-zoo-locale` 偏好。未知值使用已保存的偏好，或回退到英文。语言只改变同一份公开 JSON 快照的展示。
