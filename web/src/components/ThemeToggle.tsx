@@ -3,7 +3,7 @@ import { applyTheme, getInitialTheme, Theme } from "../theme";
 import { useLocale } from "../i18n";
 
 export default function ThemeToggle() {
-  const { locale } = useLocale();
+  const { copy } = useLocale();
   const [theme, setTheme] = useState<Theme>("light");
 
   useEffect(() => {
@@ -23,11 +23,11 @@ export default function ThemeToggle() {
     <button
       className="theme-toggle"
       type="button"
-      aria-label={locale === "en-US" ? `Switch to ${nextTheme} theme` : `切换到${nextTheme === "dark" ? "深色" : "浅色"}主题`}
+      aria-label={copy.themeToggle.switchTo.replace("{theme}", nextTheme === "dark" ? copy.themeToggle.dark : copy.themeToggle.light)}
       aria-pressed={theme === "dark"}
       onClick={toggleTheme}
     >
-      {locale === "en-US" ? (theme === "light" ? "Dark" : "Light") : (theme === "light" ? "深色" : "浅色")}
+      {theme === "light" ? copy.themeToggle.dark : copy.themeToggle.light}
     </button>
   );
 }

@@ -24,10 +24,12 @@ test("mobile dashboards fit supported locales and fallback while evidence tables
       { query: "fr", stored: "zh-CN", expected: "zh-CN" },
       { query: "", stored: "zh-CN", expected: "zh-CN" },
     ];
+    let englishData;
     for (const { query, stored, expected } of cases) {
       const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
       await page.addInitScript((value) => localStorage.setItem("a-share-zoo-locale", value), stored);
       const errors = [];
+      const dataResponses = [];
       page.on("pageerror", (error) => errors.push(error.message));
       await page.route("**/*", async (route) => {
         const url = new URL(route.request().url());
@@ -40,7 +42,9 @@ test("mobile dashboards fit supported locales and fallback while evidence tables
         const match = url.pathname.match(/^\/data\/(plant\/)?([a-z_]+\.json)$/u);
         if (match) {
           const fixture = path.join(repositoryRoot, "published", match[1] ? "plant" : "", "data", match[2]);
-          return route.fulfill({ contentType: "application/json", body: await readFile(fixture, "utf8") });
+          const body = await readFile(fixture, "utf8");
+          dataResponses.push({ path: url.pathname, body });
+          return route.fulfill({ contentType: "application/json", body });
         }
         return route.continue();
       });
@@ -55,6 +59,9 @@ test("mobile dashboards fit supported locales and fallback while evidence tables
       assert.ok(layout.width <= layout.viewport, `${query || "saved preference"}: page width ${layout.width}px exceeds ${layout.viewport}px`);
       assert.ok(await page.locator(".delisting-audit table").evaluate((table) => table.scrollWidth > table.clientWidth), `${query || "saved preference"}: wide evidence must scroll inside its table`);
       assert.deepEqual(errors, []);
+      const orderedData = dataResponses.sort((left, right) => left.path.localeCompare(right.path));
+      if (expected === "en-US") englishData = orderedData;
+      if (expected === "zh-CN" && query === "zh-CN") assert.deepEqual(orderedData, englishData, "locale must not change public JSON requests or data");
       await page.close();
     }
   } finally {

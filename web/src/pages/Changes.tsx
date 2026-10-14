@@ -9,9 +9,8 @@ type State =
   | { status: "ok"; changes: Record<IndexTheme, ChangesData> };
 
 export default function Changes() {
-  const { locale } = useLocale();
-  const english = locale === "en-US";
-  const labels = { animal: english ? "Zoo" : "动物园", plant: english ? "Garden" : "植物园" } as Record<IndexTheme, string>;
+  const { copy } = useLocale();
+  const labels = { animal: copy.changesPage.zoo, plant: copy.changesPage.garden } as Record<IndexTheme, string>;
   const [state, setState] = useState<State>({ status: "loading" });
 
   useEffect(() => {
@@ -20,13 +19,13 @@ export default function Changes() {
       .catch((err) => setState({ status: "error", message: String(err) }));
   }, []);
 
-  if (state.status === "loading") return <p>{english ? "Loading data…" : "数据加载中…"}</p>;
-  if (state.status === "error") return <p className="muted">{english ? "Data load failed: " : "数据加载失败："}{state.message}</p>;
+  if (state.status === "loading") return <p>{copy.changesPage.loading}</p>;
+  if (state.status === "error") return <p className="muted">{copy.changesPage.loadFailed}{state.message}</p>;
 
   return (
     <div className="page-changes">
-      <h2>{english ? "Rebalance history" : "调仓记录"}</h2>
-      <p className="muted">{english ? "The Zoo and Garden sections show their latest constituent changes and suspected false matches." : "动物园与植物园分别展示最近一次成分变化及疑似误匹配。"}</p>
+      <h2>{copy.changesPage.heading}</h2>
+      <p className="muted">{copy.changesPage.intro}</p>
       {(["animal", "plant"] as IndexTheme[]).map((theme) => (
         <section className="theme-record" key={theme}>
           <h3>{labels[theme]}</h3>
