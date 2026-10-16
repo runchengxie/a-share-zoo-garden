@@ -1,0 +1,33 @@
+{
+  "date": "20261016",
+  "changes": {
+    "strict": {
+      "new_in": [],
+      "removed": []
+    },
+    "extended": {
+      "new_in": [],
+      "removed": []
+    }
+  },
+  "suspected_noise": {
+    "strict": [],
+    "extended": [
+      {
+        "ts_code": "601233.SH",
+        "name": "桐昆股份",
+        "keyword": "桐"
+      },
+      {
+        "ts_code": "300511.SZ",
+        "name": "雪榕生物",
+        "keyword": "榕"
+      },
+      {
+        "ts_code": "002474.SZ",
+        "name": "榕基软件",
+        "keyword": "榕"
+      }
+    ]
+  }
+}
