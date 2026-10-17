@@ -61,7 +61,7 @@ max-complexity = 10
 [tool.ty]
 
 [tool.uv]
-# Keep the formal consumer's tested platform pin when runtime metadata includes a source URL.
+# Coordinate runtime's source URL with this consumer's frozen, tested platform revision.
 override-dependencies = [
   "quant-platform @ git+https://github.com/runchengxie/quant-platform.git@5ae3766fe8141585a2fcdfba47d85e3e5fd7ed83 ; python_version >= '3.12'",
 ]

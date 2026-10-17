@@ -126,3 +126,29 @@ def test_installed_runtime_binds_completion_to_submitted_job(tmp_path) -> None:
         assert completed.status == "SUCCEEDED"
     finally:
         store.close()
+
+
+def test_trade_accounting_job_uses_pinned_runtime_cli(tmp_path, monkeypatch) -> None:
+    pytest.importorskip("backtest_runtime")
+    monkeypatch.setenv("ZOO_BACKTEST_RUNTIME_ROOT", str(tmp_path / "runtime"))
+    frame = pd.DataFrame(
+        {
+            "symbol": ["A", "B"],
+            "previous_weight": [0.5, 0.5],
+            "target_weight": [0.5, 0.5],
+            "previous_price": [10.0, 10.0],
+            "current_price": [20.0, 10.0],
+            "tradable": [True, True],
+        }
+    )
+    turnover, cost, job_id = run_trade_accounting_job(
+        "20260105",
+        "strict",
+        frame,
+        commission_rate=0.001,
+        stamp_tax_rate=0.005,
+        slippage_rate=0.002,
+    )
+    assert turnover == pytest.approx(1 / 6)
+    assert cost == pytest.approx(1 / 3000 + 1 / 1200 + 1 / 1500)
+    assert (tmp_path / "runtime" / "results" / job_id / "accounting.parquet").is_file()
