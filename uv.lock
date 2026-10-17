@@ -7,6 +7,9 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 
+[manifest]
+overrides = [{ name = "quant-platform", marker = "python_full_version >= '3.12'", git = "https://github.com/runchengxie/quant-platform.git?rev=5ae3766fe8141585a2fcdfba47d85e3e5fd7ed83" }]
+
 [[package]]
 name = "a-share-zoo-garden"
 version = "0.1.0"
@@ -40,7 +43,7 @@ requires-dist = [
     { name = "pandas" },
     { name = "pyarrow" },
     { name = "pyyaml" },
-    { name = "quant-backtest-runtime", marker = "python_full_version >= '3.12' and extra == 'formal'", git = "https://github.com/runchengxie/quant-backtest-runtime.git?rev=50a883d3eeb5787af6e966da54c31bde2da7f992" },
+    { name = "quant-backtest-runtime", marker = "python_full_version >= '3.12' and extra == 'formal'", git = "https://github.com/runchengxie/quant-backtest-runtime.git?rev=4fbfe973540e15fb6552068be037229d2f53d540" },
     { name = "quant-platform", marker = "python_full_version >= '3.12' and extra == 'formal'", git = "https://github.com/runchengxie/quant-platform.git?rev=5ae3766fe8141585a2fcdfba47d85e3e5fd7ed83" },
     { name = "research-contracts", marker = "python_full_version >= '3.12' and extra == 'formal'", git = "https://github.com/runchengxie/quant-platform.git?subdirectory=packages%2Fresearch-contracts&rev=5ae3766fe8141585a2fcdfba47d85e3e5fd7ed83" },
     { name = "tushare" },
@@ -1434,7 +1437,7 @@ wheels = [
 [[package]]
 name = "quant-backtest-runtime"
 version = "0.1.0"
-source = { git = "https://github.com/runchengxie/quant-backtest-runtime.git?rev=50a883d3eeb5787af6e966da54c31bde2da7f992#50a883d3eeb5787af6e966da54c31bde2da7f992" }
+source = { git = "https://github.com/runchengxie/quant-backtest-runtime.git?rev=4fbfe973540e15fb6552068be037229d2f53d540#4fbfe973540e15fb6552068be037229d2f53d540" }
 dependencies = [
     { name = "quant-platform" },
 ]

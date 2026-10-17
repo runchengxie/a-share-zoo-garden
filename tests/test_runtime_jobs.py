@@ -86,3 +86,69 @@ def test_sequenced_job_publishes_verified_daily_ledger(tmp_path) -> None:
     assert daily.nav.iloc[-1] > 0
     assert len(receipt["request_sha256"]) == 64
     assert len(receipt["result_sha256"]) == 64
+
+
+def test_installed_runtime_binds_completion_to_submitted_job(tmp_path) -> None:
+    """The pinned formal dependency must reject a different job's result URI."""
+    jobs = pytest.importorskip("backtest_runtime.jobs")
+    store_module = import_module("backtest_runtime.store")
+    store = store_module.JobStore(tmp_path / "jobs.sqlite")
+    try:
+        service = jobs.BacktestJobService(
+            store, artifact_root=tmp_path / "artifacts", result_root=tmp_path / "results"
+        )
+        request = jobs.BacktestJobRequest.from_mapping(
+            {
+                "schema_version": 4,
+                "idempotency_key": "zoo-binding-contract",
+                "backend": "native.trade_accounting",
+                "evidence_tier": "diagnostic",
+                "inputs": {"accounting_ref": "artifact://sha256/" + "a" * 64},
+                "config": {"commission_rate": 0.0, "stamp_tax_rate": 0.0, "slippage_rate": 0.0},
+                "execution": {},
+                "budgets": {"wall_seconds": 120, "memory_mb": 8192},
+            }
+        )
+        receipt = service.submit(request)
+        service.claim(receipt.job_id, worker_pid=1234, lease_seconds=60)
+        with pytest.raises(ValueError, match="result_ref must match the completed job"):
+            service.complete(
+                receipt.job_id,
+                result_ref="backtest-job://00000000-0000-0000-0000-000000000000",
+                result_sha256="e" * 64,
+            )
+        assert service.get_status(receipt.job_id).status == "RUNNING"
+        completed = service.complete(
+            receipt.job_id,
+            result_ref=f"backtest-job://{receipt.job_id}",
+            result_sha256="e" * 64,
+        )
+        assert completed.status == "SUCCEEDED"
+    finally:
+        store.close()
+
+
+def test_trade_accounting_job_uses_pinned_runtime_cli(tmp_path, monkeypatch) -> None:
+    pytest.importorskip("backtest_runtime")
+    monkeypatch.setenv("ZOO_BACKTEST_RUNTIME_ROOT", str(tmp_path / "runtime"))
+    frame = pd.DataFrame(
+        {
+            "symbol": ["A", "B"],
+            "previous_weight": [0.5, 0.5],
+            "target_weight": [0.5, 0.5],
+            "previous_price": [10.0, 10.0],
+            "current_price": [20.0, 10.0],
+            "tradable": [True, True],
+        }
+    )
+    turnover, cost, job_id = run_trade_accounting_job(
+        "20260105",
+        "strict",
+        frame,
+        commission_rate=0.001,
+        stamp_tax_rate=0.005,
+        slippage_rate=0.002,
+    )
+    assert turnover == pytest.approx(1 / 6)
+    assert cost == pytest.approx(1 / 3000 + 1 / 1200 + 1 / 1500)
+    assert (tmp_path / "runtime" / "results" / job_id / "accounting.parquet").is_file()
