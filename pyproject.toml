@@ -17,8 +17,8 @@ dependencies = [
 [project.optional-dependencies]
 formal = [
   "quant-backtest-runtime @ git+https://github.com/runchengxie/quant-backtest-runtime.git@4fbfe973540e15fb6552068be037229d2f53d540 ; python_version >= '3.12'",
-  "quant-platform @ git+https://github.com/runchengxie/quant-platform.git@5ae3766fe8141585a2fcdfba47d85e3e5fd7ed83 ; python_version >= '3.12'",
-  "research-contracts @ git+https://github.com/runchengxie/quant-platform.git@5ae3766fe8141585a2fcdfba47d85e3e5fd7ed83#subdirectory=packages/research-contracts ; python_version >= '3.12'",
+  "quant-platform @ git+https://github.com/runchengxie/quant-platform.git@15ec62b66e894395d694049eaaace931de4a1265 ; python_version >= '3.12'",
+  "research-contracts @ git+https://github.com/runchengxie/quant-platform.git@15ec62b66e894395d694049eaaace931de4a1265#subdirectory=packages/research-contracts ; python_version >= '3.12'",
 ]
 
 [project.scripts]
@@ -61,7 +61,7 @@ max-complexity = 10
 [tool.ty]
 
 [tool.uv]
-# Coordinate runtime's source URL with this consumer's frozen, tested platform revision.
+# Keep the formal provider and contracts on the reviewed packaging revision.
 override-dependencies = [
-  "quant-platform @ git+https://github.com/runchengxie/quant-platform.git@5ae3766fe8141585a2fcdfba47d85e3e5fd7ed83 ; python_version >= '3.12'",
+  "quant-platform @ git+https://github.com/runchengxie/quant-platform.git@15ec62b66e894395d694049eaaace931de4a1265 ; python_version >= '3.12'",
 ]
