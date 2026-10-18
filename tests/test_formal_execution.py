@@ -74,3 +74,6 @@ def test_pricing_carries_nontradable_mark_after_delisting() -> None:
     assert carried.iloc[0].adjusted_close == 10.0
     assert not bool(carried.iloc[0].tradable)
     assert carried.iloc[0].amount == 0.0
+    assert pricing.tradable.dtype == bool
+    assert pricing.adjusted_close.dtype == float
+    assert pricing.amount.dtype == float

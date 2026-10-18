@@ -20,6 +20,8 @@ The animal and plant gardens use separate rule files and output namespaces while
 
 Requirements: [uv](https://docs.astral.sh/uv/) and a Tushare token.
 
+PNG generation requires Noto Sans CJK or Source Han Sans CN. On Debian/Ubuntu, install `fonts-noto-cjk` before starting Python. Missing fonts cause an actionable error instead of a chart with missing Chinese glyphs. CI and the daily calculation workflow install this package.
+
 ```bash
 uv sync
 export TUSHARE_TOKEN=your-token
@@ -77,7 +79,7 @@ npm run test:browser
 npm run build
 ```
 
-The `formal` extra installs the pinned execution and contract dependencies on Python 3.12+. On older supported Python versions, tests requiring `backtest_runtime` are skipped. CI runs the Python checks above and the frontend checks. `uv audit --frozen` reports dependency vulnerabilities without blocking CI. Coverage is reported by pytest; no minimum is configured.
+The `formal` extra installs the pinned execution and contract dependencies on Python 3.12+. On older supported Python versions, tests requiring `backtest_runtime` are skipped. CI runs the Python checks above and the frontend checks. `uv audit --frozen` reports dependency vulnerabilities without blocking CI. Coverage is reported by pytest; no minimum is configured. Unexpected warnings fail tests; intentional warnings must be captured explicitly.
 
 If a cross-repository contract test fails, run `uv run --extra formal python scripts/diagnose_runtime_dependencies.py`. It reports the actual Python executable, package versions, module paths, and installed Git revisions so you can compare them with `pyproject.toml` and `uv.lock`. CI prints the same diagnostic before pytest. Missing packages and invalid installation metadata are reported explicitly. The diagnostic does not validate behavior or replace contract tests, and it omits source URLs that may contain credentials.
 

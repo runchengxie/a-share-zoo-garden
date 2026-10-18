@@ -26,6 +26,8 @@
 
 需要 [uv](https://docs.astral.sh/uv/)。
 
+生成 PNG 需要 Noto Sans CJK 或 Source Han Sans CN。Debian/Ubuntu 用户应先安装 `fonts-noto-cjk`，再启动 Python。缺少字体时会给出安装提示并停止生成，避免输出中文缺字的图片。CI 和每日计算工作流会安装该字体包。
+
 ```bash
 uv sync
 ```
@@ -114,7 +116,7 @@ npm run test:browser
 npm run build
 ```
 
-`formal` extra 在 Python 3.12 及以上安装固定版本的执行与契约依赖。较旧的受支持 Python 版本会跳过需要 `backtest_runtime` 的测试。`.github/workflows/ci.yml` 执行上述 Python 检查和前端检查。`uv audit --frozen` 报告依赖漏洞，但不阻断 CI。pytest 输出覆盖率，当前没有最低覆盖率门槛。
+`formal` extra 在 Python 3.12 及以上安装固定版本的执行与契约依赖。较旧的受支持 Python 版本会跳过需要 `backtest_runtime` 的测试。`.github/workflows/ci.yml` 执行上述 Python 检查和前端检查。`uv audit --frozen` 报告依赖漏洞，但不阻断 CI。pytest 输出覆盖率，当前没有最低覆盖率门槛。未预期的警告会导致测试失败，有意触发的警告必须明确捕获。
 
 跨仓契约测试失败时，运行 `uv run --extra formal python scripts/diagnose_runtime_dependencies.py`。它会输出实际使用的 Python 可执行文件、包版本、模块路径和已安装的 Git revision，便于与 `pyproject.toml` 和 `uv.lock` 核对。CI 会在 pytest 前输出相同诊断，并明确标记缺失的包或无效的安装元数据。诊断不验证功能，也不能代替契约测试。输出省略了可能包含凭据的来源 URL。
 

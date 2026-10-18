@@ -169,7 +169,11 @@ def _pricing(
                     for symbol in missing
                 ]
             )
-            frame = pd.concat([frame, carried[columns]], ignore_index=True)
+            frame = (
+                carried[columns].copy()
+                if frame.empty
+                else pd.concat([frame, carried[columns]], ignore_index=True)
+            )
         if not frame.empty:
             frames.append(frame)
     if not frames:

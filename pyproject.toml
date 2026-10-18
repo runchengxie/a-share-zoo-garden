@@ -45,7 +45,8 @@ dev = [
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-q --disable-warnings --cov=zoo_index --cov-report=term-missing"
+addopts = "-q --cov=zoo_index --cov-report=term-missing"
+filterwarnings = ["error"]
 
 [tool.ruff]
 target-version = "py310"
