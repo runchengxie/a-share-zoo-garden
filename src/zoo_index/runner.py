@@ -102,6 +102,7 @@ class RunConfig:
     force_refresh: bool = False
     delisting_policy: str = "strict"
     backtest: BacktestConfig = field(default_factory=BacktestConfig)
+    chart: bool = False
 
 
 def _current_shanghai_date() -> str:
@@ -1041,6 +1042,8 @@ def _write_public_outputs(
     result: DailyResult,
     benchmark_source: str,
     delisting_policy: str = "strict",
+    *,
+    chart: bool = False,
 ) -> None:
     data_dir = output_dir / "data"
     badges_dir = data_dir / "badges"
@@ -1068,7 +1071,8 @@ def _write_public_outputs(
         delisting_policy,
     )
     generate_badges(badges_dir, latest, result.benchmark_label)
-    generate_chart(data_dir / "chart.png", nav_df, result.benchmark_label)
+    if chart:
+        generate_chart(data_dir / "chart.png", nav_df, result.benchmark_label)
 
 
 def _write_changes_snapshot(
@@ -1209,6 +1213,7 @@ def run_daily(config: RunConfig, client: TushareLike | None = None) -> int:
         result,
         config.benchmark.source,
         config.delisting_policy,
+        chart=config.chart,
     )
 
     print(
@@ -1328,6 +1333,8 @@ def _write_backfill_outputs(
     last_result: DailyResult,
     benchmark_source: str,
     delisting_policy: str = "strict",
+    *,
+    chart: bool = False,
 ) -> int:
     existing_columns = [
         "date",
@@ -1364,7 +1371,7 @@ def _write_backfill_outputs(
         last_result.extended_holdings,
     )
     _write_public_outputs(
-        output_dir, nav_df, latest, last_result, benchmark_source, delisting_policy
+        output_dir, nav_df, latest, last_result, benchmark_source, delisting_policy, chart=chart
     )
 
     print(
@@ -1455,6 +1462,7 @@ def run_backfill(config: RunConfig, client: TushareLike | None = None) -> int:
         last_result,
         config.benchmark.source,
         config.delisting_policy,
+        chart=config.chart,
     )
 
 

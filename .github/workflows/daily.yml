@@ -10,6 +10,11 @@ on:
         required: false
         default: false
         type: boolean
+      chart:
+        description: "Generate optional PNG share charts (requires CJK fonts)"
+        required: false
+        default: false
+        type: boolean
       backfill_mode:
         description: "回填模式：missing 只补缺失日期，all 重算指定历史区间"
         required: false
@@ -54,7 +59,7 @@ jobs:
           node-version: "22"
 
       - name: Install chart fonts
-        if: ${{ inputs.publish_only != true }}
+        if: ${{ inputs.publish_only != true && inputs.chart == true }}
         run: sudo apt-get update && sudo apt-get install -y fonts-noto-cjk
 
       - name: Install Python deps
@@ -67,7 +72,13 @@ jobs:
           TUSHARE_TOKEN: ${{ secrets.TUSHARE_TOKEN }}
           BACKFILL_MODE: ${{ inputs.backfill_mode || 'missing' }}
           BACKFILL_DAYS: ${{ inputs.backfill_days || '1' }}
-        run: uv run python -m zoo_index --output-dir published --backfill "$BACKFILL_DAYS" --backfill-mode "$BACKFILL_MODE" --delisting-policy last_price_proxy
+          GENERATE_CHART: ${{ inputs.chart && 'true' || 'false' }}
+        run: |
+          chart_args=()
+          if [ "$GENERATE_CHART" = "true" ]; then
+            chart_args+=(--chart)
+          fi
+          uv run python -m zoo_index --output-dir published --backfill "$BACKFILL_DAYS" --backfill-mode "$BACKFILL_MODE" --delisting-policy last_price_proxy "${chart_args[@]}"
 
       - name: Compute plant index (更新最近交易日)
         if: ${{ inputs.publish_only != true }}
@@ -75,7 +86,13 @@ jobs:
           TUSHARE_TOKEN: ${{ secrets.TUSHARE_TOKEN }}
           BACKFILL_MODE: ${{ inputs.backfill_mode || 'missing' }}
           BACKFILL_DAYS: ${{ inputs.backfill_days || '1' }}
-        run: uv run python -m zoo_index --rules plant_rules.yml --output-dir published/plant --backfill "$BACKFILL_DAYS" --backfill-mode "$BACKFILL_MODE"
+          GENERATE_CHART: ${{ inputs.chart && 'true' || 'false' }}
+        run: |
+          chart_args=()
+          if [ "$GENERATE_CHART" = "true" ]; then
+            chart_args+=(--chart)
+          fi
+          uv run python -m zoo_index --rules plant_rules.yml --output-dir published/plant --backfill "$BACKFILL_DAYS" --backfill-mode "$BACKFILL_MODE" "${chart_args[@]}"
 
       - name: Write published provenance
         run: python scripts/write_published_provenance.py

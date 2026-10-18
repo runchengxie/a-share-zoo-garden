@@ -285,6 +285,7 @@ def test_run_daily_writes_benchmark_named_outputs(tmp_path: Path) -> None:
         date="20240103",
     )
     assert run_daily(config, client) == 0
+    assert not (tmp_path / "data" / "chart.png").exists()
 
     nav = pd.read_csv(tmp_path / "data" / "nav.csv")
     assert "benchmark_ret" in nav.columns
@@ -713,3 +714,49 @@ def test_benchmark_return_uses_adjusted_ratio_for_fund() -> None:
     # (11*1.05)/(10*1.0) - 1 = 0.155，而非 close/pre_close 给出的 0.10。
     ret = _get_benchmark_return(client, "20240103", "20240102", bench)
     assert ret == pytest.approx(0.155)
+
+
+@pytest.mark.parametrize("backfill", [False, True])
+def test_png_option_preserves_structured_outputs(tmp_path, monkeypatch, backfill) -> None:
+    import zoo_index.runner as runner
+
+    render = runner.generate_chart
+    outputs = []
+    for enabled in (False, True):
+        output = tmp_path / str(enabled)
+        chart = output / "data" / "chart.png"
+        if not enabled:
+            chart.parent.mkdir(parents=True)
+            chart.write_bytes(b"existing image")
+
+            def unexpected_render(*args, **kwargs):
+                pytest.fail("Default computation must not invoke PNG rendering")
+
+            monkeypatch.setattr(runner, "generate_chart", unexpected_render)
+        else:
+            monkeypatch.setattr(runner, "generate_chart", render)
+        config = RunConfig(
+            repo_root=tmp_path,
+            output_dir=output,
+            rules_path=Path(__file__).resolve().parent.parent / "rules.yml",
+            token="dummy",
+            benchmark=_benchmark(),
+            date="20240108" if backfill else "20240103",
+            backfill_requested=backfill,
+            backfill_days=4 if backfill else 0,
+            chart=enabled,
+        )
+        execute = run_backfill if backfill else run_daily
+        assert execute(config, _make_client()) == 0
+        if enabled:
+            assert chart.read_bytes().startswith(b"\x89PNG\r\n\x1a\n")
+        else:
+            assert chart.read_bytes() == b"existing image"
+        outputs.append(
+            {
+                str(file.relative_to(output / "data")): file.read_bytes()
+                for file in (output / "data").rglob("*")
+                if file.is_file() and file.name != "chart.png"
+            }
+        )
+    assert outputs[0] == outputs[1]

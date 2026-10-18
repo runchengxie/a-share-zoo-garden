@@ -11,7 +11,7 @@ The animal and plant gardens use separate rule files and output namespaces while
 - Strict and extended animal-garden indices with CSI 300 comparison.
 - A plant-garden rule set that currently uses explicit multi-character plant terms to reduce false matches.
 - Reproducible keyword rules and force-include or force-exclude lists.
-- Daily NAV, charts, badges, public JSON snapshots, constituents, changes, and metadata.
+- Daily NAV, badges, public JSON snapshots, constituents, changes, metadata, and optional PNG charts.
 - Optional turnover, transaction-cost, and tradability diagnostics.
 - Optional deterministic name audits for missed or potentially false matches.
 - A research-style web presentation for index snapshots, NAV history, rebalances, constituents, and methodology.
@@ -20,7 +20,11 @@ The animal and plant gardens use separate rule files and output namespaces while
 
 Requirements: [uv](https://docs.astral.sh/uv/) and a Tushare token.
 
-PNG generation requires Noto Sans CJK or Source Han Sans CN. On Debian/Ubuntu, install `fonts-noto-cjk` before starting Python. Missing fonts cause an actionable error instead of a chart with missing Chinese glyphs. CI and the daily calculation workflow install this package.
+`zoo-index` skips PNG generation by default. Add `--chart` for `data/chart.png`, or use `zoo-chart` to redraw an existing NAV file.
+
+Only PNG rendering requires Noto Sans CJK or Source Han Sans CN. On Debian/Ubuntu, install `fonts-noto-cjk` before starting Python. CI installs the fonts for rendering tests; daily calculation installs them only when the manual `chart` option is enabled.
+
+Existing PNG files are left untouched when generation is disabled and may be stale. A `missing` backfill with no missing dates skips output generation even with `--chart`; use `zoo-chart` to redraw existing NAV. NAV, public JSON, badges, and the interactive web charts are unaffected.
 
 ```bash
 uv sync

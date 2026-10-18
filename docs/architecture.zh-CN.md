@@ -12,7 +12,7 @@ CLI 默认写入仓库的 `artifacts/`，不是 `docs/`。通过 `--output-dir` 
 | --- | --- |
 | `data/nav.csv` | 净值、每日收益和增量计算输入 |
 | `data/latest.json`、`history.json`、`constituents.json`、`changes.json`、`metadata.json` | 前端读取的 5 个公开 JSON 快照 |
-| `data/chart.png`、`data/badges/*.json` | 分享图和 shields.io 徽章 |
+| `data/chart.png`、`data/badges/*.json` | 可选分享图（`--chart`）和 shields.io 徽章 |
 | `manifests/` | 持仓、成分、变更和规则快照，用于审计与恢复计算状态 |
 
 `published/` 及审核后的 manifests 已入库。前端通过 `web/scripts/copy-published-data.mjs` 将所需公开数据复制到生成目录 `web/public/data/`。`web/dist/`、`.build/` 和原始行情缓存 `data/cache/` 不入库。`docs/` 是维护中的源文档。
@@ -45,9 +45,9 @@ uv run zoo-chart --help
 
 `zoo-audit` 支持 `--input` 和 `--namechange-input` 离线输入。可选 `--llm` 依次尝试 Gemini、配置的固定 OpenRouter 模型和 `openrouter/free`。报告保存输入、规则哈希及模型和 prompt 标识，不改变词表或公开成分。见[名称审计审核流程](audit-review.md)。
 
-只重绘图表，不请求 Tushare：
+每日与回填模式下，`zoo-index` 都只在传入 `--chart` 时生成 `data/chart.png`。默认保留已有 PNG，旧图片可能过时。`zoo-chart` 仍是显式重绘命令。PNG 渲染需要 Noto Sans CJK 或 Source Han Sans CN。Debian/Ubuntu 用户应先安装 `fonts-noto-cjk`，再启动 Python。字体仅影响展示，不改变公开 JSON 或净值。
 
-PNG 渲染需要 Noto Sans CJK 或 Source Han Sans CN。Debian/Ubuntu 用户应先安装 `fonts-noto-cjk`，再启动 Python。字体仅影响展示，不改变公开 JSON 或净值。
+只重绘图表，不请求 Tushare：
 
 ```bash
 uv run zoo-chart --nav published/data/nav.csv --out /path/to/generated/chart.png
@@ -56,6 +56,8 @@ uv run zoo-chart --nav published/data/nav.csv --out /path/to/generated/chart.png
 ## 部署
 
 `daily.yml` 每周一至周五 08:10 UTC，即北京时间 16:10 运行。默认使用 `missing` 模式，只回填 1 个交易日，不是全历史修复。手动触发可增加 `backfill_days`、选择 `all`，或用 `publish_only` 重建已合并快照而不重新计算、提交数据。
+
+定时运行默认不生成 PNG。`missing` 回填没有缺失日期时，即使指定 `--chart` 也会跳过输出生成，重绘已有净值请用 `zoo-chart`。手动触发可开启 `chart`，安装所需字体，并在计算写出产物时生成动物园、植物园 PNG。
 
 当前动物园命令使用 `--delisting-policy last_price_proxy`，写入 `published/`，metadata 标记 `evidence_tier=research_proxy`。植物园写入 `published/plant/`，使用默认 `strict` 策略。两者证据等级不同。前端展示代理序列标识，消费者也必须保留该标识，不能把代理估值当作已核实现金结算或可执行业绩。
 
