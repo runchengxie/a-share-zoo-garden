@@ -2,8 +2,14 @@
 
 from __future__ import annotations
 
+import json
+import runpy
+import subprocess
+import sys
 from dataclasses import asdict
 from importlib import import_module
+from pathlib import Path
+from types import SimpleNamespace
 
 import pandas as pd
 import pytest
@@ -13,6 +19,78 @@ from zoo_index.runtime_jobs import (
     run_sequenced_job,
     run_trade_accounting_job,
 )
+
+DIAGNOSTIC_SCRIPT = Path(__file__).resolve().parents[1] / "scripts/diagnose_runtime_dependencies.py"
+
+
+def test_runtime_dependency_diagnostic_cli_reports_actual_environment() -> None:
+    result = subprocess.run(
+        [sys.executable, str(DIAGNOSTIC_SCRIPT)], capture_output=True, text=True, check=False
+    )
+    assert result.returncode == 0, result.stderr
+    report = json.loads(result.stdout)
+    assert report["python_executable"] == sys.executable
+    assert set(report["packages"]) == {
+        "quant-backtest-runtime",
+        "quant-platform",
+        "research-contracts",
+    }
+
+
+def test_runtime_dependency_diagnostic_reports_commit_without_source_credentials(
+    monkeypatch,
+) -> None:
+    diagnostic = runpy.run_path(str(DIAGNOSTIC_SCRIPT))
+    source = json.dumps(
+        {
+            "url": "https://user:private-token@example.invalid/package.git?token=secret",
+            "vcs_info": {"vcs": "git", "commit_id": "a" * 40, "requested_revision": "release"},
+        }
+    )
+    distribution = SimpleNamespace(version="0.1.0", read_text=lambda _name: source)
+    monkeypatch.setattr(diagnostic["metadata"], "distribution", lambda _name: distribution)
+    monkeypatch.setattr(
+        diagnostic["util"], "find_spec", lambda _name: SimpleNamespace(origin="/tmp/runtime.py")
+    )
+    report = diagnostic["dependency_provenance"]("example", "runtime")
+    assert report["commit_id"] == "a" * 40
+    assert report["requested_revision"] == "release"
+    assert report["module_path"] == "/tmp/runtime.py"
+    assert "private-token" not in json.dumps(report)
+    assert "secret" not in json.dumps(report)
+
+
+@pytest.mark.parametrize("source", ["{", "[]", '{"vcs_info": null}'])
+def test_runtime_dependency_diagnostic_identifies_invalid_metadata(monkeypatch, source) -> None:
+    diagnostic = runpy.run_path(str(DIAGNOSTIC_SCRIPT))
+    distribution = SimpleNamespace(version="0.1.0", read_text=lambda _name: source)
+    monkeypatch.setattr(diagnostic["metadata"], "distribution", lambda _name: distribution)
+    report = diagnostic["dependency_provenance"]("example", "missing_runtime_fixture")
+    assert report["install_source"] == "invalid_metadata"
+    assert report["version"] == "0.1.0"
+    assert report["commit_id"] is None
+
+
+@pytest.mark.parametrize("module_exists", [False, True])
+def test_runtime_dependency_diagnostic_reports_missing_package_without_importing(
+    monkeypatch, tmp_path, module_exists
+) -> None:
+    diagnostic = runpy.run_path(str(DIAGNOSTIC_SCRIPT))
+    module = tmp_path / "optional_runtime_fixture.py"
+    if module_exists:
+        module.write_text("raise RuntimeError('diagnostics must not import this module')\n")
+    monkeypatch.syspath_prepend(str(tmp_path))
+
+    def missing(_name):
+        raise diagnostic["metadata"].PackageNotFoundError("example")
+
+    monkeypatch.setattr(diagnostic["metadata"], "distribution", missing)
+    report = diagnostic["dependency_provenance"]("example", "optional_runtime_fixture")
+    assert report["install_source"] == (
+        "missing_distribution_metadata" if module_exists else "not_installed"
+    )
+    assert report["module_path"] == (str(module) if module_exists else None)
+    assert report["version"] is None
 
 
 def test_opt_in_cost_job_requires_external_runtime_root(monkeypatch) -> None:

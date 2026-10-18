@@ -116,6 +116,8 @@ npm run build
 
 `formal` extra 在 Python 3.12 及以上安装固定版本的执行与契约依赖。较旧的受支持 Python 版本会跳过需要 `backtest_runtime` 的测试。`.github/workflows/ci.yml` 执行上述 Python 检查和前端检查。`uv audit --frozen` 报告依赖漏洞，但不阻断 CI。pytest 输出覆盖率，当前没有最低覆盖率门槛。
 
+跨仓契约测试失败时，运行 `uv run --extra formal python scripts/diagnose_runtime_dependencies.py`。它会输出实际使用的 Python 可执行文件、包版本、模块路径和已安装的 Git revision，便于与 `pyproject.toml` 和 `uv.lock` 核对。CI 会在 pytest 前输出相同诊断，并明确标记缺失的包或无效的安装元数据。诊断不验证功能，也不能代替契约测试。输出省略了可能包含凭据的来源 URL。
+
 浏览器回归启动本地 Vite 服务，读取公开快照作为测试数据，并拦截外部请求。它检查中英文及未知语言偏好回退时的窄屏布局，保留证据表格的内部滚动，不验证线上字体或供应商服务。运行前需安装 Chromium；Linux 主机可能需要用 `npx playwright install --with-deps chromium` 安装系统依赖。
 
 网页默认使用 `en-US`，并提供 `zh-CN` 切换。有效的 `?lang=` 参数优先于保存的 `a-share-zoo-locale` 偏好。未知值使用已保存的偏好，或回退到英文。语言只改变同一份公开 JSON 快照的展示。

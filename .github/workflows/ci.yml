@@ -29,6 +29,9 @@ jobs:
       - name: Ty type check
         run: uv run --extra formal ty check
 
+      - name: Report installed cross-repository dependencies
+        run: uv run --extra formal python scripts/diagnose_runtime_dependencies.py
+
       - name: Pytest
         run: uv run --extra formal pytest
 
