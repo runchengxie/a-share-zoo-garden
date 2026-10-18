@@ -79,6 +79,8 @@ npm run build
 
 The `formal` extra installs the pinned execution and contract dependencies on Python 3.12+. On older supported Python versions, tests requiring `backtest_runtime` are skipped. CI runs the Python checks above and the frontend checks. `uv audit --frozen` reports dependency vulnerabilities without blocking CI. Coverage is reported by pytest; no minimum is configured.
 
+If a cross-repository contract test fails, run `uv run --extra formal python scripts/diagnose_runtime_dependencies.py`. It reports the actual Python executable, package versions, module paths, and installed Git revisions so you can compare them with `pyproject.toml` and `uv.lock`. CI prints the same diagnostic before pytest. Missing packages and invalid installation metadata are reported explicitly. The diagnostic does not validate behavior or replace contract tests, and it omits source URLs that may contain credentials.
+
 Browser regressions start a local Vite server, read public snapshot fixtures, and block external requests. They verify narrow layouts in both locales and the unknown stored-locale fallback, while keeping wide evidence tables scrollable. They do not validate live font delivery or provider access. Chromium must be installed; Linux hosts may need `npx playwright install --with-deps chromium` for system dependencies.
 
 The website defaults to `en-US` and provides a `zh-CN` switch. A valid `?lang=` query takes precedence over the saved `a-share-zoo-locale` preference. Unknown values use the saved preference or fall back to English. The locale changes presentation of the same public JSON snapshots.
