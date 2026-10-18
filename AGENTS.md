@@ -63,6 +63,8 @@ npm run build
 
 ## 测试要求
 
+PNG 渲染和相关测试需要 Noto Sans CJK 或 Source Han Sans CN，Debian/Ubuntu 安装 `fonts-noto-cjk`。pytest 默认将未预期的警告视为错误，有意触发的警告必须明确捕获。
+
 单元测试禁止依赖真实 Tushare Token。使用合成 DataFrame、`tests/fixtures/` 与 `tests/test_runner.py` 内的 `FakeClient`（满足 `TushareLike` 协议）。
 新增计算逻辑时，优先在 `compute_day` 上补测试，保证每日与回填路径被同一组测试覆盖。
 

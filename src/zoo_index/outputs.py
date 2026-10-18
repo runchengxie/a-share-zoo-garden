@@ -8,6 +8,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pandas as pd
+from matplotlib import font_manager
 
 # 兼容旧字段名：历史 nav.csv 可能仍使用 hs300_ret / hs300_nav。
 _LEGACY_COLUMNS = {
@@ -324,9 +325,22 @@ def generate_badges(
     )
 
 
+def _chart_font() -> font_manager.FontProperties:
+    for family in ("Noto Sans CJK SC", "Source Han Sans CN", "Noto Sans CJK JP"):
+        for font in font_manager.fontManager.ttflist:
+            if font.name == family:
+                return font_manager.FontProperties(fname=font.fname)
+    raise RuntimeError(
+        "PNG charts require a Chinese font: install fonts-noto-cjk (Debian/Ubuntu) "
+        "or Noto Sans CJK SC / Source Han Sans CN, then restart the process."
+    )
+
+
 def generate_chart(path: Path, nav_df: pd.DataFrame, benchmark_label: str = "HS300 ETF") -> None:
     if nav_df.empty:
         return
+
+    font = _chart_font()
 
     nav_df = nav_df.sort_values("date").copy()
     dates = pd.to_datetime(nav_df["date"], format="%Y%m%d")
@@ -338,14 +352,16 @@ def generate_chart(path: Path, nav_df: pd.DataFrame, benchmark_label: str = "HS3
     ax.plot(dates, nav_df["zoo_extended_nav"], label="扩展动物园", linewidth=1.6)
     ax.plot(dates, nav_df["benchmark_nav"], label=benchmark_label, linewidth=1.6)
 
-    locator = mdates.AutoDateLocator(minticks=6, maxticks=10)
+    if len(dates) == 1:
+        ax.set_xlim(dates.iloc[0] - pd.Timedelta(days=1), dates.iloc[0] + pd.Timedelta(days=1))
+    locator = mdates.AutoDateLocator(minticks=3, maxticks=10)
     ax.xaxis.set_major_locator(locator)
     ax.xaxis.set_major_formatter(mdates.ConciseDateFormatter(locator))
 
-    ax.set_xlabel("日期")
-    ax.set_ylabel("净值")
-    ax.set_title("A股动物园指数")
-    ax.legend()
+    ax.set_xlabel("日期", fontproperties=font)
+    ax.set_ylabel("净值", fontproperties=font)
+    ax.set_title("A股动物园指数", fontproperties=font)
+    ax.legend(prop=font)
     ax.grid(True, axis="y", linestyle="--", alpha=0.3)
     fig.tight_layout()
     fig.savefig(path, dpi=200)

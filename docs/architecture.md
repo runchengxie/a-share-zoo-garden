@@ -45,6 +45,8 @@ Common options include `--date`, `--rules`, `--output-dir`, `--start-date`, `--b
 
 Redraw a chart without calling Tushare:
 
+PNG rendering requires Noto Sans CJK or Source Han Sans CN. Install `fonts-noto-cjk` on Debian/Ubuntu before starting Python. This dependency affects presentation only; it does not change the public JSON or NAV values.
+
 ```bash
 uv run zoo-chart --nav published/data/nav.csv --out /path/to/generated/chart.png
 ```

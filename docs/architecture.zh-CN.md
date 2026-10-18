@@ -47,6 +47,8 @@ uv run zoo-chart --help
 
 只重绘图表，不请求 Tushare：
 
+PNG 渲染需要 Noto Sans CJK 或 Source Han Sans CN。Debian/Ubuntu 用户应先安装 `fonts-noto-cjk`，再启动 Python。字体仅影响展示，不改变公开 JSON 或净值。
+
 ```bash
 uv run zoo-chart --nav published/data/nav.csv --out /path/to/generated/chart.png
 ```

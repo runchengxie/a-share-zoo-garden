@@ -53,6 +53,10 @@ jobs:
         with:
           node-version: "22"
 
+      - name: Install chart fonts
+        if: ${{ inputs.publish_only != true }}
+        run: sudo apt-get update && sudo apt-get install -y fonts-noto-cjk
+
       - name: Install Python deps
         if: ${{ inputs.publish_only != true }}
         run: uv sync --frozen

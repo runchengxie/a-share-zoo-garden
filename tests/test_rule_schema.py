@@ -69,7 +69,7 @@ overrides:
         encoding="utf-8",
     )
 
-    with pytest.raises(ValueError, match="ts_code"):
+    with pytest.warns(RuntimeWarning, match="ts_code"), pytest.raises(ValueError, match="ts_code"):
         load_rules(path)
 
 

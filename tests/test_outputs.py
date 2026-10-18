@@ -1,9 +1,50 @@
 import json
+import warnings
 from pathlib import Path
 
 import pandas as pd
+import pytest
 
 from zoo_index.outputs import compute_changes, compute_suspected_noise, generate_badges
+
+
+@pytest.mark.parametrize("periods", [1, 2, 3, 4, 5, 6, 10, 250])
+def test_chart_renders_chinese_labels_without_warnings(tmp_path, periods) -> None:
+    from zoo_index.outputs import generate_chart
+
+    nav = pd.DataFrame(
+        {
+            "date": pd.date_range("2024-01-01", periods=periods).strftime("%Y%m%d"),
+            "zoo_strict_nav": [1.0] * periods,
+            "zoo_extended_nav": [1.1] * periods,
+            "benchmark_nav": [1.2] * periods,
+        }
+    )
+    original = nav.copy(deep=True)
+    output = tmp_path / "chart.png"
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        generate_chart(output, nav, benchmark_label="沪深300")
+    assert output.read_bytes().startswith(b"\x89PNG\r\n\x1a\n")
+    pd.testing.assert_frame_equal(nav, original)
+
+
+def test_chart_requires_a_chinese_font(tmp_path, monkeypatch) -> None:
+    from matplotlib import font_manager
+
+    from zoo_index.outputs import generate_chart
+
+    monkeypatch.setattr(font_manager.fontManager, "ttflist", [])
+    nav = pd.DataFrame(
+        {
+            "date": ["20240101"],
+            "zoo_strict_nav": [1.0],
+            "zoo_extended_nav": [1.0],
+            "benchmark_nav": [1.0],
+        }
+    )
+    with pytest.raises(RuntimeError, match="fonts-noto-cjk"):
+        generate_chart(tmp_path / "chart.png", nav)
 
 
 def _code_set(records) -> set[str]:
