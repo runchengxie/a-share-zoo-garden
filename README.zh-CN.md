@@ -15,7 +15,7 @@
 - 严格动物园 / 扩展动物园双指数，与沪深300对照
 - 第一版植物园规则：只启用明确的多字植物词，暂不纳入容易误匹配的单字词
 - 规则词表 + 强制名单，结果可复现
-- 每日生成净值、曲线图、徽章与网页
+- 每日生成净值、徽章与网页，可选生成 PNG 曲线图
 - 可选生成含换手、交易成本的可交易回测诊断
 - 可选运行名称审计，发现规则漏收与疑似误收
 - 网页按研究报告式信息层级展示指数快照、净值、调仓、成分与方法
@@ -26,7 +26,11 @@
 
 需要 [uv](https://docs.astral.sh/uv/)。
 
-生成 PNG 需要 Noto Sans CJK 或 Source Han Sans CN。Debian/Ubuntu 用户应先安装 `fonts-noto-cjk`，再启动 Python。缺少字体时会给出安装提示并停止生成，避免输出中文缺字的图片。CI 和每日计算工作流会安装该字体包。
+`zoo-index` 默认不生成 PNG。添加 `--chart` 可生成 `data/chart.png`，也可用 `zoo-chart` 重绘已有净值文件。
+
+只有 PNG 渲染需要 Noto Sans CJK 或 Source Han Sans CN。Debian/Ubuntu 用户应先安装 `fonts-noto-cjk`，再启动 Python。CI 为绘图测试安装字体，每日计算仅在手动开启 `chart` 选项时安装。
+
+不生成时保留已有 PNG 文件，因此旧图片可能过时。`missing` 回填没有缺失日期时，即使指定 `--chart` 也会跳过输出生成，重绘已有净值请用 `zoo-chart`。净值、公开 JSON、徽章和网页交互图表不受影响。
 
 ```bash
 uv sync

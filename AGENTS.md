@@ -47,7 +47,7 @@ npm run build
 ## 产物清单
 
 公开 JSON（前端消费）：`latest.json`、`history.json`、`constituents.json`、`changes.json`、`metadata.json`。
-其余：`nav.csv`（净值源）、`chart.png`（分享用）、`badges/*.json`（徽章）。
+其余：`nav.csv`（净值源）、`chart.png`（可选分享图，`--chart` 开启）、`badges/*.json`（徽章）。
 
 ## 基准字段约定
 
@@ -62,6 +62,8 @@ npm run build
 * 每日状态化指数保留缺失行情成分的权重，不把权重重新分配给其他成分；已确认停牌沿用最近估值，退市持仓缺行情且无结算事件时停止计算。无状态的单日辅助计算仍有独立的缺价归一化口径，不与每日指数混用。
 
 ## 测试要求
+
+每日与回填计算默认不生成 PNG，不删除已有图片。CLI 使用 `--chart` 开启，每日工作流的手动 `chart` 选项默认关闭。
 
 PNG 渲染和相关测试需要 Noto Sans CJK 或 Source Han Sans CN，Debian/Ubuntu 安装 `fonts-noto-cjk`。pytest 默认将未预期的警告视为错误，有意触发的警告必须明确捕获。
 

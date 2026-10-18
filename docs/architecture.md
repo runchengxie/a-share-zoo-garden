@@ -12,7 +12,7 @@ The CLI defaults to `<repository>/artifacts`, not `docs/`. Pass `--output-dir` e
 | --- | --- |
 | `data/nav.csv` | NAV and daily returns, also read for incremental calculation |
 | `data/latest.json`, `history.json`, `constituents.json`, `changes.json`, `metadata.json` | Five public JSON snapshots read by the frontend |
-| `data/chart.png`, `data/badges/*.json` | Share chart and shields.io badge payloads |
+| `data/chart.png`, `data/badges/*.json` | Optional share chart (`--chart`) and shields.io badge payloads |
 | `manifests/` | Holdings, constituent, change, and rule snapshots used for audit and restart |
 
 `published/` is tracked and includes reviewed manifests. The frontend copies only the public data it needs through `web/scripts/copy-published-data.mjs` into generated `web/public/data/`. `web/dist/`, `.build/`, and the raw Tushare `data/cache/` are generated and ignored. `docs/` contains maintained source documentation.
@@ -43,9 +43,9 @@ Common options include `--date`, `--rules`, `--output-dir`, `--start-date`, `--b
 
 `zoo-audit` supports offline `--input` and `--namechange-input` files. Its optional `--llm` path tries Gemini, configured fixed OpenRouter models, then `openrouter/free`. Reports retain input/rule hashes and model/prompt identity. They do not change rules or published constituents. See [audit review](audit-review.md).
 
-Redraw a chart without calling Tushare:
+`zoo-index` generates `data/chart.png` only with `--chart`, in both daily and backfill runs. The default leaves any existing PNG untouched, so it may be stale. `zoo-chart` remains an explicit redraw command. PNG rendering requires Noto Sans CJK or Source Han Sans CN. Install `fonts-noto-cjk` on Debian/Ubuntu before starting Python. This dependency affects presentation only; it does not change the public JSON or NAV values.
 
-PNG rendering requires Noto Sans CJK or Source Han Sans CN. Install `fonts-noto-cjk` on Debian/Ubuntu before starting Python. This dependency affects presentation only; it does not change the public JSON or NAV values.
+Redraw a chart without calling Tushare:
 
 ```bash
 uv run zoo-chart --nav published/data/nav.csv --out /path/to/generated/chart.png
@@ -54,6 +54,8 @@ uv run zoo-chart --nav published/data/nav.csv --out /path/to/generated/chart.png
 ## Deployment
 
 The scheduled `daily.yml` workflow runs at 08:10 UTC on weekdays. It defaults to `missing` mode with **one** backfill trading day, not a full-history repair. Manual dispatch can increase `backfill_days`, select `all`, or use `publish_only` to rebuild the merged snapshot without calculation or a data commit.
+
+Scheduled runs skip PNG generation. A `missing` backfill with no missing dates skips output generation even with `--chart`; use `zoo-chart` to redraw existing NAV. Manual dispatch can enable `chart` to generate animal and plant PNGs when computation writes outputs, and install the required fonts.
 
 The animal command currently uses `--delisting-policy last_price_proxy` and writes `published/`; its metadata identifies `evidence_tier=research_proxy`. The plant command writes `published/plant/` with the default `strict` policy. These are different evidence tiers. The frontend labels the proxy series, and consumers must preserve that label rather than treating it as verified settlement or executable performance.
 

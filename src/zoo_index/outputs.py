@@ -2,13 +2,12 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import TYPE_CHECKING
 
-import matplotlib
-
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 import pandas as pd
-from matplotlib import font_manager
+
+if TYPE_CHECKING:
+    from matplotlib.font_manager import FontProperties
 
 # 兼容旧字段名：历史 nav.csv 可能仍使用 hs300_ret / hs300_nav。
 _LEGACY_COLUMNS = {
@@ -325,7 +324,9 @@ def generate_badges(
     )
 
 
-def _chart_font() -> font_manager.FontProperties:
+def _chart_font() -> FontProperties:
+    from matplotlib import font_manager
+
     for family in ("Noto Sans CJK SC", "Source Han Sans CN", "Noto Sans CJK JP"):
         for font in font_manager.fontManager.ttflist:
             if font.name == family:
@@ -339,6 +340,11 @@ def _chart_font() -> font_manager.FontProperties:
 def generate_chart(path: Path, nav_df: pd.DataFrame, benchmark_label: str = "HS300 ETF") -> None:
     if nav_df.empty:
         return
+
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
 
     font = _chart_font()
 

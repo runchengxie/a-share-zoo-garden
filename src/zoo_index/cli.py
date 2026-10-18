@@ -95,6 +95,9 @@ def _parse_args() -> argparse.Namespace:
         default="",
         help="基准展示名称（可选）",
     )
+    parser.add_argument(
+        "--chart", action="store_true", help="Also generate data/chart.png (requires a CJK font)"
+    )
     parser.add_argument("--no-cache", action="store_true", help="不使用本地缓存")
     parser.add_argument("--force-refresh", action="store_true", help="忽略缓存并重新拉取")
     return parser.parse_args()
@@ -187,6 +190,7 @@ def build_run_config(args: argparse.Namespace, repo_root: Path) -> RunConfig | N
         force_refresh=args.force_refresh,
         delisting_policy=args.delisting_policy,
         backtest=load_backtest_config(repo_root / "backtest.yml"),
+        chart=args.chart,
     )
 
 
