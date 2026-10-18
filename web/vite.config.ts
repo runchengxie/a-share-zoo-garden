@@ -5,4 +5,13 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   plugins: [react()],
   base: "./",
+  build: {
+    rolldownOptions: {
+      output: {
+        codeSplitting: {
+          groups: [{ name: "chart-renderer", test: /[\\/]node_modules[\\/]zrender[\\/]/ }],
+        },
+      },
+    },
+  },
 });
