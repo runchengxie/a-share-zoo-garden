@@ -88,7 +88,7 @@ PNG 渲染和相关测试需要 Noto Sans CJK 或 Source Han Sans CN，Debian/Ub
 ## CI 门禁
 
 `.github/workflows/ci.yml` 在推送与 PR 时执行 Python 质量门禁与前端质量门禁。Python 阻断门禁包括 ruff format 检查、ruff check、ty 和 pytest，使用 `formal` extra。`uv audit --frozen` 仅报告依赖漏洞，不阻断 CI。前端包括 `npm test` 与 `npm run build`。
-`.github/workflows/daily.yml` 在交易日计算并部署到 GitHub Pages，main 分支不提交任何生成物。
+`.github/workflows/daily.yml` 在交易日计算并部署到 GitHub Pages，并提交经过校验的 `published/` 公开数据快照。临时构建目录、缓存、运行日志和未经审查的产物不入库。
 
 ## 动物园与植物园数据管理
 
