@@ -104,7 +104,7 @@ PNG 渲染和相关测试需要 Noto Sans CJK 或 Source Han Sans CN，Debian/Ub
 
 * `main` 只接收 PR，不直接在 `main` 上开发。由用户本人提交或明确委托 agent 完成的 PR 无需单独 review，但仍须通过必需检查并遵守分支保护。
 * 每个独立任务必须从最新 `main` 创建独立 worktree 和分支，分支命名建议为 `feat/<topic>`、`fix/<topic>` 或 `data/<topic>`。
-* 不同 agent 不得共用同一个 worktree，不得同时修改同一分支或直接互相覆盖文件。
+* 同一任务的多个 agent 可以协调共用任务 worktree 和分支，开始前明确文件所有权，并串行执行 Git 写操作。只有可独立交付的子任务才另建分支、worktree 和 PR。不得直接互相覆盖文件。
 * 每个 worktree 内完成测试、构建和数据边界检查后推送分支并创建 PR。
 * PR 合并到 `main` 后，删除远端旧分支、删除本地分支，并移除对应 worktree。删除前先确认 PR 已合并且没有未保存改动。
 * 大型数据回填和代码重构应拆成不同 PR，避免数据冲突掩盖代码问题。
