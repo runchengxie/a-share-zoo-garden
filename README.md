@@ -18,7 +18,7 @@ The animal and plant gardens use separate rule files and output namespaces while
 
 ## Quick start
 
-Requirements: [uv](https://docs.astral.sh/uv/) and a Tushare token.
+Requirements: Python 3.11 or newer, [uv](https://docs.astral.sh/uv/) and a Tushare token.
 
 `zoo-index` skips PNG generation by default. Add `--chart` for `data/chart.png`, or use `zoo-chart` to redraw an existing NAV file.
 
@@ -90,3 +90,16 @@ If a cross-repository contract test fails, run `uv run --extra formal python scr
 Browser regressions start a local Vite server, read public snapshot fixtures, and block external requests. They verify narrow layouts in both locales and the unknown stored-locale fallback, while keeping wide evidence tables scrollable. They do not validate live font delivery or provider access. Chromium must be installed; Linux hosts may need `npx playwright install --with-deps chromium` for system dependencies.
 
 The website defaults to `en-US` and provides a `zh-CN` switch. A valid `?lang=` query takes precedence over the saved `a-share-zoo-locale` preference. Unknown values use the saved preference or fall back to English. The locale changes presentation of the same public JSON snapshots.
+
+## Python support migration
+
+Python 3.10 is no longer supported: the security fixes in Pillow 13 require Python 3.11. Upgrade the interpreter before recreating the environment. Python 3.11 and 3.13 are the validation targets. Business APIs and data formats are unchanged.
+
+```bash
+uv python install 3.11
+uv sync --python 3.11 --frozen --extra formal
+```
+
+Formal diagnostics still require Python 3.12 or newer for the pinned optional providers.
+
+Use the same command with `--python 3.13` for Python 3.13. Existing data and results do not need regeneration.

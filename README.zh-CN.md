@@ -10,6 +10,8 @@
 
 > 本项目仅供娱乐与研究，不构成任何投资建议。
 
+运行环境需要 Python 3.11 或更高版本。
+
 ## 它能做什么
 
 - 严格动物园 / 扩展动物园双指数，与沪深300对照
@@ -127,3 +129,7 @@ npm run build
 浏览器回归启动本地 Vite 服务，读取公开快照作为测试数据，并拦截外部请求。它检查中英文及未知语言偏好回退时的窄屏布局，保留证据表格的内部滚动，不验证线上字体或供应商服务。运行前需安装 Chromium；Linux 主机可能需要用 `npx playwright install --with-deps chromium` 安装系统依赖。
 
 网页默认使用 `en-US`，并提供 `zh-CN` 切换。有效的 `?lang=` 参数优先于保存的 `a-share-zoo-locale` 偏好。未知值使用已保存的偏好，或回退到英文。语言只改变同一份公开 JSON 快照的展示。
+
+## Python 版本迁移
+
+Pillow 13 的安全修复要求 Python 3.11，因此停止支持 Python 3.10。先运行 `uv python install 3.11`，再运行 `uv sync --python 3.11 --frozen --extra formal` 重建环境。验证目标为 Python 3.11 和 3.13。正式诊断所需的可选 provider 仍要求 Python 3.12 或更高版本，原有版本固定保持不变。业务 API、数据格式和已有结果不变，不需要重新计算数据。
