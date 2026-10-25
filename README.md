@@ -93,7 +93,7 @@ The website defaults to `en-US` and provides a `zh-CN` switch. A valid `?lang=` 
 
 ## Python support migration
 
-Python 3.10 is no longer supported: the security fixes in Pillow 13 requires Python 3.11. Upgrade the interpreter before recreating the environment. Python 3.11 and 3.13 are the validation targets. Business APIs and data formats are unchanged.
+Python 3.10 is no longer supported: the security fixes in Pillow 13 require Python 3.11. Upgrade the interpreter before recreating the environment. Python 3.11 and 3.13 are the validation targets. Business APIs and data formats are unchanged.
 
 ```bash
 uv python install 3.11
