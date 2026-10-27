@@ -6,6 +6,8 @@ An A-share thematic index research project. It selects stocks whose historical n
 
 The animal and plant gardens use separate rule files and output namespaces while sharing matching, listing-status, ST, liquidity, adjusted-return, and cache logic. Results are research artifacts and do not constitute investment advice.
 
+Both gardens and the CSI 300 ETF benchmark start at NAV 1 at the close of 2021-01-04. Positions are established that day; returns begin on the next trading day. History before the known rule versions is a retrospective rule replay.
+
 ## What the project provides
 
 - Strict and extended animal-garden indices with CSI 300 comparison.
