@@ -1,3 +1,4 @@
+import { formatDisplayDate } from "../chartDates";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -39,7 +40,7 @@ async function fetchThemeData(theme: IndexTheme): Promise<ThemeData> {
 
 function ThemeDashboard({ theme, data }: { theme: IndexTheme; data: ThemeData }) {
   const [settlementView, setSettlementView] = useState<"proxy" | "strict">("proxy");
-  const { copy } = useLocale();
+  const { copy, locale } = useLocale();
   const text = copy.home;
   const themeLabel = theme === "plant" ? copy.home.themePlant : copy.home.themeAnimal;
   const isResearchProxy = theme === "animal" && data.metadata.evidence_tier === "research_proxy";
@@ -53,7 +54,7 @@ function ThemeDashboard({ theme, data }: { theme: IndexTheme; data: ThemeData })
           <h2 id={`${theme}-dashboard-heading`}>{formatCopy(text.themeHeading, { theme: themeLabel })}</h2>
           <p>{formatCopy(text.dashboardIntro, { benchmark: data.latest.benchmark_label })}</p>
         </div>
-        <span className="section-asof">{formatCopy(text.asOf, { date: data.latest.date })}</span>
+        <span className="section-asof">{formatCopy(text.asOf, { date: formatDisplayDate(data.latest.date, locale) })}</span>
       </div>
 
       {theme === "animal" && (
@@ -64,7 +65,9 @@ function ThemeDashboard({ theme, data }: { theme: IndexTheme; data: ThemeData })
 
       <section className="index-snapshot" aria-labelledby={`${theme}-snapshot-heading`}>
         <div className="section-heading compact-heading"><div><div className="section-kicker">{text.indexSnapshot}</div><h3 id={`${theme}-snapshot-heading`}>{animalSnapshotBlocked ? text.navUnderReview : text.todayData}</h3></div></div>
-        {animalSnapshotBlocked ? <p className="muted">{formatCopy(text.blockedSnapshot, { date: data.latest.date })}</p> : <NavCards latest={data.latest} strictCount={data.constituents.strict.length} extendedCount={data.constituents.extended.length} themeLabel={themeLabel} />}
+        <p className="snapshot-guide">{text.variantGuide}</p>
+        {data.history[0] && <p className="snapshot-guide">{formatCopy(text.navBase, { date: formatDisplayDate(data.history[0].date, locale) })}</p>}
+        {animalSnapshotBlocked ? <p className="muted">{formatCopy(text.blockedSnapshot, { date: formatDisplayDate(data.latest.date, locale) })}</p> : <NavCards latest={data.latest} strictCount={data.constituents.strict.length} extendedCount={data.constituents.extended.length} themeLabel={themeLabel} />}
       </section>
 
       <section className="research-section" aria-labelledby={`${theme}-performance-heading`}>
@@ -94,7 +97,7 @@ function ThemeDashboard({ theme, data }: { theme: IndexTheme; data: ThemeData })
 }
 
 export default function Home() {
-  const { copy } = useLocale();
+  const { copy, locale } = useLocale();
   const text = copy.home;
   const [state, setState] = useState<State>({ status: "loading" });
   useEffect(() => {
@@ -110,7 +113,7 @@ export default function Home() {
       <section className="home-hero">
         <div className="section-kicker">{text.researchQuestion}</div><h2>{text.heroTitle}</h2>
         <p>{text.heroText}</p>
-        <div className="hero-meta" aria-label={text.indexMetadata}><span>{formatCopy(text.asOf, { date: state.themes.animal.latest.date })}</span><span>{text.closingData}</span><span>{text.ruleBuilt}</span><span>{text.researchOnly}</span></div>
+        <div className="hero-meta" aria-label={text.indexMetadata}><span>{formatCopy(text.asOf, { date: formatDisplayDate(state.themes.animal.latest.date, locale) })}</span><span>{text.closingData}</span><span>{text.ruleBuilt}</span><span>{text.researchOnly}</span></div>
       </section>
       <div className="theme-dashboards"><ThemeDashboard theme="animal" data={state.themes.animal} /><ThemeDashboard theme="plant" data={state.themes.plant} /></div>
     </div>

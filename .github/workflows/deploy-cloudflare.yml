@@ -2,17 +2,31 @@ name: deploy-cloudflare
 
 on:
   workflow_dispatch:
+  workflow_run:
+    workflows: [zoo-index-daily]
+    types: [completed]
+    branches: [main]
   push:
     branches: [main]
 
 permissions:
   contents: read
 
+concurrency:
+  group: cloudflare-pages
+  cancel-in-progress: false
+
 jobs:
   deploy:
+    if: >-
+      github.event_name != 'workflow_run' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_repository.full_name == github.repository)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
 
       - name: Set up Node
         uses: actions/setup-node@v4

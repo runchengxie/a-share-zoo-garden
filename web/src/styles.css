@@ -895,3 +895,22 @@ tr:last-child td {
     height: 360px;
   }
 }
+
+/* Reader-facing dates and controls remain legible in both locales. */
+.site-meta strong, .section-asof, .metric-detail { font-size: 13px; }
+.snapshot-guide { margin: 8px 0; font-size: 14px; line-height: 1.7; color: var(--ink-soft); }
+.site-nav .locale-toggle { font: inherit; font-size: 13px; min-height: 44px; padding: 6px 12px; background: transparent; border: 1px solid var(--rule); color: var(--ink-soft); }
+@media (max-width: 640px) {
+  .site-header { padding-top: 14px; }
+  .site-header h1 { font-size: 26px; line-height: 1.2; }
+  .site-masthead { padding-bottom: 10px; }
+  .site-meta { margin-top: 10px; padding-top: 6px; }
+  .site-nav { flex-wrap: wrap; gap: 0 16px; overflow: visible; }
+  .site-nav a { font-size: 14px; }
+  .site-main { padding-top: 16px; }
+  .home-hero { padding: 0 0 18px; }
+  .home-hero h2 { font-size: 25px; line-height: 1.25; margin: 6px 0 10px; }
+  .home-hero > p { font-size: 15px; }
+  .hero-meta { margin-top: 12px; font-size: 11px; letter-spacing: normal; }
+  .theme-dashboard-heading h2 { font-size: 22px; }
+}

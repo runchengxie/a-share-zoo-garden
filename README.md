@@ -67,7 +67,7 @@ The default run uses the most recent complete trading day in the Shanghai timezo
 - `published/plant/`: independent plant-garden outputs.
 - `artifacts/audit/`: local name-audit reports; these do not modify rules or constituents.
 
-The project deploys to GitHub Pages and Cloudflare Pages. Daily production calculation and deployment are defined in the repository workflows. Do not commit tokens, proxy addresses, local paths, or private runtime logs.
+The project deploys to GitHub Pages and Cloudflare Pages. Daily production calculation and deployment are defined in the repository workflows. Cloudflare publication follows successful main-branch daily runs as well as main pushes, building both reviewed snapshot directories from main. This also covers daily data commits made with the workflow token, which do not trigger another push workflow. Do not commit tokens, proxy addresses, local paths, or private runtime logs.
 
 ## Verification
 

@@ -1,3 +1,4 @@
+import { formatDisplayDate } from "./chartDates";
 import { useEffect, useState } from "react";
 import { NavLink, Route, Routes } from "react-router-dom";
 import { fetchMetadata } from "./api";
@@ -48,7 +49,7 @@ function AppContent() {
           </div>
           <div className="site-meta" aria-label={copy.shell.dataUpdate}>
             <span>{copy.index}</span>
-            <strong>{updated || copy.waiting}</strong>
+            <strong>{updated ? formatDisplayDate(updated, locale) : copy.waiting}</strong>
           </div>
         </div>
         <nav className="site-nav" aria-label={copy.shell.primaryNavigation}>
