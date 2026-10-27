@@ -1,3 +1,4 @@
+import { formatDisplayDate } from "../chartDates";
 import { Changes, ChangeSet, Constituent } from "../api";
 import { formatCopy, useLocale } from "../i18n";
 
@@ -47,11 +48,11 @@ function NoiseSection({ title, items }: { title: string; items: Constituent[] })
 }
 
 export default function ChangesList({ changes, themeLabel }: { changes: Changes; themeLabel: string }) {
-  const { copy } = useLocale();
+  const { copy, locale } = useLocale();
   const text = copy.changesList;
   return (
     <div className="changes-list">
-      <p className="muted">{formatCopy(text.latest, { date: changes.date })}</p>
+      <p className="muted">{formatCopy(text.latest, { date: formatDisplayDate(changes.date, locale) })}</p>
       <ChangeSection title={formatCopy(text.strict, { theme: themeLabel })} set={changes.changes.strict} />
       <ChangeSection title={formatCopy(text.extended, { theme: themeLabel })} set={changes.changes.extended} />
       <NoiseSection title={text.noiseStrict} items={changes.suspected_noise.strict} />

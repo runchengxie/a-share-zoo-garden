@@ -97,7 +97,7 @@ npm run dev
 
 ## 部署
 
-项目同时部署到 GitHub Pages 和 Cloudflare Pages。`.github/workflows/daily.yml` 在每个交易日收盘后计算数据并部署 GitHub Pages。`.github/workflows/deploy-cloudflare.yml` 在 `main` 更新后使用仓库中的 `published/data` 构建并部署 Cloudflare Pages。GitHub Actions 需要配置 `TUSHARE_TOKEN`、`CLOUDFLARE_API_TOKEN` 与 `CLOUDFLARE_ACCOUNT_ID`。细节见 [docs/architecture.zh-CN.md](docs/architecture.zh-CN.md#部署)。
+项目同时部署到 GitHub Pages 和 Cloudflare Pages。`.github/workflows/daily.yml` 在每个交易日收盘后计算数据并部署 GitHub Pages。`.github/workflows/deploy-cloudflare.yml` 在 `main` 更新或每日发布成功后，使用主分支中的 `published/data` 和 `published/plant/data` 构建并部署 Cloudflare Pages。每日数据提交由自动化令牌完成，因此还需监听每日工作流完成事件，保证镜像跟随更新。GitHub Actions 需要配置 `TUSHARE_TOKEN`、`CLOUDFLARE_API_TOKEN` 与 `CLOUDFLARE_ACCOUNT_ID`。细节见 [docs/architecture.zh-CN.md](docs/architecture.zh-CN.md#部署)。
 
 ## 开发与测试
 

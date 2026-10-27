@@ -53,6 +53,12 @@ test("mobile dashboards fit supported locales and fallback while evidence tables
       await canvas.waitFor();
       assert.equal(await page.locator("html").getAttribute("lang"), expected);
       assert.equal(await page.locator(".site-nav a").first().textContent(), expected === "zh-CN" ? "首页" : "Home");
+      for (const control of await page.locator('.site-nav a, .site-nav button').all()) {
+        const rect = await control.boundingBox();
+        assert.ok(rect && rect.x >= 0 && rect.x + rect.width <= 390, 'navigation controls must be visible without horizontal scrolling');
+      }
+      assert.ok(!/2026\d{4}/.test(await page.locator('.site-meta').innerText()), 'the shell displays a formatted date');
+      await page.locator('.snapshot-guide').first().waitFor();
       const bounds = await canvas.boundingBox();
       assert.ok(bounds && bounds.width > 100 && bounds.width <= 390, `${query || "saved preference"}: chart must fit the viewport`);
       const layout = await page.evaluate(() => ({ width: document.documentElement.scrollWidth, viewport: innerWidth }));
