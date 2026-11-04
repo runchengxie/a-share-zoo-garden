@@ -64,3 +64,12 @@ python -m zoo_index.association_study \
 ```
 
 Offline outputs remain explicitly labeled user-supplied and unverified. The CLI rejects future dates and same-day runs before 16:30 Shanghai time. Its output directory must be absolute and outside Git repositories. Omit registration to inspect the waiting state without computing returns. Retain raw inputs and reports outside source control; only reviewed public summaries belong under `published/`.
+
+
+## First real-source check
+
+[Run 41777085658](https://github.com/runchengxie/a-share-zoo-garden/actions/runs/41777085658) succeeded on reviewed revision `7816790d775953106069dce3bb3a44adec3dcfa2`, whose source files are unchanged in merged main `84a3b02`. The latest complete session checked was 3 November 2026: all 11 eligible stocks had prices and adjustment factors, and ETF price/factor fields were complete. The actual calendar places the baseline at the 5 November close. All 11 confirmed entries are waiting for that baseline; the two unconfirmed entries remain excluded. No numerical returns were generated.
+
+The earlier attempt, [run 41776582826](https://github.com/runchengxie/a-share-zoo-garden/actions/runs/41776582826), failed at the stock adjustment-factor request. The new collector had omitted the repository's designated fallback wiring; this was corrected and tested without adding credentials. The successful run reported no fallback request, so these observations do not establish that permission or fallback activation caused the first failure or subsequent success. `fallback_requested_this_run` is process activity, not provenance for previously cached prices.
+
+The public evidence record retains both attempts and candidate-report hashes. Review checked exact frozen IDs and sample/protocol/registration/code hashes, coverage counts and absence of premature returns or sensitive content. This verifies source-interface availability and consistent report construction, not independent accuracy of every raw price, predictive value of the theme, or future pipeline execution. Raw calendar and price hashes cannot be independently reproduced from the public readiness report alone.

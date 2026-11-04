@@ -1,7 +1,107 @@
 {
   "schema_version": "association-study.v1",
+  "as_of": "2026-11-03",
+  "status": "registered_observation",
+  "evidence_tier": "single_provider_unreconciled",
+  "benchmark": "510300.SH",
+  "entries": [
+    {
+      "id": "sheep-2027-002086-sz",
+      "ts_code": "002086.SZ",
+      "status": "awaiting_baseline",
+      "windows": []
+    },
+    {
+      "id": "sheep-2027-600261-sh",
+      "ts_code": "600261.SH",
+      "status": "awaiting_baseline",
+      "windows": []
+    },
+    {
+      "id": "sheep-2027-300739-sz",
+      "ts_code": "300739.SZ",
+      "status": "awaiting_baseline",
+      "windows": []
+    },
+    {
+      "id": "sheep-2027-002949-sz",
+      "ts_code": "002949.SZ",
+      "status": "awaiting_baseline",
+      "windows": []
+    },
+    {
+      "id": "sheep-2027-000819-sz",
+      "ts_code": "000819.SZ",
+      "status": "awaiting_baseline",
+      "windows": []
+    },
+    {
+      "id": "sheep-2027-002696-sz",
+      "ts_code": "002696.SZ",
+      "status": "awaiting_baseline",
+      "windows": []
+    },
+    {
+      "id": "sheep-2027-000591-sz",
+      "ts_code": "000591.SZ",
+      "status": "awaiting_baseline",
+      "windows": []
+    },
+    {
+      "id": "sheep-2027-600558-sh",
+      "ts_code": "600558.SH",
+      "status": "awaiting_baseline",
+      "windows": []
+    },
+    {
+      "id": "sheep-2027-002300-sz",
+      "ts_code": "002300.SZ",
+      "status": "awaiting_baseline",
+      "windows": []
+    },
+    {
+      "id": "sheep-2027-002580-sz",
+      "ts_code": "002580.SZ",
+      "status": "awaiting_baseline",
+      "windows": []
+    },
+    {
+      "id": "sheep-2027-002088-sz",
+      "ts_code": "002088.SZ",
+      "status": "awaiting_baseline",
+      "windows": []
+    },
+    {
+      "id": "sheep-2027-002029-sz",
+      "ts_code": "002029.SZ",
+      "status": "not_confirmed_at_freeze",
+      "windows": []
+    },
+    {
+      "id": "sheep-2027-601566-sh",
+      "ts_code": "601566.SH",
+      "status": "not_confirmed_at_freeze",
+      "windows": []
+    }
+  ],
   "cohort_id": "cohort-20261104",
-  "status": "awaiting_provider_check",
-  "generated_at": "2026-11-04T04:52:29.936202+00:00",
-  "entries": []
+  "provider": "tushare_compatible",
+  "fallback_requested_this_run": false,
+  "generated_at": "2026-11-04T13:05:39.282268+08:00",
+  "scheduled_baseline": "2026-11-05",
+  "input_check": {
+    "date": "2026-11-03",
+    "expected_stocks": 11,
+    "complete_stocks": 11,
+    "benchmark_complete": true
+  },
+  "input_hashes": {
+    "sample": "bcd3d91bb4bae70d9840d9d2f2a0f85aec19eb7c74e22b5f4e2b04ecdbf52674",
+    "protocol": "ddeb83dbf62c59904ccd65e0d5c168be1fa6c5c1be3b4e844bbce9210f4ca66a",
+    "registration": "45a4f19b1d6d0f0ace280e6cdeb3e6f846767cc02a93a323a7f3a9002f74690c",
+    "calendar": "4c72a72aeee8e19e3cb2586d7c97659aa4272a00300b1b1a3ee120a6e30e91f8",
+    "prices": "688b5ef09f61ce700861cc557f87a5194c57c2180f114b6ab07cbc641f804a66"
+  },
+  "engine_sha256": "60530bb0e47829a2204073b652d8605808e9c80617474c0e0cb7c97017666c77",
+  "collector_sha256": "739d2d749fd361c469ac7ed7790dcfef74e6ad6f2f118316586650f1dc422352"
 }
