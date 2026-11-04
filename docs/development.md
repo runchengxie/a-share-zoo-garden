@@ -1,6 +1,6 @@
-# A-share Zoo and Plant Garden
+# Development guide
 
-[中文 README](development.zh-CN.md)
+[简体中文](development.zh-CN.md) · [Project overview](../README.md)
 
 An A-share thematic index research project. It selects stocks whose historical names contain configured animal or plant terms, builds strict and extended theme portfolios, updates the public outputs daily, and compares them with the CSI 300 benchmark.
 

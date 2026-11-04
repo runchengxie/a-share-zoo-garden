@@ -1,6 +1,6 @@
-# A 股动物园与植物园
+# 开发指南
 
-[English README](development.md)
+[English](development.md) · [项目介绍](../README.zh-CN.md)
 
 [GitHub Pages 在线预览](https://runchengxie.github.io/a-share-zoo-garden/) · [Cloudflare Pages 在线预览](https://a-share-zoo-garden.pages.dev/)
 

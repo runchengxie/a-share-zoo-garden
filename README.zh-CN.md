@@ -1,5 +1,7 @@
 # A 股动物园与植物园
 
+[English](README.md)
+
 把股票名字里的动物和植物找出来，看看按固定规则组成的组合，长期表现会怎样。
 
 [打开网站](https://a-share-zoo-garden.pages.dev/) · [备用网站](https://runchengxie.github.io/a-share-zoo-garden/)
@@ -20,5 +22,3 @@
 - [市场联想观察池](docs/market-associations.zh-CN.md)
 
 词表、历史版本和回测设置统一放在 [configs](configs/) 中。已发布数据放在 `published/`，动物园和植物园各自保存，不能混用。
-
-开发者也可阅读 [English development guide](docs/development.md)。
