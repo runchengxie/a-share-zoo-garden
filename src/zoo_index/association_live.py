@@ -127,7 +127,7 @@ def collect_observation(root: Path, source: ObservationSource, now: datetime) ->
             "cohort_id": COHORT,
             "evidence_tier": "single_provider_unreconciled",
             "provider": "tushare_compatible",
-            "fallback_used": bool(getattr(source, "_fallback_warned", False)),
+            "fallback_requested_this_run": bool(getattr(source, "_fallback_warned", False)),
             "generated_at": now.isoformat(),
             "scheduled_baseline": baseline,
             "input_check": {
