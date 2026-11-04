@@ -2,7 +2,7 @@ name: zoo-index-daily
 
 on:
   schedule:
-    - cron: "10 8 * * 1-5"
+    - cron: "45 8 * * 1-5"
   workflow_dispatch:
     inputs:
       publish_only:
@@ -93,6 +93,24 @@ jobs:
             chart_args+=(--chart)
           fi
           uv run python -m zoo_index --rules configs/plant_rules.yml --output-dir published/plant --backfill "$BACKFILL_DAYS" --backfill-mode "$BACKFILL_MODE" "${chart_args[@]}"
+
+      - name: Restore association provider cache
+        if: ${{ inputs.publish_only != true }}
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/association-study/cache
+          key: association-provider-v1-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: association-provider-v1-${{ runner.os }}-
+
+      - name: Update registered association observations
+        if: ${{ inputs.publish_only != true }}
+        continue-on-error: true
+        env:
+          TUSHARE_TOKEN: ${{ secrets.TUSHARE_TOKEN }}
+        run: >-
+          uv run python -m zoo_index.association_live
+          --runtime-dir "$RUNNER_TEMP/association-study"
+          --public-output published/data/association_study.json
 
       - name: Write published provenance
         run: python scripts/write_published_provenance.py

@@ -1,0 +1,443 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-11-04T10:13:31+08:00",
+  "published_at": null,
+  "performance_status": "not_started",
+  "sample_scope": "all_same_day_examples_in_selected_reporting_20261103",
+  "sources": [
+    {
+      "id": "hx-20261103",
+      "title": "“羊字辈”集体发力！002086走出10天6板，七匹狼两连板，“狼吃羊”成热梗",
+      "publisher": "华夏时报 / 东方财富",
+      "url": "https://finance.eastmoney.com/a/202611033919985856.html",
+      "published_at": "2026-11-03T12:07:00+08:00",
+      "accessed_at": "2026-11-04T10:13:31+08:00"
+    },
+    {
+      "id": "cnw-20261103",
+      "title": "“羊、洋、阳”，大爆发",
+      "publisher": "中国新闻周刊 / 新浪财经",
+      "url": "https://finance.sina.com.cn/cj/2026-11-03/doc-inixnits6621071.shtml",
+      "published_at": "2026-11-03T19:36:00+08:00",
+      "accessed_at": "2026-11-04T10:13:31+08:00"
+    }
+  ],
+  "entries": [
+    {
+      "id": "sheep-2027-002086-sz",
+      "ts_code": "002086.SZ",
+      "name_at_source": "东方海洋",
+      "theme": "animal",
+      "target_term": "羊",
+      "name_term": "洋",
+      "relation": "homophone",
+      "catalyst": "zodiac_2027",
+      "source_ids": [
+        "hx-20261103"
+      ],
+      "source_first_known_at": "2026-11-03T12:07:00+08:00",
+      "recorded_at": "2026-11-04T10:13:31+08:00",
+      "reviewed_at": "2026-11-04T10:13:31+08:00",
+      "review_due_at": "2026-12-04T10:13:31+08:00",
+      "status": "confirmed",
+      "evidence": "media_explicit",
+      "summary": {
+        "zh-CN": "报道在羊年谐音题材中列举该股，记录的是媒体归类，未验证价格驱动。",
+        "en-US": "Named in reporting about the sheep-year homophone theme; this records media classification, not a verified price driver."
+      },
+      "events": [
+        {
+          "at": "2026-11-04T10:13:31+08:00",
+          "status": "confirmed",
+          "reason": "source_review",
+          "reviewer": "project-maintainer-agent"
+        }
+      ],
+      "tracking_start": null
+    },
+    {
+      "id": "sheep-2027-600261-sh",
+      "ts_code": "600261.SH",
+      "name_at_source": "阳光照明",
+      "theme": "animal",
+      "target_term": "羊",
+      "name_term": "阳",
+      "relation": "homophone",
+      "catalyst": "zodiac_2027",
+      "source_ids": [
+        "hx-20261103"
+      ],
+      "source_first_known_at": "2026-11-03T12:07:00+08:00",
+      "recorded_at": "2026-11-04T10:13:31+08:00",
+      "reviewed_at": "2026-11-04T10:13:31+08:00",
+      "review_due_at": "2026-12-04T10:13:31+08:00",
+      "status": "confirmed",
+      "evidence": "media_explicit",
+      "summary": {
+        "zh-CN": "报道在羊年谐音题材中列举该股，记录的是媒体归类，未验证价格驱动。",
+        "en-US": "Named in reporting about the sheep-year homophone theme; this records media classification, not a verified price driver."
+      },
+      "events": [
+        {
+          "at": "2026-11-04T10:13:31+08:00",
+          "status": "confirmed",
+          "reason": "source_review",
+          "reviewer": "project-maintainer-agent"
+        }
+      ],
+      "tracking_start": null
+    },
+    {
+      "id": "sheep-2027-300739-sz",
+      "ts_code": "300739.SZ",
+      "name_at_source": "明阳电路",
+      "theme": "animal",
+      "target_term": "羊",
+      "name_term": "阳",
+      "relation": "homophone",
+      "catalyst": "zodiac_2027",
+      "source_ids": [
+        "hx-20261103"
+      ],
+      "source_first_known_at": "2026-11-03T12:07:00+08:00",
+      "recorded_at": "2026-11-04T10:13:31+08:00",
+      "reviewed_at": "2026-11-04T10:13:31+08:00",
+      "review_due_at": "2026-12-04T10:13:31+08:00",
+      "status": "confirmed",
+      "evidence": "media_explicit",
+      "summary": {
+        "zh-CN": "报道在羊年谐音题材中列举该股，记录的是媒体归类，未验证价格驱动。",
+        "en-US": "Named in reporting about the sheep-year homophone theme; this records media classification, not a verified price driver."
+      },
+      "events": [
+        {
+          "at": "2026-11-04T10:13:31+08:00",
+          "status": "confirmed",
+          "reason": "source_review",
+          "reviewer": "project-maintainer-agent"
+        }
+      ],
+      "tracking_start": null
+    },
+    {
+      "id": "sheep-2027-002949-sz",
+      "ts_code": "002949.SZ",
+      "name_at_source": "华阳国际",
+      "theme": "animal",
+      "target_term": "羊",
+      "name_term": "阳",
+      "relation": "homophone",
+      "catalyst": "zodiac_2027",
+      "source_ids": [
+        "hx-20261103"
+      ],
+      "source_first_known_at": "2026-11-03T12:07:00+08:00",
+      "recorded_at": "2026-11-04T10:13:31+08:00",
+      "reviewed_at": "2026-11-04T10:13:31+08:00",
+      "review_due_at": "2026-12-04T10:13:31+08:00",
+      "status": "confirmed",
+      "evidence": "media_explicit",
+      "summary": {
+        "zh-CN": "报道在羊年谐音题材中列举该股，记录的是媒体归类，未验证价格驱动。",
+        "en-US": "Named in reporting about the sheep-year homophone theme; this records media classification, not a verified price driver."
+      },
+      "events": [
+        {
+          "at": "2026-11-04T10:13:31+08:00",
+          "status": "confirmed",
+          "reason": "source_review",
+          "reviewer": "project-maintainer-agent"
+        }
+      ],
+      "tracking_start": null
+    },
+    {
+      "id": "sheep-2027-000819-sz",
+      "ts_code": "000819.SZ",
+      "name_at_source": "岳阳兴长",
+      "theme": "animal",
+      "target_term": "羊",
+      "name_term": "阳",
+      "relation": "homophone",
+      "catalyst": "zodiac_2027",
+      "source_ids": [
+        "hx-20261103"
+      ],
+      "source_first_known_at": "2026-11-03T12:07:00+08:00",
+      "recorded_at": "2026-11-04T10:13:31+08:00",
+      "reviewed_at": "2026-11-04T10:13:31+08:00",
+      "review_due_at": "2026-12-04T10:13:31+08:00",
+      "status": "confirmed",
+      "evidence": "media_explicit",
+      "summary": {
+        "zh-CN": "报道在羊年谐音题材中列举该股，记录的是媒体归类，未验证价格驱动。",
+        "en-US": "Named in reporting about the sheep-year homophone theme; this records media classification, not a verified price driver."
+      },
+      "events": [
+        {
+          "at": "2026-11-04T10:13:31+08:00",
+          "status": "confirmed",
+          "reason": "source_review",
+          "reviewer": "project-maintainer-agent"
+        }
+      ],
+      "tracking_start": null
+    },
+    {
+      "id": "sheep-2027-002696-sz",
+      "ts_code": "002696.SZ",
+      "name_at_source": "百洋股份",
+      "theme": "animal",
+      "target_term": "羊",
+      "name_term": "洋",
+      "relation": "homophone",
+      "catalyst": "zodiac_2027",
+      "source_ids": [
+        "hx-20261103"
+      ],
+      "source_first_known_at": "2026-11-03T12:07:00+08:00",
+      "recorded_at": "2026-11-04T10:13:31+08:00",
+      "reviewed_at": "2026-11-04T10:13:31+08:00",
+      "review_due_at": "2026-12-04T10:13:31+08:00",
+      "status": "confirmed",
+      "evidence": "media_explicit",
+      "summary": {
+        "zh-CN": "报道在羊年谐音题材中列举该股，记录的是媒体归类，未验证价格驱动。",
+        "en-US": "Named in reporting about the sheep-year homophone theme; this records media classification, not a verified price driver."
+      },
+      "events": [
+        {
+          "at": "2026-11-04T10:13:31+08:00",
+          "status": "confirmed",
+          "reason": "source_review",
+          "reviewer": "project-maintainer-agent"
+        }
+      ],
+      "tracking_start": null
+    },
+    {
+      "id": "sheep-2027-000591-sz",
+      "ts_code": "000591.SZ",
+      "name_at_source": "太阳能",
+      "theme": "animal",
+      "target_term": "羊",
+      "name_term": "阳",
+      "relation": "homophone",
+      "catalyst": "zodiac_2027",
+      "source_ids": [
+        "hx-20261103"
+      ],
+      "source_first_known_at": "2026-11-03T12:07:00+08:00",
+      "recorded_at": "2026-11-04T10:13:31+08:00",
+      "reviewed_at": "2026-11-04T10:13:31+08:00",
+      "review_due_at": "2026-12-04T10:13:31+08:00",
+      "status": "confirmed",
+      "evidence": "media_explicit",
+      "summary": {
+        "zh-CN": "报道在羊年谐音题材中列举该股，记录的是媒体归类，未验证价格驱动。",
+        "en-US": "Named in reporting about the sheep-year homophone theme; this records media classification, not a verified price driver."
+      },
+      "events": [
+        {
+          "at": "2026-11-04T10:13:31+08:00",
+          "status": "confirmed",
+          "reason": "source_review",
+          "reviewer": "project-maintainer-agent"
+        }
+      ],
+      "tracking_start": null
+    },
+    {
+      "id": "sheep-2027-600558-sh",
+      "ts_code": "600558.SH",
+      "name_at_source": "大西洋",
+      "theme": "animal",
+      "target_term": "羊",
+      "name_term": "洋",
+      "relation": "homophone",
+      "catalyst": "zodiac_2027",
+      "source_ids": [
+        "hx-20261103"
+      ],
+      "source_first_known_at": "2026-11-03T12:07:00+08:00",
+      "recorded_at": "2026-11-04T10:13:31+08:00",
+      "reviewed_at": "2026-11-04T10:13:31+08:00",
+      "review_due_at": "2026-12-04T10:13:31+08:00",
+      "status": "confirmed",
+      "evidence": "media_explicit",
+      "summary": {
+        "zh-CN": "报道在羊年谐音题材中列举该股，记录的是媒体归类，未验证价格驱动。",
+        "en-US": "Named in reporting about the sheep-year homophone theme; this records media classification, not a verified price driver."
+      },
+      "events": [
+        {
+          "at": "2026-11-04T10:13:31+08:00",
+          "status": "confirmed",
+          "reason": "source_review",
+          "reviewer": "project-maintainer-agent"
+        }
+      ],
+      "tracking_start": null
+    },
+    {
+      "id": "sheep-2027-002300-sz",
+      "ts_code": "002300.SZ",
+      "name_at_source": "太阳电缆",
+      "theme": "animal",
+      "target_term": "羊",
+      "name_term": "阳",
+      "relation": "homophone",
+      "catalyst": "zodiac_2027",
+      "source_ids": [
+        "hx-20261103"
+      ],
+      "source_first_known_at": "2026-11-03T12:07:00+08:00",
+      "recorded_at": "2026-11-04T10:13:31+08:00",
+      "reviewed_at": "2026-11-04T10:13:31+08:00",
+      "review_due_at": "2026-12-04T10:13:31+08:00",
+      "status": "confirmed",
+      "evidence": "media_explicit",
+      "summary": {
+        "zh-CN": "报道在羊年谐音题材中列举该股，记录的是媒体归类，未验证价格驱动。",
+        "en-US": "Named in reporting about the sheep-year homophone theme; this records media classification, not a verified price driver."
+      },
+      "events": [
+        {
+          "at": "2026-11-04T10:13:31+08:00",
+          "status": "confirmed",
+          "reason": "source_review",
+          "reviewer": "project-maintainer-agent"
+        }
+      ],
+      "tracking_start": null
+    },
+    {
+      "id": "sheep-2027-002580-sz",
+      "ts_code": "002580.SZ",
+      "name_at_source": "圣阳股份",
+      "theme": "animal",
+      "target_term": "羊",
+      "name_term": "阳",
+      "relation": "homophone",
+      "catalyst": "zodiac_2027",
+      "source_ids": [
+        "hx-20261103"
+      ],
+      "source_first_known_at": "2026-11-03T12:07:00+08:00",
+      "recorded_at": "2026-11-04T10:13:31+08:00",
+      "reviewed_at": "2026-11-04T10:13:31+08:00",
+      "review_due_at": "2026-12-04T10:13:31+08:00",
+      "status": "confirmed",
+      "evidence": "media_explicit",
+      "summary": {
+        "zh-CN": "报道在羊年谐音题材中列举该股，记录的是媒体归类，未验证价格驱动。",
+        "en-US": "Named in reporting about the sheep-year homophone theme; this records media classification, not a verified price driver."
+      },
+      "events": [
+        {
+          "at": "2026-11-04T10:13:31+08:00",
+          "status": "confirmed",
+          "reason": "source_review",
+          "reviewer": "project-maintainer-agent"
+        }
+      ],
+      "tracking_start": null
+    },
+    {
+      "id": "sheep-2027-002088-sz",
+      "ts_code": "002088.SZ",
+      "name_at_source": "鲁阳节能",
+      "theme": "animal",
+      "target_term": "羊",
+      "name_term": "阳",
+      "relation": "homophone",
+      "catalyst": "zodiac_2027",
+      "source_ids": [
+        "hx-20261103"
+      ],
+      "source_first_known_at": "2026-11-03T12:07:00+08:00",
+      "recorded_at": "2026-11-04T10:13:31+08:00",
+      "reviewed_at": "2026-11-04T10:13:31+08:00",
+      "review_due_at": "2026-12-04T10:13:31+08:00",
+      "status": "confirmed",
+      "evidence": "media_explicit",
+      "summary": {
+        "zh-CN": "报道在羊年谐音题材中列举该股，记录的是媒体归类，未验证价格驱动。",
+        "en-US": "Named in reporting about the sheep-year homophone theme; this records media classification, not a verified price driver."
+      },
+      "events": [
+        {
+          "at": "2026-11-04T10:13:31+08:00",
+          "status": "confirmed",
+          "reason": "source_review",
+          "reviewer": "project-maintainer-agent"
+        }
+      ],
+      "tracking_start": null
+    },
+    {
+      "id": "sheep-2027-002029-sz",
+      "ts_code": "002029.SZ",
+      "name_at_source": "七匹狼",
+      "theme": "animal",
+      "target_term": "羊",
+      "name_term": "狼",
+      "relation": "narrative",
+      "catalyst": "zodiac_2027",
+      "source_ids": [
+        "hx-20261103"
+      ],
+      "source_first_known_at": "2026-11-03T12:07:00+08:00",
+      "recorded_at": "2026-11-04T10:13:31+08:00",
+      "reviewed_at": "2026-11-04T10:13:31+08:00",
+      "review_due_at": "2026-12-04T10:13:31+08:00",
+      "status": "pending",
+      "evidence": "community_narrative",
+      "summary": {
+        "zh-CN": "报道转述网友的狼吃羊说法，属于叙事联想，仍待核实。",
+        "en-US": "Reporting relays a community story about wolves eating sheep; the association remains unverified."
+      },
+      "events": [
+        {
+          "at": "2026-11-04T10:13:31+08:00",
+          "status": "pending",
+          "reason": "source_review",
+          "reviewer": "project-maintainer-agent"
+        }
+      ],
+      "tracking_start": null
+    },
+    {
+      "id": "sheep-2027-601566-sh",
+      "ts_code": "601566.SH",
+      "name_at_source": "九牧王",
+      "theme": "animal",
+      "target_term": "羊",
+      "name_term": "牧",
+      "relation": "narrative",
+      "catalyst": "zodiac_2027",
+      "source_ids": [
+        "cnw-20261103"
+      ],
+      "source_first_known_at": "2026-11-03T19:36:00+08:00",
+      "recorded_at": "2026-11-04T10:13:31+08:00",
+      "reviewed_at": "2026-11-04T10:13:31+08:00",
+      "review_due_at": "2026-12-04T10:13:31+08:00",
+      "status": "pending",
+      "evidence": "community_narrative",
+      "summary": {
+        "zh-CN": "报道转述网友将其称为牧羊犬题材，属于叙事联想，仍待核实。",
+        "en-US": "Reporting relays a community interpretation of the name as a sheepdog theme; it remains unverified."
+      },
+      "events": [
+        {
+          "at": "2026-11-04T10:13:31+08:00",
+          "status": "pending",
+          "reason": "source_review",
+          "reviewer": "project-maintainer-agent"
+        }
+      ],
+      "tracking_start": null
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+import { AssociationPerformance, AssociationStudySummary } from "../components/AssociationPerformance";
 import { useState } from 'react';
 import { useLocale } from '../i18n';
 import { associationPublication, associations, associationSources, formatAssociationTime, type AssociationStatus, type AssociationTheme } from '../marketAssociations';
@@ -19,6 +20,7 @@ export default function Associations() {
         <p>{text.preparationText}</p>
         <p>{text.publication}: {time(associationPublication.sample_published_at)} · <a href={associationPublication.evidence_url} target="_blank" rel="noopener noreferrer">{text.publicationProof}</a></p>
       </aside>
+      <AssociationStudySummary />
       <p>{text.scope}</p>
       <p>{text.confirmedMeaning}</p>
       <div className="association-filters">
@@ -47,6 +49,7 @@ export default function Associations() {
             <dt>{text.reviewed}</dt><dd>{time(entry.reviewed_at)}</dd>
             <dt>{text.due}</dt><dd>{time(entry.review_due_at)}{entry.status !== 'expired' && Date.now() >= Date.parse(entry.review_due_at) ? ` · ${text.overdue}` : ''}</dd>
           </dl>
+          <AssociationPerformance id={entry.id} />
           <details className="association-source"><summary>{text.sources}</summary>
             <ul>{entry.source_ids.map(id => {
               const source = associationSources.get(id)!;
