@@ -2,6 +2,7 @@ import { formatDisplayDate } from "./chartDates";
 import { useEffect, useState } from "react";
 import { NavLink, Route, Routes } from "react-router-dom";
 import { fetchMetadata } from "./api";
+import Associations from "./pages/Associations";
 import About from "./pages/About";
 import Changes from "./pages/Changes";
 import Constituents from "./pages/Constituents";
@@ -58,6 +59,7 @@ function AppContent() {
           <NavLink to="/constituents">{copy.nav[2]}</NavLink>
           <NavLink to="/history">{copy.nav[3]}</NavLink>
           <NavLink to="/changes">{copy.nav[4]}</NavLink>
+          <NavLink to="/associations">{copy.associations.nav}</NavLink>
           <NavLink to="/about">{copy.nav[5]}</NavLink>
           <button className="locale-toggle" type="button" onClick={switchLocale} aria-label={copy.shell.switchToLanguage.replace("{language}", copy.switchTo)}>{copy.switchTo}</button>
           <ThemeToggle />
@@ -70,6 +72,7 @@ function AppContent() {
           <Route path="/constituents" element={<Constituents />} />
           <Route path="/history" element={<History />} />
           <Route path="/changes" element={<Changes />} />
+          <Route path="/associations" element={<Associations />} />
           <Route path="/about" element={<About />} />
         </Routes>
       </main>

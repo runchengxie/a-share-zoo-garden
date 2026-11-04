@@ -4,6 +4,21 @@ export type Locale = "en-US" | "zh-CN";
 
 const COPY = {
   "en-US": {
+    associations: {
+      nav: "Market associations", heading: "Market associations observation pool",
+      intro: "How reporting and communities connect stock names to animals and plants. These records do not change the name-based indices.",
+      boundary: "Forward observation has not started. No returns are shown. Publication and a tracking start must be recorded before any future performance series.",
+      scope: "Initial sample: all same-day examples in the selected 3 November 2026 reporting, collected after the event. This is neither a market-wide list nor evidence that the narrative caused a price move.",
+      confirmedMeaning: "Confirmed means a source explicitly makes the association. Community interpretations remain pending. Expired records are retained; review deadlines do not automatically prove a narrative has ended.",
+      theme: "Theme", status: "Review status", all: "All", animal: "Animal", plant: "Plant",
+      pending: "Pending verification", confirmed: "Source association confirmed", expired: "Expired",
+      empty: "No records for these filters. Plant cases will be added when evidence is available.",
+      homophone: "Homophone", character_split: "Character split", zodiac: "Zodiac", narrative: "Narrative association",
+      media_explicit: "Explicit media classification", community_narrative: "Community interpretation reported by media",
+      sourceTime: "Earliest checked source", recorded: "Project collection", reviewed: "Last review", due: "Review due", overdue: "Review overdue",
+      evidence: "Evidence", sources: "Sources · original titles", history: "Review history", source_review: "Source reviewed",
+      target: "Associated term", nameTerm: "Name term", catalyst: "2027 sheep-year expectation", noTracking: "Tracking not started",
+    },
     brandKicker: "A-share zoo & garden · rule-based research",
     title: "A-share Zoo & Garden",
     documentTitle: "A-share Zoo & Garden · Rule-based research",
@@ -104,6 +119,22 @@ const COPY = {
     chart: { strict: "Strict {theme}", extended: "Extended {theme}", ariaLabel: "{theme} index NAV chart" },
   },
   "zh-CN": {
+    associations: {
+      nav: "市场联想", heading: "市场联想观察池",
+      intro: "记录报道和社区如何把股票名称与动物、植物联系起来，独立于名称分类指数。",
+      boundary: "前瞻跟踪尚未启动，暂不展示收益。后续须先记录公开发布时间和跟踪起点，再生成表现序列。",
+      scope: "首批样本覆盖所选 2026 年 11 月 3 日报道当日行情段落提及的全部案例，属于事件发生后的收录。它不是全市场名单，也不证明联想造成股价变化。",
+      confirmedMeaning: "已确认仅指来源明确建立联系。网友解释保留为待核实，失效记录继续保存。到期需复核不等于联想已消失。",
+      theme: "主题", status: "审核状态", all: "全部", animal: "动物", plant: "植物",
+      pending: "待核实", confirmed: "来源关联已确认", expired: "已失效",
+      empty: "当前筛选下暂无记录。植物案例将在获得证据后收录。",
+      homophone: "谐音", character_split: "拆字", zodiac: "生肖", narrative: "叙事联想",
+      media_explicit: "媒体明确归类", community_narrative: "媒体转述网友联想",
+      sourceTime: "已核查来源最早时间", recorded: "项目收录时间", reviewed: "最近审核", due: "复核期限", overdue: "已到复核期限",
+      evidence: "证据", sources: "来源及原文标题", history: "审核记录", source_review: "来源核查",
+      target: "关联词", nameTerm: "名称用字", catalyst: "2027 羊年预期", noTracking: "尚未启动跟踪",
+    },
+
     brandKicker: "A 股动物园与植物园 · 规则化研究",
     title: "A 股动物园与植物园",
     documentTitle: "A 股动物园与植物园 · 规则化研究",

@@ -914,3 +914,16 @@ tr:last-child td {
   .hero-meta { margin-top: 12px; font-size: 11px; letter-spacing: normal; }
   .theme-dashboard-heading h2 { font-size: 22px; }
 }
+
+.association-boundary { border-left: 3px solid var(--ink-soft); padding: 12px 16px; background: var(--paper); }
+.association-filters { display: flex; flex-wrap: wrap; gap: 16px; margin-block: 24px; }
+.association-filters label { display: flex; flex-direction: column; gap: 6px; max-width: 100%; }
+.association-filters select { min-height: 44px; max-width: 100%; font: inherit; color: var(--ink); background: var(--paper); border: 1px solid var(--rule); padding: 8px; }
+.association-list { display: grid; gap: 24px; }
+.association-card { border-top: 1px solid var(--rule); padding-block: 16px; min-width: 0; overflow-wrap: anywhere; }
+.association-card h3 small { font-size: 14px; font-weight: normal; color: var(--ink-soft); }
+.association-card dl { display: grid; grid-template-columns: minmax(100px, 180px) minmax(0, 1fr); gap: 8px 16px; font-size: 14px; }
+.association-card dd { margin: 0; }
+.association-card details { margin-top: 12px; }
+.association-card summary { cursor: pointer; min-height: 44px; }
+@media (max-width: 640px) { .association-card dl { grid-template-columns: 1fr; gap: 4px; } .association-card dd { margin-bottom: 8px; } }
