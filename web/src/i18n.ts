@@ -4,13 +4,23 @@ export type Locale = "en-US" | "zh-CN";
 
 const COPY = {
   "en-US": {
+    associationStudy: {
+      heading: "Registered observations", protocolPublished: "Protocol publication", proof: "Deployment evidence",
+      updated: "Report generated", asOf: "Completed session", baseline: "Baseline close", inputCheck: "Available stocks",
+      registered_observation: "Registered cohort; see each observation window below.", unavailable: "Observation update unavailable. No previous result is presented as current.",
+      awaiting_provider_check: "Registration complete; provider verification is pending.", stale: "Report has not updated for over 48 hours",
+      awaiting_baseline: "Waiting for the first eligible trading close.", not_confirmed_at_freeze: "Not confirmed in this frozen cohort; excluded from performance.",
+      limits: "Single-provider price observations, not independently reconciled or executable returns. Missing inputs remain unavailable. Review status changes do not rewrite the frozen sample.",
+      available: "Available", missing_prices: "Missing data", not_matured: "Not yet matured", observed: "Observed",
+      benchmark: "CSI 300 ETF", windows: "Fixed observation windows", horizon: "Sessions", observationStatus: "Status", stock: "Stock return", excess: "Excess (pp)",
+    },
     associations: {
       preparation: "Next stage: fixed observation windows",
-      preparationText: "The offline study tool uses 1, 5 and 20 trading-day windows from the first trading close after both sample and protocol publication. The benchmark is adjusted CSI 300 ETF (510300.SH). Missing prices remain unavailable; no trading costs or execution are modelled. Protocol registration and verified market inputs are still required.",
+      preparationText: "The offline study tool uses 1, 5 and 20 trading-day windows from the first trading close after both sample and protocol publication. The benchmark is adjusted CSI 300 ETF (510300.SH). Missing prices remain unavailable; no trading costs or execution are modelled. The registered cohort updates after the daily data cutoff.",
       publication: "First-sample publication", publicationProof: "Deployment evidence",
       nav: "Market associations", heading: "Market associations observation pool",
       intro: "How reporting and communities connect stock names to animals and plants. These records do not change the name-based indices.",
-      boundary: "Forward observation has not started. No returns are shown. Publication and a tracking start must be recorded before any future performance series.",
+      boundary: "The protocol is registered. Returns appear only after the first eligible baseline close and each complete observation window.",
       scope: "Initial sample: all same-day examples in the selected 3 November 2026 reporting, collected after the event. This is neither a market-wide list nor evidence that the narrative caused a price move.",
       confirmedMeaning: "Confirmed means a source explicitly makes the association. Community interpretations remain pending. Expired records are retained; review deadlines do not automatically prove a narrative has ended.",
       theme: "Theme", status: "Review status", all: "All", animal: "Animal", plant: "Plant",
@@ -122,13 +132,24 @@ const COPY = {
     chart: { strict: "Strict {theme}", extended: "Extended {theme}", ariaLabel: "{theme} index NAV chart" },
   },
   "zh-CN": {
+    associationStudy: {
+      heading: "已注册观察", protocolPublished: "协议公开时间", proof: "部署凭证",
+      updated: "报告生成时间", asOf: "完整交易日", baseline: "基点收盘日", inputCheck: "行情完整股票数",
+      registered_observation: "固定名单已注册，各观察期限状态见下方。", unavailable: "本次观察更新不可用，不把旧结果作为当前结果展示。",
+      awaiting_provider_check: "注册已完成，正在等待数据源核验。", stale: "报告已超过 48 小时未更新",
+      awaiting_baseline: "等待符合条件的首个交易日收盘。", not_confirmed_at_freeze: "冻结时尚未确认，不参与本批表现观察。",
+      limits: "当前为单一数据源价格观察，未经独立对账，也不代表可执行收益。缺数据继续保留，后续审核状态变化不改写冻结样本。",
+      available: "可用", missing_prices: "缺数据", not_matured: "尚未到期", observed: "已观察",
+      benchmark: "沪深 300 ETF", windows: "固定期限观察", horizon: "交易日数", observationStatus: "状态", stock: "股票收益", excess: "超额（百分点）",
+    },
+
     associations: {
       preparation: "下一阶段：固定期限观察",
-      preparationText: "离线工具按名单和协议均公开后的首个交易日收盘设基点，观察此后 1、5、20 个交易日，与复权沪深 300 ETF（510300.SH）比较。缺价保留为无法核实，不模拟交易费用或成交。正式跟踪仍需协议注册和真实行情核验。",
+      preparationText: "离线工具按名单和协议均公开后的首个交易日收盘设基点，观察此后 1、5、20 个交易日，与复权沪深 300 ETF（510300.SH）比较。缺价保留为无法核实，不模拟交易费用或成交。固定名单已登记，在每日完整数据截止后更新。",
       publication: "首批名单公开时间", publicationProof: "部署凭证",
       nav: "市场联想", heading: "市场联想观察池",
       intro: "记录报道和社区如何把股票名称与动物、植物联系起来，独立于名称分类指数。",
-      boundary: "前瞻跟踪尚未启动，暂不展示收益。后续须先记录公开发布时间和跟踪起点，再生成表现序列。",
+      boundary: "观察协议已注册。只有在符合条件的基点收盘和各观察期限结束后，才展示相应收益。",
       scope: "首批样本覆盖所选 2026 年 11 月 3 日报道当日行情段落提及的全部案例，属于事件发生后的收录。它不是全市场名单，也不证明联想造成股价变化。",
       confirmedMeaning: "已确认仅指来源明确建立联系。网友解释保留为待核实，失效记录继续保存。到期需复核不等于联想已消失。",
       theme: "主题", status: "审核状态", all: "全部", animal: "动物", plant: "植物",

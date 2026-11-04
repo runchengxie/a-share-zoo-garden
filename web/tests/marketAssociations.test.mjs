@@ -19,7 +19,7 @@ test('observation pool supports locales, evidence, filters and mobile layout', a
     assert.equal(await page.locator('.association-card').count(), 13);
     assert.match(await page.locator('.association-preparation').innerText(), /1, 5 and 20/u);
     assert.equal(await page.locator('.association-preparation a').getAttribute('href'), 'https://github.com/runchengxie/a-share-zoo-garden/actions/runs/41759840493');
-    assert.match(await page.locator('.association-boundary').innerText(), /not started/u);
+    assert.match(await page.locator('.association-boundary').innerText(), /protocol is registered/u);
     assert.ok(await page.locator('.association-source a[href^="https://"]').count() >= 13);
     await page.locator('#association-status').selectOption('pending');
     assert.equal(await page.locator('.association-card').count(), 2);

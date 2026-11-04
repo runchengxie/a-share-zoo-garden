@@ -47,10 +47,21 @@ test('reviewed associations preserve source chronology, evidence and event histo
 
 test('first-sample receipt binds the exact published sample and a successful deployment record', async () => {
   const { createHash } = await import('node:crypto');
-  const sample = readFileSync(new URL('../../published/data/market_associations.json', import.meta.url));
+  const sample = readFileSync(new URL('../../published/association-study/cohort-20261104/sample.json', import.meta.url));
   const receipt = JSON.parse(readFileSync(new URL('../../published/data/association_publication.json', import.meta.url), 'utf8'));
   assert.equal(receipt.sample_sha256, createHash('sha256').update(sample).digest('hex'));
   assert.equal(receipt.sample_published_at, '2026-11-04T02:18:40Z');
   assert.match(receipt.evidence_url, /^https:\/\/github.com\/runchengxie\/a-share-zoo-garden\/actions\/runs\/\d+$/u);
   assert.equal(receipt.protocol_registration, null);
+});
+
+
+test('registered cohort hashes bind frozen inputs independently of the editable observation pool', async () => {
+  const { createHash } = await import('node:crypto');
+  const receipt = JSON.parse(readFileSync(new URL('../../published/data/association_registration.json', import.meta.url), 'utf8'));
+  for (const key of ['sample', 'protocol']) {
+    const bytes = readFileSync(new URL(`../../published/association-study/cohort-20261104/${key}.json`, import.meta.url));
+    assert.equal(receipt[`${key}_sha256`], createHash('sha256').update(bytes).digest('hex'));
+  }
+  assert.equal(receipt.protocol_published_at, '2026-11-04T02:48:15Z');
 });

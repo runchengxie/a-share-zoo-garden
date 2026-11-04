@@ -1,0 +1,12 @@
+{
+  "schema_version": "association-registration.v1",
+  "cohort_id": "cohort-20261104",
+  "sample_sha256": "bcd3d91bb4bae70d9840d9d2f2a0f85aec19eb7c74e22b5f4e2b04ecdbf52674",
+  "protocol_sha256": "ddeb83dbf62c59904ccd65e0d5c168be1fa6c5c1be3b4e844bbce9210f4ca66a",
+  "sample_published_at": "2026-11-04T02:18:40Z",
+  "protocol_published_at": "2026-11-04T02:48:15Z",
+  "sample_commit": "eb29c8ed640b3fe7b6198d53b1027ba52c65bf10",
+  "protocol_commit": "94e7d0bfba63eaffd9ff31c8abee21b68be5b203",
+  "sample_evidence_url": "https://github.com/runchengxie/a-share-zoo-garden/actions/runs/41759840493",
+  "evidence_url": "https://github.com/runchengxie/a-share-zoo-garden/actions/runs/41763006926"
+}

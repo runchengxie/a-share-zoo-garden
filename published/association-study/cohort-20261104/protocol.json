@@ -1,0 +1,9 @@
+{
+  "version": "association-study.v1",
+  "benchmark": "510300.SH",
+  "horizons": [
+    1,
+    5,
+    20
+  ]
+}

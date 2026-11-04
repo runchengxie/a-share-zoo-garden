@@ -927,3 +927,7 @@ tr:last-child td {
 .association-card details { margin-top: 12px; }
 .association-card summary { cursor: pointer; min-height: 44px; }
 @media (max-width: 640px) { .association-card dl { grid-template-columns: 1fr; gap: 4px; } .association-card dd { margin-bottom: 8px; } }
+
+.association-performance { overflow-x: auto; max-width: 100%; }
+.association-performance table { min-width: 540px; font-size: 14px; }
+.association-study-summary { margin-block: 24px; padding-block: 12px; border-block: 1px solid var(--rule); }
