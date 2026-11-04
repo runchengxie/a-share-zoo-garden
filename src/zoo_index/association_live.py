@@ -126,7 +126,8 @@ def collect_observation(root: Path, source: ObservationSource, now: datetime) ->
             "status": "registered_observation",
             "cohort_id": COHORT,
             "evidence_tier": "single_provider_unreconciled",
-            "provider": "tushare",
+            "provider": "tushare_compatible",
+            "fallback_used": bool(getattr(source, "_fallback_warned", False)),
             "generated_at": now.isoformat(),
             "scheduled_baseline": baseline,
             "input_check": {
@@ -186,7 +187,12 @@ def main(argv: list[str] | None = None) -> int:
         token = os.environ.get("TUSHARE_TOKEN", "").strip()
         if not token:
             raise ValueError("provider credential unavailable")
-        source = TushareClient(token, cache_dir=runtime / "cache")
+        source = TushareClient(
+            token,
+            cache_dir=runtime / "cache",
+            token2=os.environ.get("TUSHARE_TOKEN_2", "").strip() or None,
+            api_url2=os.environ.get("TUSHARE_API_URL", "").strip() or None,
+        )
         root = Path(__file__).resolve().parents[2]
         report = collect_observation(root, source, now)
         _write(output, report)
