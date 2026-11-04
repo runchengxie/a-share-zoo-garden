@@ -44,3 +44,13 @@ test('reviewed associations preserve source chronology, evidence and event histo
   assert.equal(data.entries.find(entry => entry.ts_code === '002086.SZ').relation, 'homophone');
   assert.ok(!JSON.stringify(data).match(/"(?:nav|return|price|weight)"/u));
 });
+
+test('first-sample receipt binds the exact published sample and a successful deployment record', async () => {
+  const { createHash } = await import('node:crypto');
+  const sample = readFileSync(new URL('../../published/data/market_associations.json', import.meta.url));
+  const receipt = JSON.parse(readFileSync(new URL('../../published/data/association_publication.json', import.meta.url), 'utf8'));
+  assert.equal(receipt.sample_sha256, createHash('sha256').update(sample).digest('hex'));
+  assert.equal(receipt.sample_published_at, '2026-11-04T02:18:40Z');
+  assert.match(receipt.evidence_url, /^https:\/\/github.com\/runchengxie\/a-share-zoo-garden\/actions\/runs\/\d+$/u);
+  assert.equal(receipt.protocol_registration, null);
+});

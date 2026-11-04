@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useLocale } from '../i18n';
-import { associations, associationSources, formatAssociationTime, type AssociationStatus, type AssociationTheme } from '../marketAssociations';
+import { associationPublication, associations, associationSources, formatAssociationTime, type AssociationStatus, type AssociationTheme } from '../marketAssociations';
 
 export default function Associations() {
   const { copy, locale } = useLocale();
@@ -14,6 +14,11 @@ export default function Associations() {
       <h2>{text.heading}</h2>
       <p>{text.intro}</p>
       <p className="association-boundary">{text.boundary}</p>
+      <aside className="association-preparation">
+        <h3>{text.preparation}</h3>
+        <p>{text.preparationText}</p>
+        <p>{text.publication}: {time(associationPublication.sample_published_at)} · <a href={associationPublication.evidence_url} target="_blank" rel="noopener noreferrer">{text.publicationProof}</a></p>
+      </aside>
       <p>{text.scope}</p>
       <p>{text.confirmedMeaning}</p>
       <div className="association-filters">

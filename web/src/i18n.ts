@@ -5,6 +5,9 @@ export type Locale = "en-US" | "zh-CN";
 const COPY = {
   "en-US": {
     associations: {
+      preparation: "Next stage: fixed observation windows",
+      preparationText: "The offline study tool uses 1, 5 and 20 trading-day windows from the first trading close after both sample and protocol publication. The benchmark is adjusted CSI 300 ETF (510300.SH). Missing prices remain unavailable; no trading costs or execution are modelled. Protocol registration and verified market inputs are still required.",
+      publication: "First-sample publication", publicationProof: "Deployment evidence",
       nav: "Market associations", heading: "Market associations observation pool",
       intro: "How reporting and communities connect stock names to animals and plants. These records do not change the name-based indices.",
       boundary: "Forward observation has not started. No returns are shown. Publication and a tracking start must be recorded before any future performance series.",
@@ -120,6 +123,9 @@ const COPY = {
   },
   "zh-CN": {
     associations: {
+      preparation: "下一阶段：固定期限观察",
+      preparationText: "离线工具按名单和协议均公开后的首个交易日收盘设基点，观察此后 1、5、20 个交易日，与复权沪深 300 ETF（510300.SH）比较。缺价保留为无法核实，不模拟交易费用或成交。正式跟踪仍需协议注册和真实行情核验。",
+      publication: "首批名单公开时间", publicationProof: "部署凭证",
       nav: "市场联想", heading: "市场联想观察池",
       intro: "记录报道和社区如何把股票名称与动物、植物联系起来，独立于名称分类指数。",
       boundary: "前瞻跟踪尚未启动，暂不展示收益。后续须先记录公开发布时间和跟踪起点，再生成表现序列。",
