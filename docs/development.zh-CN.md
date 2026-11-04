@@ -80,7 +80,8 @@ npm run dev
 | `uv run zoo-index --start-date 20210104 --backfill-mode all` | 从共同起点全量重算，首日收盘净值为 1 |
 | `uv run zoo-chart` | 仅重绘图表，不调用 Tushare |
 | `uv run zoo-audit --date YYYYMMDD` | 生成确定性收录审核候选 |
-| `make daily` / `make backfill` / `make chart` / `make test` | Makefile 快捷命令 |
+| `uv run zoo-index --backfill-years 5` | 按指定年数回填历史 |
+| `uv run zoo-index --output-dir /path/to/output --date YYYYMMDD` | 指定输出目录和交易日 |
 
 更多命令行参数（回填天数、缓存、基准切换、快照等）见 [docs/architecture.zh-CN.md](architecture.zh-CN.md#使用细节)。
 

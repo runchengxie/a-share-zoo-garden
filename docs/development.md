@@ -57,7 +57,8 @@ The default run uses the most recent complete trading day in the Shanghai timezo
 | `uv run zoo-index --start-date 20210104 --backfill-mode all` | Recalculate from the shared start date |
 | `uv run zoo-chart` | Redraw charts without calling Tushare |
 | `uv run zoo-audit --date YYYYMMDD` | Produce deterministic name-audit candidates |
-| `make daily` / `make backfill` / `make chart` / `make test` | Run the corresponding Make targets |
+| `uv run zoo-index --backfill-years 5` | Backfill a chosen number of years |
+| `uv run zoo-index --output-dir /path/to/output --date YYYYMMDD` | Choose the output directory and trading day |
 
 ## Documentation and outputs
 
