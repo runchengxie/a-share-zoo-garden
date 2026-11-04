@@ -133,3 +133,5 @@ npm run build
 ## Python 版本迁移
 
 Pillow 13 的安全修复要求 Python 3.11，因此停止支持 Python 3.10。先运行 `uv python install 3.11`，再运行 `uv sync --python 3.11 --frozen --extra formal` 重建环境。验证目标为 Python 3.11 和 3.13。正式诊断所需的可选 provider 仍要求 Python 3.12 或更高版本，原有版本固定保持不变。业务 API、数据格式和已有结果不变，不需要重新计算数据。
+
+独立的[市场联想观察池](docs/market-associations.zh-CN.md)记录谐音、生肖等有来源的市场叙事。网页提供双语入口，观察记录不改变指数成分。

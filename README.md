@@ -105,3 +105,5 @@ uv sync --python 3.11 --frozen --extra formal
 Formal diagnostics still require Python 3.12 or newer for the pinned optional providers.
 
 Use the same command with `--python 3.13` for Python 3.13. Existing data and results do not need regeneration.
+
+Market narratives are documented in the independent [observation pool policy](docs/market-associations.zh-CN.md). The website includes a bilingual market-associations page with reviewed sources; these records do not alter index membership.
