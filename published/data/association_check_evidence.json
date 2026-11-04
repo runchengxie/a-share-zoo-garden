@@ -1,0 +1,26 @@
+{
+  "schema_version": "association-check-evidence.v1",
+  "cohort_id": "cohort-20261104",
+  "attempts": [
+    {
+      "run_url": "https://github.com/runchengxie/a-share-zoo-garden/actions/runs/41776582826",
+      "conclusion": "failure",
+      "failure_stage": "get_adj_factor",
+      "report_sha256": "951916257ed6c02949f3261aa4a59fa37e6eeea57ecb3790c768e60e9d1bbffe"
+    },
+    {
+      "run_url": "https://github.com/runchengxie/a-share-zoo-garden/actions/runs/41777085658",
+      "conclusion": "success",
+      "head_sha": "7816790d775953106069dce3bb3a44adec3dcfa2",
+      "candidate_report_sha256": "ccc8d631eda0f65f13b191a44f19d2de015d9263e789ca8969f283a3cf812879",
+      "fallback_requested_this_run": false
+    }
+  ],
+  "checked_session": "2026-11-03",
+  "available_stocks": 11,
+  "expected_stocks": 11,
+  "benchmark_complete": true,
+  "scheduled_baseline": "2026-11-05",
+  "independently_reconciled": false,
+  "numeric_returns_published": false
+}
