@@ -1,6 +1,6 @@
 {
   "schema_version": "association-study.v1",
-  "as_of": "2026-11-03",
+  "as_of": "2026-11-04",
   "status": "registered_observation",
   "evidence_tier": "single_provider_unreconciled",
   "benchmark": "510300.SH",
@@ -87,10 +87,10 @@
   "cohort_id": "cohort-20261104",
   "provider": "tushare_compatible",
   "fallback_requested_this_run": false,
-  "generated_at": "2026-11-04T13:05:39.282268+08:00",
+  "generated_at": "2026-11-05T00:40:18.448466+08:00",
   "scheduled_baseline": "2026-11-05",
   "input_check": {
-    "date": "2026-11-03",
+    "date": "2026-11-04",
     "expected_stocks": 11,
     "complete_stocks": 11,
     "benchmark_complete": true
@@ -99,8 +99,8 @@
     "sample": "bcd3d91bb4bae70d9840d9d2f2a0f85aec19eb7c74e22b5f4e2b04ecdbf52674",
     "protocol": "ddeb83dbf62c59904ccd65e0d5c168be1fa6c5c1be3b4e844bbce9210f4ca66a",
     "registration": "45a4f19b1d6d0f0ace280e6cdeb3e6f846767cc02a93a323a7f3a9002f74690c",
-    "calendar": "4c72a72aeee8e19e3cb2586d7c97659aa4272a00300b1b1a3ee120a6e30e91f8",
-    "prices": "688b5ef09f61ce700861cc557f87a5194c57c2180f114b6ab07cbc641f804a66"
+    "calendar": "928fd53c3bc89b34a43c1f2da13e8de1290d94c776adb57a64722af9e2104a9c",
+    "prices": "e13a746d7b8df04c4c91b08183258efd036b51270b0d7f27218b18e87d917af4"
   },
   "engine_sha256": "60530bb0e47829a2204073b652d8605808e9c80617474c0e0cb7c97017666c77",
   "collector_sha256": "739d2d749fd361c469ac7ed7790dcfef74e6ad6f2f118316586650f1dc422352"
