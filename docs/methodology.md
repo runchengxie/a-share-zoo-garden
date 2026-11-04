@@ -6,7 +6,7 @@ Animal and plant indices classify historical security names using separate rule 
 
 ## Rules and historical availability
 
-`rules.yml` and `plant_rules.yml` define strict/extended keywords, `exclude_patterns`, and ts_code-only `force_include`/`force_exclude` lists. Extended matching includes strict keywords. Strict rules emphasize unambiguous real animal or plant names; extended rules can include ambiguous, collective, or mythical terms. Industry membership alone does not qualify a security whose name has no matching term.
+`configs/rules.yml` and `configs/plant_rules.yml` define strict/extended keywords, `exclude_patterns`, and ts_code-only `force_include`/`force_exclude` lists. Extended matching includes strict keywords. Strict rules emphasize unambiguous real animal or plant names; extended rules can include ambiguous, collective, or mythical terms. Industry membership alone does not qualify a security whose name has no matching term.
 
 Historical names use `namechange` as-of records. The provider paginates name history and supplements missing 2006 intervals. Unknown historical names cannot be replaced with the current `stock_basic.name`. `list_date`/`delist_date` filter the historical universe. ST, exchange, minimum listing age, and liquidity constraints further restrict eligibility.
 
@@ -40,7 +40,7 @@ A holding can trigger removal when delisted, in an announced/effective delisting
 
 ## Optional transaction-cost layer
 
-`backtest.yml` defaults to `enabled: false` with zero `commission_rate`, `stamp_tax_rate`, and `slippage_rate`. Enabling it retains gross index returns and adds turnover, cost, net-return, and net-NAV fields to NAV and public snapshots.
+`configs/backtest.yml` defaults to `enabled: false` with zero `commission_rate`, `stamp_tax_rate`, and `slippage_rate`. Enabling it retains gross index returns and adds turnover, cost, net-return, and net-NAV fields to NAV and public snapshots.
 
 The formal extra pins `quant-backtest-runtime` v4 and the `quant-platform` accounting provider. It requires Python 3.12+ and an external absolute `ZOO_BACKTEST_RUNTIME_ROOT` for job inputs, database, and outputs. Missing configuration rejects the run. Strict and extended rebalance settlement is submitted separately.
 

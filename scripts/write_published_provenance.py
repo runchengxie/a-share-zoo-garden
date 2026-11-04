@@ -24,7 +24,7 @@ def main() -> int:
         data / "constituents.json",
         data / "changes.json",
         data / "delisting_audit.json",
-        root / "rules.yml",
+        root / "configs" / "rules.yml",
     ]
     files: dict[str, str] = {}
     for path in paths:

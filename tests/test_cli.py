@@ -62,3 +62,18 @@ def test_daily_workflow_forwards_chart_option(tmp_path, enabled) -> None:
             check=True,
         )
         assert ("--chart" in capture.read_text().splitlines()) is enabled
+
+
+def test_default_configs_directory_loads_backtest(monkeypatch, tmp_path) -> None:
+    configs = tmp_path / "configs"
+    configs.mkdir()
+    (configs / "rules.yml").write_text("strict_keywords: []\n", encoding="utf-8")
+    (configs / "backtest.yml").write_text(
+        "enabled: true\ncommission_rate: 0.001\n", encoding="utf-8"
+    )
+    monkeypatch.setattr("sys.argv", ["zoo-index", "--token", "dummy"])
+    config = build_run_config(_parse_args(), tmp_path)
+    assert config is not None
+    assert config.rules_path == configs / "rules.yml"
+    assert config.backtest.enabled
+    assert config.backtest.commission_rate == 0.001

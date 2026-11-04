@@ -7,7 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_plant_rules_keep_core_and_expanded_words_separate() -> None:
-    rules = load_rules(ROOT / "plant_rules.yml")
+    rules = load_rules(ROOT / "configs" / "plant_rules.yml")
     matcher = Matcher(rules)
 
     assert matcher.classify("000001.SZ", "兰花科创").strict

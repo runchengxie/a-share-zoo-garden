@@ -25,7 +25,8 @@ def test_provenance_writer_links_metadata_before_hashing(tmp_path: Path) -> None
     )
     for name in ("latest", "history", "constituents", "changes"):
         (data / f"{name}.json").write_text("{}\n", encoding="utf-8")
-    (tmp_path / "rules.yml").write_text("keywords: []\n", encoding="utf-8")
+    (tmp_path / "configs").mkdir()
+    (tmp_path / "configs" / "rules.yml").write_text("keywords: []\n", encoding="utf-8")
     (data / "delisting_audit.json").write_text(
         json.dumps(
             {

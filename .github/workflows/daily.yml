@@ -92,7 +92,7 @@ jobs:
           if [ "$GENERATE_CHART" = "true" ]; then
             chart_args+=(--chart)
           fi
-          uv run python -m zoo_index --rules plant_rules.yml --output-dir published/plant --backfill "$BACKFILL_DAYS" --backfill-mode "$BACKFILL_MODE" "${chart_args[@]}"
+          uv run python -m zoo_index --rules configs/plant_rules.yml --output-dir published/plant --backfill "$BACKFILL_DAYS" --backfill-mode "$BACKFILL_MODE" "${chart_args[@]}"
 
       - name: Write published provenance
         run: python scripts/write_published_provenance.py

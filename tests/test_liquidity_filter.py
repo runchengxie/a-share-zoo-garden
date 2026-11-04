@@ -10,7 +10,7 @@ from zoo_index.runner import _get_constituents_for_rebalance
 
 
 def _rules_with(min_listing_days: int = 0, min_daily_amount: float = 0.0) -> Rules:
-    base = load_rules(Path(__file__).resolve().parent.parent / "rules.yml")
+    base = load_rules(Path(__file__).resolve().parent.parent / "configs" / "rules.yml")
     return Rules(
         strict_keywords=base.strict_keywords,
         extended_keywords=base.extended_keywords,

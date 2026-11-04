@@ -76,7 +76,7 @@ def test_load_rules_asof_new_fields_default(tmp_path: Path) -> None:
 
 
 def test_repository_rules_keep_new_terms_out_of_earlier_rebalances() -> None:
-    rules_path = Path(__file__).resolve().parent.parent / "rules.yml"
+    rules_path = Path(__file__).resolve().parent.parent / "configs" / "rules.yml"
     before = load_rules_asof("20260904", rules_path)
     after = load_rules_asof("20260907", rules_path)
     assert "螳螂" not in before.strict_keywords
@@ -86,7 +86,7 @@ def test_repository_rules_keep_new_terms_out_of_earlier_rebalances() -> None:
 
 
 def test_plant_rules_do_not_read_animal_history() -> None:
-    rules_path = Path(__file__).resolve().parent.parent / "plant_rules.yml"
+    rules_path = Path(__file__).resolve().parent.parent / "configs" / "plant_rules.yml"
     rules = load_rules_asof("20210906", rules_path)
     assert "兰花" in rules.strict_keywords
     assert "熊猫" not in rules.strict_keywords

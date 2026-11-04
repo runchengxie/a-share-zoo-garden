@@ -6,7 +6,7 @@
 
 ## 规则与历史可用性
 
-`rules.yml`、`plant_rules.yml` 定义严格词表、扩展词表、`exclude_patterns`，以及只接受 ts_code 的 `force_include`、`force_exclude`。扩展匹配包含严格关键词。严格层侧重明确的现实生物名称，扩展层可包含高歧义词、集合概念或神话生物。公司行业相关但名称没有匹配词，不构成主题成员。
+`configs/rules.yml`、`configs/plant_rules.yml` 定义严格词表、扩展词表、`exclude_patterns`，以及只接受 ts_code 的 `force_include`、`force_exclude`。扩展匹配包含严格关键词。严格层侧重明确的现实生物名称，扩展层可包含高歧义词、集合概念或神话生物。公司行业相关但名称没有匹配词，不构成主题成员。
 
 历史简称使用 `namechange` 的 as-of 记录，服务端按页获取并补充 2006 年缺失区间。未知历史简称不能用当前 `stock_basic.name` 回填。`list_date`、`delist_date` 筛选历史证券范围，ST、交易所、上市时长和流动性进一步限制资格。
 
@@ -40,7 +40,7 @@ CLI 默认 `--delisting-policy strict`。退市缺行情且没有已核实结算
 
 ## 可选交易成本层
 
-`backtest.yml` 默认 `enabled: false`，`commission_rate`、`stamp_tax_rate`、`slippage_rate` 都为 0。开启后保留毛收益，并在 NAV 和公开快照追加换手、成本、净收益及净值字段。
+`configs/backtest.yml` 默认 `enabled: false`，`commission_rate`、`stamp_tax_rate`、`slippage_rate` 都为 0。开启后保留毛收益，并在 NAV 和公开快照追加换手、成本、净收益及净值字段。
 
 `formal` extra 固定 `quant-backtest-runtime` v4 与 `quant-platform` 会计 provider，要求 Python 3.12 及以上，且必须配置仓库外的绝对 `ZOO_BACKTEST_RUNTIME_ROOT`，用于输入、作业数据库和输出。缺少配置时拒绝运行。严格版与扩展版分别提交再平衡结算。
 

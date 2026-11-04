@@ -22,4 +22,4 @@ uv run zoo-audit --date 20260904 --mode all --llm
 
 模型之间意见一致只能提高审核优先级，不能直接批准。`confidence` 只用于排序，不代表经过校准的概率。
 
-批准结果应写回 typed rule 或带股票代码、层级和原因的 override，并追加 `rules_history.yml` 生效日期。不要把 audit JSON 直接复制成正式规则。
+批准结果应写回 typed rule 或带股票代码、层级和原因的 override，并追加 `configs/rules_history.yml` 生效日期。不要把 audit JSON 直接复制成正式规则。

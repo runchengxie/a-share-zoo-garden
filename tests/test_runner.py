@@ -122,7 +122,7 @@ class FakeClient:
 
 
 def _rules() -> Rules:
-    return load_rules(Path(__file__).resolve().parent.parent / "rules.yml")
+    return load_rules(Path(__file__).resolve().parent.parent / "configs" / "rules.yml")
 
 
 def test_compute_day_reports_opt_in_trade_costs(tmp_path, monkeypatch) -> None:
@@ -279,7 +279,7 @@ def test_run_daily_writes_benchmark_named_outputs(tmp_path: Path) -> None:
     config = RunConfig(
         repo_root=tmp_path,
         output_dir=tmp_path,
-        rules_path=Path(__file__).resolve().parent.parent / "rules.yml",
+        rules_path=Path(__file__).resolve().parent.parent / "configs" / "rules.yml",
         token="dummy",
         benchmark=_benchmark(),
         date="20240103",
@@ -311,7 +311,7 @@ def test_run_daily_writes_benchmark_named_outputs(tmp_path: Path) -> None:
 
 def test_run_backfill_then_missing_is_idempotent(tmp_path: Path) -> None:
     client = _make_client()
-    rules_path = Path(__file__).resolve().parent.parent / "rules.yml"
+    rules_path = Path(__file__).resolve().parent.parent / "configs" / "rules.yml"
 
     def _config() -> RunConfig:
         return RunConfig(
@@ -336,7 +336,7 @@ def test_run_backfill_then_missing_is_idempotent(tmp_path: Path) -> None:
 
 def test_run_backfill_all_mode_recomputes(tmp_path: Path) -> None:
     client = _make_client()
-    rules_path = Path(__file__).resolve().parent.parent / "rules.yml"
+    rules_path = Path(__file__).resolve().parent.parent / "configs" / "rules.yml"
     config = RunConfig(
         repo_root=tmp_path,
         output_dir=tmp_path,
@@ -666,7 +666,7 @@ def test_new_st_status_changes_next_day_holdings_not_same_day_return(
 def test_backfill_carries_state_across_months(tmp_path: Path) -> None:
     # 回填跨月时，状态按日传递：二月首日收益用一月篮子（去前视）。
     client = TwoMonthClient()
-    rules_path = Path(__file__).resolve().parent.parent / "rules.yml"
+    rules_path = Path(__file__).resolve().parent.parent / "configs" / "rules.yml"
     config = RunConfig(
         repo_root=tmp_path,
         output_dir=tmp_path,
@@ -738,7 +738,7 @@ def test_png_option_preserves_structured_outputs(tmp_path, monkeypatch, backfill
         config = RunConfig(
             repo_root=tmp_path,
             output_dir=output,
-            rules_path=Path(__file__).resolve().parent.parent / "rules.yml",
+            rules_path=Path(__file__).resolve().parent.parent / "configs" / "rules.yml",
             token="dummy",
             benchmark=_benchmark(),
             date="20240108" if backfill else "20240103",

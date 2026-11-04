@@ -48,7 +48,7 @@ def _name_history(stock: pd.DataFrame) -> pd.DataFrame:
 
 def test_audit_keeps_theme_membership_separate_from_eligibility() -> None:
     stock = _stock_basic()
-    rules = load_rules(__import__("pathlib").Path("plant_rules.yml"))
+    rules = load_rules(__import__("pathlib").Path("configs/plant_rules.yml"))
 
     candidates = build_audit_candidates(stock, _name_history(stock), "20260904", rules)
     by_code = {item.ts_code: item for item in candidates}
@@ -62,7 +62,7 @@ def test_audit_keeps_theme_membership_separate_from_eligibility() -> None:
 
 def test_audit_modes_and_order_are_deterministic() -> None:
     stock = _stock_basic()
-    rules = load_rules(__import__("pathlib").Path("rules.yml"))
+    rules = load_rules(__import__("pathlib").Path("configs/rules.yml"))
 
     precision = build_audit_candidates(stock, _name_history(stock), "20260904", rules, "precision")
     recall = build_audit_candidates(stock, _name_history(stock), "20260904", rules, "recall")
@@ -73,7 +73,7 @@ def test_audit_modes_and_order_are_deterministic() -> None:
 
 def test_audit_report_has_stable_json_and_markdown_sections(tmp_path) -> None:
     stock = _stock_basic()
-    rules = load_rules(__import__("pathlib").Path("rules.yml"))
+    rules = load_rules(__import__("pathlib").Path("configs/rules.yml"))
     candidates = build_audit_candidates(stock, _name_history(stock), "20260904", rules)
     result = build_audit_result(stock, candidates, "20260904", rules, "all")
 

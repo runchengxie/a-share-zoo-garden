@@ -11,7 +11,7 @@ from zoo_index.runner import _anomalous_codes, _require_delisting_marks, compute
 
 
 def _rules() -> Rules:
-    return load_rules(Path(__file__).resolve().parent.parent / "rules.yml")
+    return load_rules(Path(__file__).resolve().parent.parent / "configs" / "rules.yml")
 
 
 def _benchmark(source: str = "index"):

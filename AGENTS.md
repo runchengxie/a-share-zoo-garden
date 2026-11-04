@@ -10,12 +10,12 @@
 
 * `src/zoo_index/cli.py`：命令行入口，仅负责解析参数并产出 `RunConfig`。
 * `src/zoo_index/runner.py`：编排逻辑，核心函数 `compute_day` 同时服务于每日与回填两条路径。
-* `src/zoo_index/config.py`：加载 `rules.yml`，产出 `Rules`。
+* `src/zoo_index/config.py`：加载 `configs/rules.yml`，产出 `Rules`。
 * `src/zoo_index/matcher.py`：按规则把股票分为严格 / 扩展 / 排除，处理强制名单。
 * `src/zoo_index/index.py`：构建成分、计算等权收益。
 * `src/zoo_index/outputs.py`：写出 nav.csv 与 5 个公开 JSON、图表、徽章。
 * `src/zoo_index/data_sources/tushare.py`：Tushare 客户端与缓存；`TushareLike` 是其结构化接口协议。
-* `rules.yml`：动物词表、排除项、强制名单（字段名保持英文，注释用中文）。
+* `configs/rules.yml`：动物词表、排除项、强制名单（字段名保持英文，注释用中文）。
 * `web/`：TypeScript 前端，只展示公开 JSON，不接触 Token，不在浏览器计算指数。
 * `docs/`：入库维护的方法、架构与研究证据说明。
 * `web/dist/`、`web/public/data/`、`.build/`：生成物，不入库。
@@ -93,7 +93,7 @@ PNG 渲染和相关测试需要 Noto Sans CJK 或 Source Han Sans CN，Debian/Ub
 ## 动物园与植物园数据管理
 
 * `published/` 是动物园默认产物的公开真相源，包含网页使用的 JSON、`nav.csv` 与增量回填所需的 manifests。
-* `published/plant/` 是植物园独立产物，使用 `plant_rules.yml`，不得覆盖或混写动物园的 `published/data/`。
+* `published/plant/` 是植物园独立产物，使用 `configs/plant_rules.yml`，不得覆盖或混写动物园的 `published/data/`。
 * 动物园与植物园共享 Tushare 原始缓存、上市状态筛选、历史时点名称、流动性过滤、复权收益和增量计算逻辑，规则文件和输出目录必须显式区分。
 * 本地优先：先在本机使用已有缓存完成增量更新，确认产物和测试后提交公开数据快照。
 * Actions 只承担 fallback：使用 `--backfill-mode missing` 补齐缺失交易日，不从头下载或重算完整历史；按日期不可变的行情缓存应通过 Actions cache 或工作流缓存复用。

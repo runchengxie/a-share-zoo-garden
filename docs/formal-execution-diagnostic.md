@@ -8,7 +8,7 @@
 uv sync --extra formal
 uv run --extra formal zoo-formal-diagnostic \
   --cache-dir /path/to/cache --calendar-nav /path/to/nav.csv \
-  --rules rules.yml --limit-asset /path/to/a_share_limit_status_latest \
+  --rules configs/rules.yml --limit-asset /path/to/a_share_limit_status_latest \
   --output-dir /path/to/empty-output \
   --start 20251222 --end 20260625
 ```

@@ -153,11 +153,11 @@ def _resolve_backfill_args(args: argparse.Namespace) -> tuple[bool, int, int] | 
 
 
 def build_run_config(args: argparse.Namespace, repo_root: Path) -> RunConfig | None:
-    rules_path = Path(args.rules).resolve() if args.rules else repo_root / "rules.yml"
+    rules_path = Path(args.rules).resolve() if args.rules else repo_root / "configs" / "rules.yml"
     token = args.token.strip() or os.getenv("TUSHARE_TOKEN", "").strip()
 
     if not rules_path.exists():
-        print("规则文件不存在，请检查 rules.yml 路径。")
+        print("规则文件不存在，请检查 configs/rules.yml 路径。")
         return None
 
     if not token:
@@ -189,7 +189,7 @@ def build_run_config(args: argparse.Namespace, repo_root: Path) -> RunConfig | N
         no_cache=args.no_cache,
         force_refresh=args.force_refresh,
         delisting_policy=args.delisting_policy,
-        backtest=load_backtest_config(repo_root / "backtest.yml"),
+        backtest=load_backtest_config(repo_root / "configs" / "backtest.yml"),
         chart=args.chart,
     )
 
@@ -229,7 +229,7 @@ def audit_main() -> int:
     args = _audit_args()
     repo_root = Path(__file__).resolve().parents[2]
     as_of = args.date.strip() or datetime.now(ZoneInfo("Asia/Shanghai")).strftime("%Y%m%d")
-    rules_path = Path(args.rules).resolve() if args.rules else repo_root / "rules.yml"
+    rules_path = Path(args.rules).resolve() if args.rules else repo_root / "configs" / "rules.yml"
     output_dir = (
         Path(args.output_dir).resolve() if args.output_dir else repo_root / "artifacts" / "audit"
     )
