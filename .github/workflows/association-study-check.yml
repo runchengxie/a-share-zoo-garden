@@ -17,6 +17,8 @@ jobs:
         continue-on-error: true
         env:
           TUSHARE_TOKEN: ${{ secrets.TUSHARE_TOKEN }}
+          TUSHARE_TOKEN_2: ${{ secrets.TUSHARE_TOKEN_2 }}
+          TUSHARE_API_URL: ${{ secrets.TUSHARE_API_URL }}
         run: >-
           uv run python -m zoo_index.association_live
           --runtime-dir "$RUNNER_TEMP/association-study"

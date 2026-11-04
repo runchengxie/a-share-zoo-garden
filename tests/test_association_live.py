@@ -138,3 +138,26 @@ def test_failed_provider_request_retains_only_safe_stage_code(tmp_path, monkeypa
     assert json.loads(data)["failure_stage"] == "get_fund_adj"
     assert "do-not-publish" not in data + capsys.readouterr().out
     assert "private-provider" not in data
+
+
+def test_cli_connects_existing_backup_only_as_secondary_source(tmp_path, monkeypatch):
+    import zoo_index.association_live as module
+
+    monkeypatch.setenv("TUSHARE_TOKEN", "synthetic-primary")
+    monkeypatch.setenv("TUSHARE_TOKEN_2", "synthetic-secondary")
+    monkeypatch.setenv("TUSHARE_API_URL", "https://backup.example.invalid")
+    seen = {}
+
+    def factory(token, **kwargs):
+        seen.update(token=token, **kwargs)
+        return Source()
+
+    monkeypatch.setattr(module, "TushareClient", factory)
+    path = tmp_path / "public.json"
+    assert (
+        module.main(["--runtime-dir", str(tmp_path / "runtime"), "--public-output", str(path)]) == 0
+    )
+    assert json.loads(path.read_text())["status"] == "registered_observation"
+    assert seen["token2"] == "synthetic-secondary"
+    assert seen["api_url2"] == "https://backup.example.invalid"
+    assert "api_url" not in seen
