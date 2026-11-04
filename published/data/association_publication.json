@@ -1,0 +1,10 @@
+{
+  "schema_version": "association-publication.v1",
+  "sample_sha256": "bcd3d91bb4bae70d9840d9d2f2a0f85aec19eb7c74e22b5f4e2b04ecdbf52674",
+  "sample_commit": "eb29c8ed640b3fe7b6198d53b1027ba52c65bf10",
+  "sample_published_at": "2026-11-04T02:18:40Z",
+  "evidence_url": "https://github.com/runchengxie/a-share-zoo-garden/actions/runs/41759840493",
+  "evidence_step": "Deploy to GitHub Pages",
+  "status": "sample_publication_verified",
+  "protocol_registration": null
+}

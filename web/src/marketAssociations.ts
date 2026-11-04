@@ -1,3 +1,4 @@
+import publication from "../../published/data/association_publication.json";
 import snapshot from '../../published/data/market_associations.json';
 import type { Locale } from './i18n';
 
@@ -36,3 +37,5 @@ export function formatAssociationTime(value: string, locale: Locale) {
     timeZone: 'Asia/Shanghai', timeZoneName: 'short',
   }).format(new Date(value));
 }
+
+export const associationPublication = publication;

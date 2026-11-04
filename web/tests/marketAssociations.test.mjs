@@ -17,6 +17,8 @@ test('observation pool supports locales, evidence, filters and mobile layout', a
     await page.locator('h2').waitFor();
     assert.match(await page.locator('h2').innerText(), /Market associations/u);
     assert.equal(await page.locator('.association-card').count(), 13);
+    assert.match(await page.locator('.association-preparation').innerText(), /1, 5 and 20/u);
+    assert.equal(await page.locator('.association-preparation a').getAttribute('href'), 'https://github.com/runchengxie/a-share-zoo-garden/actions/runs/41759840493');
     assert.match(await page.locator('.association-boundary').innerText(), /not started/u);
     assert.ok(await page.locator('.association-source a[href^="https://"]').count() >= 13);
     await page.locator('#association-status').selectOption('pending');
@@ -28,6 +30,7 @@ test('observation pool supports locales, evidence, filters and mobile layout', a
     assert.match(await page.locator('[role="status"]').innerText(), /No records/u);
     await page.locator('.locale-toggle').click();
     assert.match(await page.locator('h2').innerText(), /市场联想观察池/u);
+    assert.match(await page.locator('.association-preparation').innerText(), /1、5、20/u);
     assert.match(await page.locator('[role="status"]').innerText(), /暂无记录/u);
     await page.locator('#association-theme').selectOption('all');
     await page.locator('#association-status').selectOption('all');
